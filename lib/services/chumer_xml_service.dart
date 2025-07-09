@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart';
 import '../models/shadowrun_character.dart';
 
@@ -14,7 +15,7 @@ class ChumerXmlService {
       final xmlContent = await file.readAsString();
       return parseCharacterXml(xmlContent);
     } catch (e) {
-      print('Error parsing character file: $e');
+      debugPrint('Error parsing character file: $e');
       return null;
     }
   }
@@ -76,7 +77,7 @@ class ChumerXmlService {
       
       return ShadowrunCharacter.fromXml(characterData);
     } catch (e) {
-      print('Error parsing XML: $e');
+      debugPrint('Error parsing XML: $e');
       return null;
     }
   }

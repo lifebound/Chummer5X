@@ -16,7 +16,7 @@ class EnhancedChumerXmlService {
       final xmlContent = await file.readAsString();
       return parseCharacterXml(xmlContent);
     } catch (e) {
-      print('Error parsing character file: $e');
+      debugPrint('Error parsing character file: $e');
       return null;
     }
   }
@@ -109,7 +109,7 @@ class EnhancedChumerXmlService {
         depEnabled: depEnabled,
       );
     } catch (e) {
-      print('Error parsing XML: $e');
+      debugPrint('Error parsing XML: $e');
       return null;
     }
   }
@@ -198,6 +198,7 @@ class EnhancedChumerXmlService {
           final name = _getElementText(skillElement, 'name');
           final karma = _getElementText(skillElement, 'karma');
           final base = _getElementText(skillElement, 'base');
+          final category = _getElementText(skillElement, 'category');
           
           if (name != null) {
             // Find matching skill group using the skill group mapping
@@ -227,6 +228,7 @@ class EnhancedChumerXmlService {
               'name': name,
               'karma': karma,
               'base': base,
+              'category': category,
             };
             
             // Parse specializations

@@ -4,14 +4,41 @@ import '../utils/skill_attribute_map.dart';
 import '../utils/skill_group_map.dart';
 import '../utils/responsive_layout.dart';
 
-class SkillsCard extends StatelessWidget {
+enum SkillOrganization {
+  alphabetical('Alphabetical'),
+  byAttribute('By Attribute'),
+  byCategory('By Category'),
+  bySkillGroup('By Skill Group');
+
+  const SkillOrganization(this.displayName);
+  final String displayName;
+}
+
+enum SkillFilter {
+  showAll('Show All'),
+  showWithSkillRating('Has Skill Points'),
+  showWithTotalRating('Has Total Rating');
+
+  const SkillFilter(this.displayName);
+  final String displayName;
+}
+
+class SkillsCard extends StatefulWidget {
   final ShadowrunCharacter character;
 
   const SkillsCard({super.key, required this.character});
 
   @override
+  State<SkillsCard> createState() => _SkillsCardState();
+}
+
+class _SkillsCardState extends State<SkillsCard> {
+  SkillOrganization _organization = SkillOrganization.alphabetical;
+  SkillFilter _filter = SkillFilter.showAll;
+
+  @override
   Widget build(BuildContext context) {
-    final skills = character.skills;
+    final skills = widget.character.skills;
     
     if (skills.isEmpty) {
       return Card(
@@ -41,8 +68,9 @@ class SkillsCard extends StatelessWidget {
       );
     }
 
-    // Group skills by category
-    final skillGroups = _groupSkillsByCategory(skills);
+    // Apply filters and organization
+    final filteredSkills = _filterSkills(skills);
+    final skillGroups = _organizeSkills(filteredSkills);
     
     return Card(
       child: Padding(
@@ -50,12 +78,9 @@ class SkillsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Skills',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
+            _buildHeader(context),
+            const SizedBox(height: 16),
+            _buildFilterControls(context),
             const SizedBox(height: 16),
             ...skillGroups.entries.map((entry) => 
               _buildSkillGroup(context, entry.key, entry.value)),
@@ -65,13 +90,59 @@ class SkillsCard extends StatelessWidget {
     );
   }
 
-  Map<String, List<Skill>> _groupSkillsByCategory(List<Skill> skills) {
+  List<Skill> _filterSkills(List<Skill> skills) {
+    switch (_filter) {
+      case SkillFilter.showWithSkillRating:
+        return skills.where((skill) {
+          final baseRating = int.tryParse(skill.base ?? '0') ?? 0;
+          final karmaRating = int.tryParse(skill.karma ?? '0') ?? 0;
+          final skillRating = baseRating + karmaRating + skill.skillGroupTotal;
+          return skillRating > 0;
+        }).toList();
+      
+      case SkillFilter.showWithTotalRating:
+        return skills.where((skill) {
+          final totalRating = calculateTotalSkillRating(
+            skill.name, 
+            skill.skillGroupTotal, 
+            widget.character.attributes, 
+            isPrioritySkill: skill.isPrioritySkill,
+          );
+          return totalRating > 0;
+        }).toList();
+      
+      case SkillFilter.showAll:
+      default:
+        return skills;
+    }
+  }
+
+  Map<String, List<Skill>> _organizeSkills(List<Skill> skills) {
     final groups = <String, List<Skill>>{};
     
     for (final skill in skills) {
-      // For now, group by skill group name since skillCategory doesn't exist
-      final category = skill.skillGroupName.isNotEmpty ? skill.skillGroupName : 'Individual Skills';
-      groups.putIfAbsent(category, () => []).add(skill);
+      String key;
+      switch (_organization) {
+        case SkillOrganization.byAttribute:
+          final attributeName = getSkillAttribute(skill.name);
+          key = attributeName ?? 'Unknown Attribute';
+          break;
+        
+        case SkillOrganization.byCategory:
+          key = skill.category?.isNotEmpty == true ? skill.category! : 'Uncategorized';
+          break;
+        
+        case SkillOrganization.bySkillGroup:
+          key = skill.skillGroupName.isNotEmpty ? skill.skillGroupName : 'No Skill Group';
+          break;
+        
+        case SkillOrganization.alphabetical:
+        default:
+          key = 'A'; // All skills under alphabetical go here for now
+          break;
+      }
+      
+      groups.putIfAbsent(key, () => []).add(skill);
     }
     
     // Sort each group by skill name
@@ -80,6 +151,59 @@ class SkillsCard extends StatelessWidget {
     }
     
     return groups;
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Text(
+      'Skills',
+      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
+    );
+  }
+
+  Widget _buildFilterControls(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: DropdownButton<SkillOrganization>(
+            value: _organization,
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _organization = value;
+                });
+              }
+            },
+            items: SkillOrganization.values.map((org) {
+              return DropdownMenuItem<SkillOrganization>(
+                value: org,
+                child: Text(org.displayName),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: DropdownButton<SkillFilter>(
+            value: _filter,
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _filter = value;
+                });
+              }
+            },
+            items: SkillFilter.values.map((filter) {
+              return DropdownMenuItem<SkillFilter>(
+                value: filter,
+                child: Text(filter.displayName),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildSkillGroup(BuildContext context, String category, List<Skill> skills) {
@@ -165,7 +289,7 @@ class SkillsCard extends StatelessWidget {
     final totalRating = calculateTotalSkillRating(
       skillName, 
       skillRating, 
-      character.attributes, 
+      widget.character.attributes, 
       isPrioritySkill: skill.isPrioritySkill,
     );
     
@@ -301,7 +425,7 @@ class SkillsCard extends StatelessWidget {
     if (skillRating == 0 && skillAllowsDefaulting(skill.name)) {
       // Skill is using defaulting
       final parts = <String>[];
-      final attributeValue = character.attributes
+      final attributeValue = widget.character.attributes
           .where((attr) => attr.name.toUpperCase() == attributeName)
           .firstOrNull?.totalValue ?? 0;
       
@@ -320,12 +444,10 @@ class SkillsCard extends StatelessWidget {
     
     // Normal skill calculation (skill + attribute + priority)
     final parts = <String>[];
-    parts.add('$skillRating'); // Skill points
-    
-    // Add attribute bonus
-    final attributeValue = character.attributes
-        .where((attr) => attr.name.toUpperCase() == attributeName)
-        .firstOrNull?.totalValue ?? 0;
+    parts.add('$skillRating'); // Skill points      // Add attribute bonus
+      final attributeValue = widget.character.attributes
+          .where((attr) => attr.name.toUpperCase() == attributeName)
+          .firstOrNull?.totalValue ?? 0;
     if (attributeValue > 0) {
       parts.add('${attributeValue.round()}');
     }
@@ -379,7 +501,7 @@ class SkillsCard extends StatelessWidget {
     final specializedRating = calculateSpecializedSkillRating(
       skill.name,
       skillRating,
-      character.attributes,
+      widget.character.attributes,
       isPrioritySkill: skill.isPrioritySkill,
       hasSpecialization: true,
     );
@@ -432,7 +554,7 @@ class SkillsCard extends StatelessWidget {
     final specializedRating = calculateSpecializedSkillRating(
       skill.name,
       skillRating,
-      character.attributes,
+      widget.character.attributes,
       isPrioritySkill: skill.isPrioritySkill,
       hasSpecialization: true,
     );
@@ -476,7 +598,7 @@ class SkillsCard extends StatelessWidget {
     
     return SkillGroupMap.isGroupBroken(
       skill.skillGroupName,
-      character.skills,
+      widget.character.skills,
       skill.skillGroupTotal,
     );
   }

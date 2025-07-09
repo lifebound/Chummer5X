@@ -94,6 +94,7 @@ class Skill {
   final String name;
   final String? karma;
   final String? base;
+  final String? category; // Added category field
   final String skillGroupName;
   final int skillGroupTotal;
   final int? adeptMod;
@@ -105,6 +106,7 @@ class Skill {
     this.karma,
     this.base,
     required this.skillGroupName,
+    this.category,
     required this.skillGroupTotal,
     this.adeptMod,
     this.isPrioritySkill = false,
@@ -129,6 +131,7 @@ class Skill {
       name: json['name'] ?? '',
       karma: json['karma'],
       base: json['base'],
+      category: json['category'],
       skillGroupName: skillGroupName,
       skillGroupTotal: skillGroupTotal,
       isPrioritySkill: isPrioritySkill,
@@ -141,6 +144,7 @@ class Skill {
       name: name,
       karma: karma,
       base: base,
+      category: category,
       skillGroupName: skillGroupName,
       skillGroupTotal: skillGroupTotal,
       adeptMod: adeptMod ?? this.adeptMod,

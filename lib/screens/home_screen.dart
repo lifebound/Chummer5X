@@ -1,7 +1,6 @@
 import 'package:chummer5x/services/enhanced_chumer_xml_service.dart';
 import 'package:flutter/material.dart';
 import '../models/shadowrun_character.dart';
-import '../services/chumer_xml_service.dart';
 import '../services/file_service.dart';
 import 'character_detail_screen.dart';
 

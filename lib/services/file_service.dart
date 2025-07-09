@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileService {
@@ -17,7 +18,8 @@ class FileService {
       }
       return null;
     } catch (e) {
-      print('Error picking file: $e');
+      debugPrint('Error picking file: $e');
+
       return null;
     }
   }
@@ -42,7 +44,7 @@ class FileService {
       await file.writeAsString(xmlContent);
       return true;
     } catch (e) {
-      print('Error saving file: $e');
+      debugPrint('Error saving file: $e');
       return false;
     }
   }
@@ -58,7 +60,7 @@ class FileService {
       }
       return null;
     } catch (e) {
-      print('Error reading cached file: $e');
+      debugPrint('Error reading cached file: $e');
       return null;
     }
   }
@@ -76,7 +78,7 @@ class FileService {
           .map((file) => file.path.split('/').last)
           .toList();
     } catch (e) {
-      print('Error listing cached files: $e');
+      debugPrint('Error listing cached files: $e');
       return [];
     }
   }
@@ -93,7 +95,7 @@ class FileService {
       }
       return false;
     } catch (e) {
-      print('Error deleting cached file: $e');
+      debugPrint('Error deleting cached file: $e');
       return false;
     }
   }

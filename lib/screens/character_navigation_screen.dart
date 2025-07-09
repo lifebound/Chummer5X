@@ -325,20 +325,20 @@ class _CharacterNavigationScreenState extends State<CharacterNavigationScreen> {
 
   Widget _buildContactsView(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+      child: const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Contacts',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text('No contacts implemented yet'),
+            SizedBox(height: 16),
+            Text('No contacts implemented yet'),
           ],
         ),
       ),

@@ -797,7 +797,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 6,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -817,6 +817,38 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Add increment/decrement controls
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: filled > 0 ? () => _adjustConditionMonitor(label, -1) : null,
+                  icon: const Icon(Icons.remove_circle_outline),
+                  iconSize: 20,
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  style: IconButton.styleFrom(
+                    foregroundColor: filled > 0 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: filled < total ? () => _adjustConditionMonitor(label, 1) : null,
+                  icon: const Icon(Icons.add_circle_outline),
+                  iconSize: 20,
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  style: IconButton.styleFrom(
+                    foregroundColor: filled < total 
+                        ? Theme.of(context).colorScheme.primary 
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  ),
+                ),
               ],
             ),
           ] else ...[
@@ -914,5 +946,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       ],
     );
+  }
+
+  void _adjustConditionMonitor(String monitorType, int delta) {
+    if (_currentCharacter == null) return;
+    
+    final isPhysical = monitorType == 'Physical';
+    final increment = delta > 0;
+    
+    final updatedCharacter = _currentCharacter!.adjustConditionMonitor(
+      isPhysical: isPhysical,
+      increment: increment,
+    );
+    
+    setState(() {
+      // Update the character in our list
+      final characterIndex = _characters.indexOf(_currentCharacter!);
+      if (characterIndex != -1) {
+        _characters[characterIndex] = updatedCharacter;
+        _currentCharacter = updatedCharacter;
+      }
+    });
+    
+    debugPrint("Adjusted $monitorType condition monitor by $delta");
   }
 }

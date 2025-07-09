@@ -632,4 +632,128 @@ class ShadowrunCharacter {
   int get memory => logic + willpower;
   int get liftCarry => body + strength;
   int get movement => agility * 2 + 10;
+
+  // Condition Monitor Penalty calculation
+  // For every 3 points of damage on either track (not including overflow), apply -1 penalty
+  int get conditionMonitorPenalty {
+    final physicalPenalty = (conditionMonitor.physicalCMFilled.clamp(0, conditionMonitor.physicalCMTotal) / 3).floor();
+    final stunPenalty = (conditionMonitor.stunCMFilled.clamp(0, conditionMonitor.stunCMTotal) / 3).floor();
+    return -(physicalPenalty + stunPenalty);
+  }
+  
+  // copyWith method for creating modified copies of the character
+  ShadowrunCharacter copyWith({
+    String? name,
+    String? alias,
+    String? metatype,
+    String? ethnicity,
+    String? age,
+    String? sex,
+    String? height,
+    String? weight,
+    String? streetCred,
+    String? notoriety,
+    String? publicAwareness,
+    String? karma,
+    String? totalKarma,
+    List<Attribute>? attributes,
+    List<Skill>? skills,
+    Map<String, LimitDetail>? limits,
+    List<Spell>? spells,
+    List<Spirit>? spirits,
+    List<ComplexForm>? complexForms,
+    List<AdeptPower>? adeptPowers,
+    List<Gear>? gear,
+    ConditionMonitor? conditionMonitor,
+    int? nuyen,
+    bool? magEnabled,
+    bool? resEnabled,
+    bool? depEnabled,
+  }) {
+    return ShadowrunCharacter(
+      name: name ?? this.name,
+      alias: alias ?? this.alias,
+      metatype: metatype ?? this.metatype,
+      ethnicity: ethnicity ?? this.ethnicity,
+      age: age ?? this.age,
+      sex: sex ?? this.sex,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      streetCred: streetCred ?? this.streetCred,
+      notoriety: notoriety ?? this.notoriety,
+      publicAwareness: publicAwareness ?? this.publicAwareness,
+      karma: karma ?? this.karma,
+      totalKarma: totalKarma ?? this.totalKarma,
+      attributes: attributes ?? this.attributes,
+      skills: skills ?? this.skills,
+      limits: limits ?? this.limits,
+      spells: spells ?? this.spells,
+      spirits: spirits ?? this.spirits,
+      complexForms: complexForms ?? this.complexForms,
+      adeptPowers: adeptPowers ?? this.adeptPowers,
+      gear: gear ?? this.gear,
+      conditionMonitor: conditionMonitor ?? this.conditionMonitor,
+      nuyen: nuyen ?? this.nuyen,
+      magEnabled: magEnabled ?? this.magEnabled,
+      resEnabled: resEnabled ?? this.resEnabled,
+      depEnabled: depEnabled ?? this.depEnabled,
+    );
+  }
+
+  // Method to adjust condition monitor filled values
+  ShadowrunCharacter adjustConditionMonitor({
+    required bool isPhysical,
+    required bool increment,
+  }) {
+    final currentConditionMonitor = conditionMonitor;
+    
+    if (isPhysical) {
+      int newPhysicalFilled = currentConditionMonitor.physicalCMFilled;
+      final maxPhysicalDamage = currentConditionMonitor.physicalCMTotal + currentConditionMonitor.physicalCMOverflow;
+      
+      if (increment) {
+        // Increment but don't exceed total + overflow (death threshold)
+        newPhysicalFilled = (newPhysicalFilled + 1).clamp(0, maxPhysicalDamage);
+      } else {
+        // Decrement but don't go below zero
+        newPhysicalFilled = (newPhysicalFilled - 1).clamp(0, maxPhysicalDamage);
+      }
+      
+      // Return new character with updated physical condition monitor
+      return copyWith(
+        conditionMonitor: ConditionMonitor(
+          physicalCM: currentConditionMonitor.physicalCM,
+          physicalCMFilled: newPhysicalFilled,
+          physicalCMOverflow: currentConditionMonitor.physicalCMOverflow,
+          physicalCMThresholdOffset: currentConditionMonitor.physicalCMThresholdOffset,
+          stunCM: currentConditionMonitor.stunCM,
+          stunCMFilled: currentConditionMonitor.stunCMFilled,
+          stunCMThresholdOffset: currentConditionMonitor.stunCMThresholdOffset,
+        ),
+      );
+    } else {
+      int newStunFilled = currentConditionMonitor.stunCMFilled;
+      
+      if (increment) {
+        // Increment but don't exceed total
+        newStunFilled = (newStunFilled + 1).clamp(0, currentConditionMonitor.stunCMTotal);
+      } else {
+        // Decrement but don't go below zero
+        newStunFilled = (newStunFilled - 1).clamp(0, currentConditionMonitor.stunCMTotal);
+      }
+      
+      // Return new character with updated stun condition monitor
+      return copyWith(
+        conditionMonitor: ConditionMonitor(
+          physicalCM: currentConditionMonitor.physicalCM,
+          physicalCMFilled: currentConditionMonitor.physicalCMFilled,
+          physicalCMOverflow: currentConditionMonitor.physicalCMOverflow,
+          physicalCMThresholdOffset: currentConditionMonitor.physicalCMThresholdOffset,
+          stunCM: currentConditionMonitor.stunCM,
+          stunCMFilled: newStunFilled,
+          stunCMThresholdOffset: currentConditionMonitor.stunCMThresholdOffset,
+        ),
+      );
+    }
+  }
 }

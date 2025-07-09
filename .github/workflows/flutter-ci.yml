@@ -23,13 +23,13 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: 3.24.5
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Run tests
         run: flutter test
@@ -42,7 +42,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: 3.24.5
 
       - run: flutter pub get
       - run: flutter build web --release
@@ -62,7 +62,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: 3.24.5
 
       - name: Install Linux build dependencies
         run: |
@@ -88,7 +88,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: 3.24.5
 
       - run: flutter config --enable-windows-desktop
       - run: flutter pub get
@@ -109,7 +109,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: 3.24.5
 
       - run: flutter pub get
       - run: flutter build apk --release

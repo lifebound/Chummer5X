@@ -70,6 +70,26 @@ class SkillGroup {
   }
 }
 
+class SkillSpecialization {
+  final String name;
+  final bool free;
+  final bool expertise;
+
+  const SkillSpecialization({
+    required this.name,
+    this.free = false,
+    this.expertise = false,
+  });
+
+  factory SkillSpecialization.fromJson(Map<String, dynamic> json) {
+    return SkillSpecialization(
+      name: json['name'] ?? '',
+      free: json['free'] == 'True',
+      expertise: json['expertise'] == 'True',
+    );
+  }
+}
+
 class Skill {
   final String name;
   final String? karma;
@@ -77,6 +97,8 @@ class Skill {
   final String skillGroupName;
   final int skillGroupTotal;
   final int? adeptMod;
+  final bool isPrioritySkill;
+  final List<SkillSpecialization> specializations;
 
   const Skill({
     required this.name,
@@ -85,19 +107,36 @@ class Skill {
     required this.skillGroupName,
     required this.skillGroupTotal,
     this.adeptMod,
+    this.isPrioritySkill = false,
+    this.specializations = const [],
   });
 
-  factory Skill.fromJson(Map<String, dynamic> json, String skillGroupName, int skillGroupTotal) {
+  factory Skill.fromJson(Map<String, dynamic> json, String skillGroupName, int skillGroupTotal, {bool isPrioritySkill = false}) {
+    final specs = <SkillSpecialization>[];
+    if (json['specs'] != null) {
+      final specsData = json['specs'];
+      if (specsData is Map && specsData['spec'] != null) {
+        final specData = specsData['spec'];
+        if (specData is List) {
+          specs.addAll(specData.map((s) => SkillSpecialization.fromJson(Map<String, dynamic>.from(s))));
+        } else if (specData is Map) {
+          specs.add(SkillSpecialization.fromJson(Map<String, dynamic>.from(specData)));
+        }
+      }
+    }
+
     return Skill(
       name: json['name'] ?? '',
       karma: json['karma'],
       base: json['base'],
       skillGroupName: skillGroupName,
       skillGroupTotal: skillGroupTotal,
+      isPrioritySkill: isPrioritySkill,
+      specializations: specs,
     );
   }
 
-  Skill copyWith({int? adeptMod}) {
+  Skill copyWith({int? adeptMod, bool? isPrioritySkill}) {
     return Skill(
       name: name,
       karma: karma,
@@ -105,6 +144,8 @@ class Skill {
       skillGroupName: skillGroupName,
       skillGroupTotal: skillGroupTotal,
       adeptMod: adeptMod ?? this.adeptMod,
+      isPrioritySkill: isPrioritySkill ?? this.isPrioritySkill,
+      specializations: specializations,
     );
   }
 }

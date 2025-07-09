@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
 import '../models/shadowrun_character.dart';
+import '../utils/skill_group_map.dart';
 
 class EnhancedChumerXmlService {
   /// Parse a Chummer XML file and return a comprehensive ShadowrunCharacter
@@ -50,8 +51,14 @@ class EnhancedChumerXmlService {
       // Parse skill groups
       final skillGroups = _parseSkillGroups(characterElement);
       
+      // Parse priority skills (root level)
+      final prioritySkills = _parsePrioritySkills(characterElement);
+      
       // Parse skills
-      final skills = _parseSkills(characterElement, skillGroups);
+      final skills = _parseSkills(characterElement, skillGroups, prioritySkills);
+      
+      // Check for broken skill groups and log them
+      _checkBrokenSkillGroups(skillGroups, skills);
       
       // Calculate and parse limits
       final limits = _calculateLimits(attributes, characterElement);
@@ -170,6 +177,7 @@ class EnhancedChumerXmlService {
               base: base,
               karma: karma,
             ));
+            debugPrint('Parsed skill group: $name, Base: $base, Karma: $karma');
           }
         }
       }
@@ -178,8 +186,9 @@ class EnhancedChumerXmlService {
     return skillGroups;
   }
   
-  static List<Skill> _parseSkills(XmlElement characterElement, List<SkillGroup> skillGroups) {
+  static List<Skill> _parseSkills(XmlElement characterElement, List<SkillGroup> skillGroups, Set<String> prioritySkills) {
     final skills = <Skill>[];
+    
     final skillsElement = characterElement.findElements('newskills').firstOrNull;
     
     if (skillsElement != null) {
@@ -191,16 +200,68 @@ class EnhancedChumerXmlService {
           final base = _getElementText(skillElement, 'base');
           
           if (name != null) {
-            // Find matching skill group
-            final skillGroupName = ''; // Would need skill group mapping
-            final skillGroupTotal = 0;
+            // Find matching skill group using the skill group mapping
+            final skillGroupName = SkillGroupMap.getSkillGroup(name);
             
-            skills.add(Skill(
-              name: name,
-              karma: karma,
-              base: base,
-              skillGroupName: skillGroupName,
-              skillGroupTotal: skillGroupTotal,
+            // Find the skill group data to get the group total
+            int skillGroupTotal = 0;
+            if (skillGroupName.isNotEmpty) {
+              final matchingGroup = skillGroups.firstWhere(
+                (group) => group.name == skillGroupName,
+                orElse: () => const SkillGroup(name: '', base: null, karma: null),
+              );
+              if (matchingGroup.name.isNotEmpty) {
+                skillGroupTotal = SkillGroupMap.calculateGroupTotal(
+                  matchingGroup.base, 
+                  matchingGroup.karma
+                );
+              }
+            }
+            
+            debugPrint('Parsing skill: $name, Karma: $karma, Base: $base, Group: $skillGroupName, GroupTotal: $skillGroupTotal');
+            // Check if this is a priority skill
+            final isPrioritySkill = prioritySkills.contains(name);
+            debugPrint('Is priority skill: $isPrioritySkill');
+            // Convert skill element to JSON-like map for parsing
+            final skillJson = <String, dynamic>{
+              'name': name,
+              'karma': karma,
+              'base': base,
+            };
+            
+            // Parse specializations
+            final specsElement = skillElement.findElements('specs').firstOrNull;
+            if (specsElement != null) {
+              final specElements = specsElement.findElements('spec');
+              if (specElements.isNotEmpty) {
+                final specs = <Map<String, dynamic>>[];
+                for (final specElement in specElements) {
+                  final specName = _getElementText(specElement, 'name');
+                  final free = _getElementText(specElement, 'free') ?? 'False';
+                  final expertise = _getElementText(specElement, 'expertise') ?? 'False';
+                  
+                  if (specName != null) {
+                    specs.add({
+                      'name': specName,
+                      'free': free,
+                      'expertise': expertise,
+                    });
+                  }
+                }
+                
+                if (specs.length == 1) {
+                  skillJson['specs'] = {'spec': specs.first};
+                } else if (specs.length > 1) {
+                  skillJson['specs'] = {'spec': specs};
+                }
+              }
+            }
+            
+            skills.add(Skill.fromJson(
+              skillJson,
+              skillGroupName,
+              skillGroupTotal,
+              isPrioritySkill: isPrioritySkill,
             ));
           }
         }
@@ -208,6 +269,44 @@ class EnhancedChumerXmlService {
     }
     
     return skills;
+  }
+  
+  static Set<String> _parsePrioritySkills(XmlElement characterElement) {
+  debugPrint('Parsing priority skills...');
+  final prioritySkills = <String>{};
+  final prioritySkillsElements = characterElement.findElements('priorityskills');
+  debugPrint('Found ${prioritySkillsElements.length} priority skills elements');
+  
+  // Process each priorityskills element
+  for (final prioritySkillsElement in prioritySkillsElements) {
+    debugPrint('Processing priority skills element...');
+    for (final prioritySkillElement in prioritySkillsElement.findElements('priorityskill')) {
+      debugPrint('Parsing priority skill element: $prioritySkillElement');
+      final prioritySkillName = prioritySkillElement.innerText.trim();
+      if (prioritySkillName.isNotEmpty) {
+        debugPrint('Found priority skill: $prioritySkillName');
+        prioritySkills.add(prioritySkillName);
+      }
+    }
+  }
+  
+  debugPrint('Total priority skills found: ${prioritySkills.length}');
+  return prioritySkills;
+}
+
+  /// Check for broken skill groups and log warnings
+  static void _checkBrokenSkillGroups(List<SkillGroup> skillGroups, List<Skill> skills) {
+    for (final group in skillGroups) {
+      final groupTotal = SkillGroupMap.calculateGroupTotal(group.base, group.karma);
+      if (groupTotal > 0) {
+        final isBroken = SkillGroupMap.isGroupBroken(group.name, skills, groupTotal);
+        if (isBroken) {
+          debugPrint('WARNING: Skill group "${group.name}" is broken!');
+        } else {
+          debugPrint('Skill group "${group.name}" is intact (total: $groupTotal)');
+        }
+      }
+    }
   }
   
   static Map<String, LimitDetail> _calculateLimits(List<Attribute> attributes, XmlElement characterElement) {

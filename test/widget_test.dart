@@ -11,7 +11,7 @@ void main() {
 
     // Verify that our app title is displayed.
     expect(find.text('Chummer5X'), findsOneWidget);
-    expect(find.text('Welcome to Chummer5X'), findsOneWidget);
+    expect(find.text('No Characters Loaded'), findsOneWidget);
     expect(find.text('Load Character File'), findsOneWidget);
   });
 }

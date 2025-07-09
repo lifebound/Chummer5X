@@ -1,0 +1,122 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+      - 'hotfix/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - develop
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+  build-web:
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - run: flutter pub get
+      - run: flutter build web --release
+
+      - name: Upload Web Snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-web
+          path: build/web/
+          retention-days: 60
+
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+
+      - run: flutter config --enable-linux-desktop
+      - run: flutter pub get
+      - run: flutter build linux
+
+      - name: Upload Linux Snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-linux
+          path: build/linux/x64/release/bundle/
+          retention-days: 60
+
+  build-windows:
+    runs-on: windows-latest
+    needs: analyze-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter build windows
+
+      - name: Upload Windows Snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-windows
+          path: build/windows/runner/Release/
+          retention-days: 60
+
+  build-android:
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - run: flutter pub get
+      - run: flutter build apk --release
+
+      - name: Upload Android APK Snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-android
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 60

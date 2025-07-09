@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/shadowrun_character.dart';
+import '../utils/responsive_layout.dart';
 
 class CharacterInfoCard extends StatelessWidget {
   final ShadowrunCharacter character;
@@ -20,11 +21,11 @@ class CharacterInfoCard extends StatelessWidget {
                   radius: 30,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   child: Text(
-                    character.name.isNotEmpty ? character.name[0].toUpperCase() : '?',
-                    style: const TextStyle(
+                    (character.name?.isNotEmpty == true) ? character.name![0].toUpperCase() : '?',
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -34,29 +35,29 @@ class CharacterInfoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        character.name,
+                        character.name ?? 'Unknown',
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (character.alias.isNotEmpty) ...[
+                      if (character.alias?.isNotEmpty == true) ...[
                         const SizedBox(height: 4),
                         Text(
                           '"${character.alias}"',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontStyle: FontStyle.italic,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                       const SizedBox(height: 4),
                       Text(
-                        character.metatype,
-                        style: const TextStyle(
+                        character.metatype ?? 'Unknown',
+                        style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -67,32 +68,38 @@ class CharacterInfoCard extends StatelessWidget {
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 8),
-            _buildInfoGrid(),
+            _buildInfoGrid(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoGrid() {
+  Widget _buildInfoGrid(BuildContext context) {
     final infoItems = [
-      if (character.ethnicity.isNotEmpty) ('Ethnicity', character.ethnicity),
-      if (character.age.isNotEmpty) ('Age', character.age),
-      if (character.sex.isNotEmpty) ('Sex', character.sex),
-      if (character.height.isNotEmpty) ('Height', character.height),
-      if (character.weight.isNotEmpty) ('Weight', character.weight),
-      ('Karma', character.karma),
-      ('Total Karma', character.totalKarma),
-      if (character.streetCred.isNotEmpty) ('Street Cred', character.streetCred),
-      if (character.notoriety.isNotEmpty) ('Notoriety', character.notoriety),
-      if (character.publicAwareness.isNotEmpty) ('Public Awareness', character.publicAwareness),
+      if (character.ethnicity?.isNotEmpty == true) ('Ethnicity', character.ethnicity!),
+      if (character.age?.isNotEmpty == true) ('Age', character.age!),
+      if (character.sex?.isNotEmpty == true) ('Sex', character.sex!),
+      if (character.height?.isNotEmpty == true) ('Height', character.height!),
+      if (character.weight?.isNotEmpty == true) ('Weight', character.weight!),
+      if (character.karma?.isNotEmpty == true) ('Karma', character.karma!),
+      if (character.totalKarma?.isNotEmpty == true) ('Total Karma', character.totalKarma!),
+      if (character.streetCred?.isNotEmpty == true) ('Street Cred', character.streetCred!),
+      if (character.notoriety?.isNotEmpty == true) ('Notoriety', character.notoriety!),
+      if (character.publicAwareness?.isNotEmpty == true) ('Public Awareness', character.publicAwareness!),
     ];
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: ResponsiveLayout.responsive(
+          context,
+          phone: 2,     // 2 columns on phone (current)
+          tablet: 3,    // 3 columns on tablet
+          desktop: 4,   // 4 columns on desktop
+          fourK: 5,     // 5 columns on 4K
+        ),
         childAspectRatio: 2.5,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
@@ -103,7 +110,7 @@ class CharacterInfoCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: Theme.of(context).colorScheme.surfaceVariant,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -112,18 +119,19 @@ class CharacterInfoCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],

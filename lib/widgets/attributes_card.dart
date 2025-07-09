@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/shadowrun_character.dart';
+import '../utils/responsive_layout.dart';
 
 class AttributesCard extends StatelessWidget {
   final ShadowrunCharacter character;
@@ -22,68 +23,139 @@ class AttributesCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            _buildAttributeGrid(),
+            _buildAttributeGrid(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAttributeGrid() {
-    final attributes = [
-      ('Body', character.body, _getAttributeColor(character.body)),
-      ('Agility', character.agility, _getAttributeColor(character.agility)),
-      ('Reaction', character.reaction, _getAttributeColor(character.reaction)),
-      ('Strength', character.strength, _getAttributeColor(character.strength)),
-      ('Charisma', character.charisma, _getAttributeColor(character.charisma)),
-      ('Intuition', character.intuition, _getAttributeColor(character.intuition)),
-      ('Logic', character.logic, _getAttributeColor(character.logic)),
-      ('Willpower', character.willpower, _getAttributeColor(character.willpower)),
-      ('Edge', character.edge, _getAttributeColor(character.edge)),
-      if (character.magic > 0) ('Magic', character.magic, _getAttributeColor(character.magic)),
-      if (character.resonance > 0) ('Resonance', character.resonance, _getAttributeColor(character.resonance)),
-    ];
+  Widget _buildAttributeGrid(BuildContext context) {
+    // Map standard Shadowrun attributes to categories for better organization
+    String getAttributeCategory(String name) {
+      final physicalAttributes = ['BOD', 'AGI', 'REA', 'STR', 'Body', 'Agility', 'Reaction', 'Strength'];
+      final mentalAttributes = ['CHA', 'INT', 'LOG', 'WIL', 'Charisma', 'Intuition', 'Logic', 'Willpower'];
+      final specialAttributes = ['EDG', 'MAG', 'MAGAdept', 'RES', 'ESS', 'DEP', 'Edge', 'Magic', 'Resonance', 'Essence'];
+      
+      if (physicalAttributes.contains(name)) return 'Physical';
+      if (mentalAttributes.contains(name)) return 'Mental';
+      if (specialAttributes.contains(name)) return 'Special';
+      return 'Other';
+    }
+
+    // Filter attributes based on enabled flags and display rules
+    List<Attribute> filterAttributes(List<Attribute> attributes) {
+      return attributes.where((attr) {
+        // Always hide MAGAdept - no reason to display it
+        if (attr.name == 'MAGAdept') return false;
+        
+        // Only display DEP if depEnabled is true
+        if (attr.name == 'DEP') {
+          return character.depEnabled;
+        }
+        
+        // Only display MAG if magEnabled is true  
+        if (attr.name == 'MAG') {
+          return character.magEnabled;
+        }
+        
+        // Only display RES if resEnabled is true
+        if (attr.name == 'RES') {
+          return character.resEnabled;
+        }
+        if (attr.name == 'ESS') {
+          //never show ESS, it's not an attribute that should be displayed
+          return false;
+        }
+        return true;
+      }).toList();
+    }
+    
+    final physicalAttributes = filterAttributes(character.attributes.where((attr) => getAttributeCategory(attr.name) == 'Physical').toList());
+    final mentalAttributes = filterAttributes(character.attributes.where((attr) => getAttributeCategory(attr.name) == 'Mental').toList());
+    final specialAttributes = filterAttributes(character.attributes.where((attr) => getAttributeCategory(attr.name) == 'Special').toList());
+    final otherAttributes = filterAttributes(character.attributes.where((attr) => getAttributeCategory(attr.name) == 'Other').toList());
+
+    final allAttributes = [...physicalAttributes, ...mentalAttributes, ...specialAttributes, ...otherAttributes];
+    
+    if (allAttributes.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'No attributes found',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: ResponsiveLayout.getAttributeGridColumns(context),
         childAspectRatio: 1.2,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
-      itemCount: attributes.length,
+      itemCount: allAttributes.length,
       itemBuilder: (context, index) {
-        final (label, value, color) = attributes[index];
-        return Container(
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            border: Border.all(color: color, width: 2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                value.toString(),
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+        final attribute = allAttributes[index];
+        final totalValue = attribute.totalValue + (attribute.adeptMod ?? 0);
+        final color = _getAttributeColor(totalValue);
+        
+        return GestureDetector(
+          onTap: () => _showAttributeDetails(context, attribute),
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              border: Border.all(color: color, width: 2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  totalValue.toString(),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
+                if (attribute.adeptMod != null && attribute.adeptMod! > 0) ...[
+                  Text(
+                    '(+${attribute.adeptMod})',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text(
+                  attribute.name,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                // Show base + karma breakdown
+                if (attribute.base > 0 || attribute.karma > 0)
+                  Text(
+                    '${attribute.base}+${attribute.karma}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
@@ -100,5 +172,53 @@ class AttributesCard extends StatelessWidget {
     } else {
       return Colors.red; // Poor
     }
+  }
+
+  void _showAttributeDetails(BuildContext context, Attribute attribute) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('${attribute.name} Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow('Category', attribute.metatypeCategory),
+              _buildDetailRow('Total Value', attribute.totalValue.toString()),
+              _buildDetailRow('Base', attribute.base.toString()),
+              _buildDetailRow('Karma', attribute.karma.toString()),
+              _buildDetailRow('Metatype Min', attribute.metatypeMin.toString()),
+              _buildDetailRow('Metatype Max', attribute.metatypeMax.toString()),
+              _buildDetailRow('Aug Max', attribute.metatypeAugMax.toString()),
+              if (attribute.adeptMod != null)
+                _buildDetailRow('Adept Mod', '+${attribute.adeptMod}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+          Text(value),
+        ],
+      ),
+    );
   }
 }

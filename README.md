@@ -5,11 +5,48 @@ A modern, platform-agnostic Flutter application for viewing and interacting with
 ## Features
 
 - 📱 **Cross-Platform**: Works on mobile, desktop, and web
-- 📄 **XML Parsing**: Reads Chummer XML character files
+- 📄 **XML Parsing**: Reads Chummer XML character files with comprehensive data extraction
 - 🎨 **Modern UI**: Clean, intuitive Material Design interface
-- 📊 **Character Display**: View attributes, skills, and character information
+- 📊 **Enhanced Character Display**: 
+  - Comprehensive attribute system with adept power modifiers
+  - Skills with skill groups and specializations
+  - Spells, spirits, and complex forms for magical characters
+  - Adept powers with ratings and effects
+  - Gear and equipment with categories and ratings
+  - Limit calculations and modifiers
 - 🌙 **Dark Mode**: Automatic light/dark theme support
 - 💾 **File Handling**: Easy file selection and caching
+- 🔄 **Backwards Compatibility**: Supports both basic and enhanced parsing modes
+
+## Character Data Supported
+
+### Basic Information
+- Character name, alias, metatype
+- Physical characteristics (age, sex, height, weight)
+- Karma, street cred, notoriety, public awareness
+
+### Attributes & Skills
+- All 8 primary attributes (Body, Agility, Reaction, Strength, Charisma, Intuition, Logic, Willpower)
+- Special attributes (Edge, Magic, Resonance)
+- Comprehensive skills system with skill groups
+- Adept power modifications to attributes and skills
+
+### Magic & Resonance
+- Spells with categories and grades
+- Spirits and their bindings
+- Complex forms for technomancers
+- Adept powers with ratings and specializations
+
+### Equipment & Gear
+- Weapons, armor, and general gear
+- Equipment ratings and categories
+- Equipped vs. carried status
+- Quantity tracking
+
+### Derived Statistics
+- Physical, Mental, and Social limits
+- Initiative and other derived attributes
+- Condition monitors (Physical and Stun damage)
 
 ## Getting Started
 
@@ -53,18 +90,20 @@ flutter run
 
 ```
 lib/
-├── main.dart                 # Application entry point
+├── main.dart                          # Application entry point
 ├── models/
-│   └── shadowrun_character.dart  # Character data model
+│   └── shadowrun_character.dart       # Enhanced character data model with attributes, skills, magic, gear
 ├── screens/
-│   ├── home_screen.dart      # Main application screen
-│   └── character_detail_screen.dart  # Character details view
+│   ├── home_screen.dart               # Main application screen
+│   ├── character_detail_screen.dart   # Character overview and navigation
+│   └── skills_screen.dart             # Skills, spells, powers, and gear display
 ├── services/
-│   ├── chumer_xml_service.dart    # XML parsing logic
-│   └── file_service.dart     # File handling operations
+│   ├── chumer_xml_service.dart        # Basic XML parsing (backwards compatible)
+│   ├── enhanced_chumer_xml_service.dart # Comprehensive XML parsing
+│   └── file_service.dart              # File handling operations
 └── widgets/
-    ├── character_info_card.dart   # Character info widget
-    └── attributes_card.dart       # Attributes display widget
+    ├── character_info_card.dart       # Character information widget
+    └── attributes_card.dart           # Enhanced attributes display widget
 ```
 
 ## Contributing

@@ -34,9 +34,9 @@ class _CharacterNavigationScreenState extends State<CharacterNavigationScreen> {
       appBar: AppBar(
         title: Text(widget.character.name ?? 'Character'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: EdgeInsets.only(right: 16.0),
             child: Center(child: ScreenSizeIndicator()),
           ),
         ],
@@ -324,8 +324,8 @@ class _CharacterNavigationScreenState extends State<CharacterNavigationScreen> {
   }
 
   Widget _buildContactsView(BuildContext context) {
-    return Card(
-      child: const Padding(
+    return const Card(
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,21 +346,21 @@ class _CharacterNavigationScreenState extends State<CharacterNavigationScreen> {
   }
 
   Widget _buildNotesView(BuildContext context) {
-    return Card(
+    return const Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Notes',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text('No notes implementation yet'),
+            SizedBox(height: 16),
+            Text('No notes implementation yet'),
           ],
         ),
       ),

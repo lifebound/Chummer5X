@@ -308,5 +308,33 @@ void main() {
       
       expect(testCharacter.conditionMonitorPenalty, -3);
     });
+
+    test('CM Penalty should update dynamically when adjusting condition monitors', () {
+      // Start with no penalty
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 2,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 0,
+        ),
+      );
+      expect(testCharacter.conditionMonitorPenalty, 0);
+      
+      // Add 1 more physical damage (total 3) - should trigger -1 penalty
+      final step1 = testCharacter.adjustConditionMonitor(isPhysical: true, increment: true);
+      expect(step1.conditionMonitorPenalty, -1);
+      
+      // Add 3 stun damage - should trigger additional -1 penalty
+      var step2 = step1.adjustConditionMonitor(isPhysical: false, increment: true);
+      step2 = step2.adjustConditionMonitor(isPhysical: false, increment: true);
+      step2 = step2.adjustConditionMonitor(isPhysical: false, increment: true);
+      expect(step2.conditionMonitorPenalty, -2);
+      
+      // Decrement back to 2 stun - should reduce penalty by 1
+      final step3 = step2.adjustConditionMonitor(isPhysical: false, increment: false);
+      expect(step3.conditionMonitorPenalty, -1);
+    });
   });
 }

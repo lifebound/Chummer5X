@@ -102,6 +102,42 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _isLoading ? null : _createSampleMagician,
+                icon: const Icon(Icons.auto_fix_high),
+                label: const Text('Create Sample Magician'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _isLoading ? null : _createSampleAdept,
+                icon: const Icon(Icons.flash_on),
+                label: const Text('Create Sample Adept'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _isLoading ? null : _createSampleTechnomancer,
+                icon: const Icon(Icons.memory),
+                label: const Text('Create Sample Technomancer'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
+                  ),
+                ),
+              ),
             ] else ...[
               Card(
                 elevation: 4,
@@ -333,6 +369,366 @@ class _HomeScreenState extends State<HomeScreen> {
       magEnabled: false, // Sample character doesn't have magic enabled
       resEnabled: false, // Sample character doesn't have resonance enabled  
       depEnabled: false, // Sample character doesn't have depth enabled
+      isAdept: false, // Sample character is not an adept
+      isMagician: false, // Sample character is not a magician
+      isTechnomancer: false, // Sample character is not a technomancer
+    );
+    
+    setState(() {
+      _currentCharacter = sampleCharacter;
+    });
+  }
+
+  void _createSampleMagician() {
+    final sampleCharacter = ShadowrunCharacter(
+      name: 'Morgan Shadowweaver',
+      alias: 'Mage',
+      metatype: 'Human',
+      skills: [], // Empty for now
+      limits: {}, // Empty for now
+      attributes: [
+        Attribute(
+          name: 'Body',
+          metatypeCategory: 'Physical',
+          totalValue: 3,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 2,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Agility',
+          metatypeCategory: 'Physical',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Reaction',
+          metatypeCategory: 'Physical',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Strength',
+          metatypeCategory: 'Physical',
+          totalValue: 2,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 1,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Charisma',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Intuition',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Logic',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Willpower',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Edge',
+          metatypeCategory: 'Special',
+          totalValue: 3,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 0,
+        ),
+      ],
+      conditionMonitor: const ConditionMonitor(
+        physicalCM: 9,
+        physicalCMFilled: 0,
+        physicalCMOverflow: 4,
+        stunCM: 10,
+        stunCMFilled: 0,
+      ),
+      magEnabled: true,
+      resEnabled: false,
+      depEnabled: false,
+      isAdept: false,
+      isMagician: true, // This is a magician
+      isTechnomancer: false,
+    );
+    
+    setState(() {
+      _currentCharacter = sampleCharacter;
+    });
+  }
+
+  void _createSampleAdept() {
+    final sampleCharacter = ShadowrunCharacter(
+      name: 'Kane Swiftfoot',
+      alias: 'Blur',
+      metatype: 'Elf',
+      skills: [], // Empty for now
+      limits: {}, // Empty for now
+      attributes: [
+        Attribute(
+          name: 'Body',
+          metatypeCategory: 'Physical',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Agility',
+          metatypeCategory: 'Physical',
+          totalValue: 6,
+          metatypeMin: 2,
+          metatypeMax: 7,
+          metatypeAugMax: 10,
+          base: 5,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Reaction',
+          metatypeCategory: 'Physical',
+          totalValue: 6,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 5,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Strength',
+          metatypeCategory: 'Physical',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Charisma',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 3,
+          metatypeMax: 8,
+          metatypeAugMax: 11,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Intuition',
+          metatypeCategory: 'Mental',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Logic',
+          metatypeCategory: 'Mental',
+          totalValue: 3,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 2,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Willpower',
+          metatypeCategory: 'Mental',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Edge',
+          metatypeCategory: 'Special',
+          totalValue: 2,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 2,
+          karma: 0,
+        ),
+      ],
+      conditionMonitor: const ConditionMonitor(
+        physicalCM: 10,
+        physicalCMFilled: 0,
+        physicalCMOverflow: 4,
+        stunCM: 10,
+        stunCMFilled: 0,
+      ),
+      magEnabled: true,
+      resEnabled: false,
+      depEnabled: false,
+      isAdept: true, // This is an adept
+      isMagician: false,
+      isTechnomancer: false,
+    );
+    
+    setState(() {
+      _currentCharacter = sampleCharacter;
+    });
+  }
+
+  void _createSampleTechnomancer() {
+    final sampleCharacter = ShadowrunCharacter(
+      name: 'Alex Wireframe',
+      alias: 'Pulse',
+      metatype: 'Human',
+      skills: [], // Empty for now
+      limits: {}, // Empty for now
+      attributes: [
+        Attribute(
+          name: 'Body',
+          metatypeCategory: 'Physical',
+          totalValue: 3,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 2,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Agility',
+          metatypeCategory: 'Physical',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Reaction',
+          metatypeCategory: 'Physical',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Strength',
+          metatypeCategory: 'Physical',
+          totalValue: 2,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 1,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Charisma',
+          metatypeCategory: 'Mental',
+          totalValue: 4,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 3,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Intuition',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Logic',
+          metatypeCategory: 'Mental',
+          totalValue: 6,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 5,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Willpower',
+          metatypeCategory: 'Mental',
+          totalValue: 5,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 4,
+          karma: 1,
+        ),
+        Attribute(
+          name: 'Edge',
+          metatypeCategory: 'Special',
+          totalValue: 2,
+          metatypeMin: 1,
+          metatypeMax: 6,
+          metatypeAugMax: 9,
+          base: 2,
+          karma: 0,
+        ),
+      ],
+      conditionMonitor: const ConditionMonitor(
+        physicalCM: 9,
+        physicalCMFilled: 0,
+        physicalCMOverflow: 4,
+        stunCM: 11,
+        stunCMFilled: 0,
+      ),
+      magEnabled: false,
+      resEnabled: true,
+      depEnabled: false,
+      isAdept: false,
+      isMagician: false,
+      isTechnomancer: true, // This is a technomancer
     );
     
     setState(() {

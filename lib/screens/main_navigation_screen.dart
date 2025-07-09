@@ -12,6 +12,10 @@ enum NavigationSection {
   attributes,
   skills,
   spells,
+  spirits,
+  adeptPowers,
+  complexForms,
+  sprites,
   gear,
   combat,
   contacts,
@@ -171,12 +175,44 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Icons.school,
               'Skills',
             ),
-            _buildNavigationTile(
-              context,
-              NavigationSection.spells,
-              Icons.auto_fix_high,
-              'Spells',
-            ),
+            
+            // Dynamic navigation tiles based on character type
+            if (_currentCharacter!.shouldShowSpellsTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.spells,
+                Icons.auto_fix_high,
+                'Spells',
+              ),
+            if (_currentCharacter!.shouldShowSpiritsTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.spirits,
+                Icons.pets,
+                'Spirits',
+              ),
+            if (_currentCharacter!.shouldShowAdeptPowersTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.adeptPowers,
+                Icons.flash_on,
+                'Adept Powers',
+              ),
+            if (_currentCharacter!.shouldShowComplexFormsTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.complexForms,
+                Icons.memory,
+                'Complex Forms',
+              ),
+            if (_currentCharacter!.shouldShowSpritesTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.sprites,
+                Icons.computer,
+                'Sprites',
+              ),
+            
             _buildNavigationTile(
               context,
               NavigationSection.gear,
@@ -556,6 +592,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return _buildSkillsView(context);
       case NavigationSection.spells:
         return _buildSpellsView(context);
+      case NavigationSection.spirits:
+        return _buildSpiritsView(context);
+      case NavigationSection.adeptPowers:
+        return _buildAdeptPowersView(context);
+      case NavigationSection.complexForms:
+        return _buildComplexFormsView(context);
+      case NavigationSection.sprites:
+        return _buildSpritesView(context);
       case NavigationSection.gear:
         return _buildGearView(context);
       case NavigationSection.combat:
@@ -605,6 +649,94 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             const SizedBox(height: 16),
             Text(
               'Spells section coming soon...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpiritsView(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Spirits',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Spirits section coming soon...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdeptPowersView(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adept Powers',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Adept Powers section coming soon...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildComplexFormsView(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Complex Forms',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Complex Forms section coming soon...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpritesView(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sprites',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Sprites section coming soon...',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],

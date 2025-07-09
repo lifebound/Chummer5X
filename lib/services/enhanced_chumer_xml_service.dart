@@ -80,6 +80,11 @@ class EnhancedChumerXmlService {
       final resEnabled = _getElementText(characterElement, 'resenabled')?.toLowerCase() == 'true';  
       final depEnabled = _getElementText(characterElement, 'depenabled')?.toLowerCase() == 'true';
       
+      // Parse character type flags (for Shadowrun 5e: adept, magician, technomancer)
+      final isAdept = _getElementText(characterElement, 'adept')?.toLowerCase() == 'true';
+      final isMagician = _getElementText(characterElement, 'magician')?.toLowerCase() == 'true';
+      final isTechnomancer = _getElementText(characterElement, 'technomancer')?.toLowerCase() == 'true';
+      
       return ShadowrunCharacter(
         name: name,
         alias: name, // In Chummer, alias is often the main name
@@ -107,6 +112,9 @@ class EnhancedChumerXmlService {
         magEnabled: magEnabled,
         resEnabled: resEnabled,
         depEnabled: depEnabled,
+        isAdept: isAdept,
+        isMagician: isMagician,
+        isTechnomancer: isTechnomancer,
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');

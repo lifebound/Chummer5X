@@ -400,6 +400,11 @@ class ShadowrunCharacter {
   final bool resEnabled;
   final bool depEnabled;
 
+  // Character type flags
+  final bool isAdept;
+  final bool isMagician;
+  final bool isTechnomancer;
+
   const ShadowrunCharacter({
     this.name,
     this.alias,
@@ -427,6 +432,9 @@ class ShadowrunCharacter {
     this.magEnabled = false,
     this.resEnabled = false,
     this.depEnabled = false,
+    this.isAdept = false,
+    this.isMagician = false,
+    this.isTechnomancer = false,
   });
   
   // Factory constructor for basic XML parsing (backwards compatible)
@@ -669,6 +677,9 @@ class ShadowrunCharacter {
     bool? magEnabled,
     bool? resEnabled,
     bool? depEnabled,
+    bool? isAdept,
+    bool? isMagician,
+    bool? isTechnomancer,
   }) {
     return ShadowrunCharacter(
       name: name ?? this.name,
@@ -697,8 +708,18 @@ class ShadowrunCharacter {
       magEnabled: magEnabled ?? this.magEnabled,
       resEnabled: resEnabled ?? this.resEnabled,
       depEnabled: depEnabled ?? this.depEnabled,
+      isAdept: isAdept ?? this.isAdept,
+      isMagician: isMagician ?? this.isMagician,
+      isTechnomancer: isTechnomancer ?? this.isTechnomancer,
     );
   }
+
+  // Navigation logic computed properties
+  bool get shouldShowSpellsTab => isMagician;
+  bool get shouldShowSpiritsTab => isMagician;
+  bool get shouldShowAdeptPowersTab => isAdept;
+  bool get shouldShowComplexFormsTab => isTechnomancer;
+  bool get shouldShowSpritesTab => isTechnomancer;
 
   // Method to adjust condition monitor filled values
   ShadowrunCharacter adjustConditionMonitor({

@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/shadowrun_character.dart';
 
 /// Mapping of skill names to their associated attributes in Shadowrun 5th Edition
@@ -167,36 +169,36 @@ String? getSkillAttribute(String skillName) {
 /// CM penalty is applied at the end and result cannot go below 0
 int calculateTotalSkillRating(String skillName, int skillRating, List<Attribute> attributes, {bool isPrioritySkill = false, int conditionMonitorPenalty = 0}) {
   final attributeName = getSkillAttribute(skillName);
-  print('Calculating total skill rating for $skillName with base rating $skillRating, attribute $attributeName, priority skill: $isPrioritySkill, CM penalty: $conditionMonitorPenalty');
+  debugPrint('Calculating total skill rating for $skillName with base rating $skillRating, attribute $attributeName, priority skill: $isPrioritySkill, CM penalty: $conditionMonitorPenalty');
   final priorityBonus = isPrioritySkill ? 2 : 0;
   
   // Handle skills with 0 effective skill points (including priority bonus)
   if (skillRating + priorityBonus == 0) {
     if (!skillAllowsDefaulting(skillName)) {
-      print('Skill $skillName does not allow defaulting and has no points, returning 0');
+      debugPrint('Skill $skillName does not allow defaulting and has no points, returning 0');
       // Skill doesn't allow defaulting - total is 0 regardless of attribute or CM penalty
       return 0;
     } else {
-      print('Skill $skillName allows defaulting, calculating default rating');
+      debugPrint('Skill $skillName allows defaulting, calculating default rating');
       // Skill allows defaulting - use attribute - 1 (plus any priority bonus), then apply CM penalty
       if (attributeName != null) {
-        print('Using attribute $attributeName for defaulting calculation');
+        debugPrint('Using attribute $attributeName for defaulting calculation');
         try {
           final attribute = attributes.firstWhere(
             (attr) => attr.name.toUpperCase() == attributeName,
           );
-          print('Found attribute $attributeName with total value ${attribute.totalValue}');
+          debugPrint('Found attribute $attributeName with total value ${attribute.totalValue}');
           // For defaulting: attribute - 1 + priority bonus + CM penalty, but never below 0
           final baseDefault = (attribute.totalValue.round() - 1) + priorityBonus;
-          print('Base default rating: $baseDefault, applying CM penalty: $conditionMonitorPenalty');
+          debugPrint('Base default rating: $baseDefault, applying CM penalty: $conditionMonitorPenalty');
           return (baseDefault + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
         } catch (e) {
-          print('Attribute $attributeName not found, returning just priority bonus + CM penalty');
+          debugPrint('Attribute $attributeName not found, returning just priority bonus + CM penalty');
           // If attribute not found, return just the priority bonus + CM penalty, but never below 0
           return (priorityBonus + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
         }
       } else {
-        print(priorityBonus + conditionMonitorPenalty);
+        debugPrint((priorityBonus + conditionMonitorPenalty).toString());
         // No attribute mapping found, return just the priority bonus + CM penalty, but never below 0
         return (priorityBonus + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
       }
@@ -205,7 +207,7 @@ int calculateTotalSkillRating(String skillName, int skillRating, List<Attribute>
   
   // Normal calculation for skills with effective points (skill + priority > 0)
   var totalRating = skillRating + priorityBonus;
-  print('Initial total rating (skill + priority): $totalRating');
+  debugPrint('Initial total rating (skill + priority): $totalRating');
   // Add attribute bonus if available
   if (attributeName != null) {
     try {
@@ -217,7 +219,7 @@ int calculateTotalSkillRating(String skillName, int skillRating, List<Attribute>
       // If attribute not found, just continue with current total
     }
   }
-  print('Total rating after adding attribute: $totalRating');
+  debugPrint('Total rating after adding attribute: $totalRating');
   // Apply CM penalty and ensure result is never below 0
   return (totalRating + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
 }

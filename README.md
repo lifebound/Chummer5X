@@ -48,6 +48,23 @@ A modern, platform-agnostic Flutter application for viewing and interacting with
 - Initiative and other derived attributes
 - Condition monitors (Physical and Stun damage)
 
+## Platform Support
+
+This application supports the following platforms:
+
+- ✅ **Android** - Full support
+- ✅ **Windows** - Full support  
+- ✅ **Linux** - Full support
+- ✅ **Web** - Full support
+- ❌ **iOS** - Not supported
+- ⏳ **macOS** - Potential future support (releases only, if there's demand)
+
+### Note on iOS Support
+
+Unfortunately, I will not be developing for iOS due to Apple's platform limitations. As this is a free, open-source application with no monetization, the costs and requirements associated with iOS development (Xcode requirements, Apple Developer Program fees, etc.) are not feasible for this project. I hope you understand this decision.
+
+If there's sufficient community demand, I may consider adding macOS builds in the future, but these would be release-only builds without active development support.
+
 ## Getting Started
 
 ### Prerequisites

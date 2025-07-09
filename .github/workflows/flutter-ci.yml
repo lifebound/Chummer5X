@@ -1,20 +1,12 @@
 name: Flutter CI
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - 'release/**'
-      - 'hotfix/**'
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - main
-      - develop
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   analyze-and-test:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +27,7 @@ jobs:
         run: flutter test
 
   build-web:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     needs: analyze-and-test
     steps:
@@ -55,6 +48,7 @@ jobs:
           retention-days: 60
 
   build-linux:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     needs: analyze-and-test
     steps:
@@ -81,6 +75,7 @@ jobs:
           retention-days: 60
 
   build-windows:
+    if: github.event.pull_request.draft == false
     runs-on: windows-latest
     needs: analyze-and-test
     steps:
@@ -102,6 +97,7 @@ jobs:
           retention-days: 60
 
   build-android:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     needs: analyze-and-test
     steps:

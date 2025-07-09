@@ -107,6 +107,7 @@ class _SkillsCardState extends State<SkillsCard> {
             skill.skillGroupTotal, 
             widget.character.attributes, 
             isPrioritySkill: skill.isPrioritySkill,
+            conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
           );
           return totalRating > 0;
         }).toList();
@@ -291,6 +292,7 @@ class _SkillsCardState extends State<SkillsCard> {
       skillRating, 
       widget.character.attributes, 
       isPrioritySkill: skill.isPrioritySkill,
+      conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
     );
     
     return Container(
@@ -504,6 +506,7 @@ class _SkillsCardState extends State<SkillsCard> {
       widget.character.attributes,
       isPrioritySkill: skill.isPrioritySkill,
       hasSpecialization: true,
+      conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
     );
     
     // Show just the first specialization with count if multiple
@@ -557,6 +560,7 @@ class _SkillsCardState extends State<SkillsCard> {
       widget.character.attributes,
       isPrioritySkill: skill.isPrioritySkill,
       hasSpecialization: true,
+      conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
     );
     
     return Container(

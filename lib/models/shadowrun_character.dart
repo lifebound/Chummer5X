@@ -633,6 +633,14 @@ class ShadowrunCharacter {
   int get liftCarry => body + strength;
   int get movement => agility * 2 + 10;
 
+  // Condition Monitor Penalty calculation
+  // For every 3 points of damage on either track (not including overflow), apply -1 penalty
+  int get conditionMonitorPenalty {
+    final physicalPenalty = (conditionMonitor.physicalCMFilled.clamp(0, conditionMonitor.physicalCMTotal) / 3).floor();
+    final stunPenalty = (conditionMonitor.stunCMFilled.clamp(0, conditionMonitor.stunCMTotal) / 3).floor();
+    return -(physicalPenalty + stunPenalty);
+  }
+  
   // copyWith method for creating modified copies of the character
   ShadowrunCharacter copyWith({
     String? name,

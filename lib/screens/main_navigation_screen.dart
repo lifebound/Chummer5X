@@ -703,7 +703,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildConditionMonitorCard() {
     final cm = _currentCharacter!.conditionMonitor;
-    debugPrint("Condition Monitor: ${cm.physicalCMFilled}/${cm.physicalCMTotal} Physical, ${cm.stunCMFilled}/${cm.stunCMTotal} Stun");
+    final cmPenalty = _currentCharacter!.conditionMonitorPenalty;
+    debugPrint("Condition Monitor: ${cm.physicalCMFilled}/${cm.physicalCMTotal} Physical, ${cm.stunCMFilled}/${cm.stunCMTotal} Stun, CM Penalty: $cmPenalty");
     
     return Card(
       child: Padding(
@@ -711,11 +712,41 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Condition Monitors',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Condition Monitors',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                // CM Penalty indicator
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: cmPenalty < 0 
+                        ? Colors.red.shade100 
+                        : Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: cmPenalty < 0 
+                          ? Colors.red.shade400 
+                          : Colors.green.shade400,
+                    ),
+                  ),
+                  child: Text(
+                    'CM Penalty: ${cmPenalty >= 0 ? '+' : ''}$cmPenalty',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: cmPenalty < 0 
+                          ? Colors.red.shade700 
+                          : Colors.green.shade700,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Row(

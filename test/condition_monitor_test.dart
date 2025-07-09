@@ -209,5 +209,104 @@ void main() {
       // Should not exceed death threshold
       expect(updatedCharacter.conditionMonitor.physicalCMFilled, 14); // Should remain at death threshold
     });
+
+    // CM Penalty calculation tests
+    test('CM Penalty: 0 stun, 0 physical should be 0', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 0,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 0,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, 0);
+    });
+
+    test('CM Penalty: 0 stun, 2 physical should be 0', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 2,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 0,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, 0);
+    });
+
+    test('CM Penalty: 3 stun, 0 physical should be -1', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 0,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 3,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, -1);
+    });
+
+    test('CM Penalty: 3 stun, 2 physical should be -1', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 2,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 3,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, -1);
+    });
+
+    test('CM Penalty: 3 stun, 3 physical should be -2', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 3,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 3,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, -2);
+    });
+
+    test('CM Penalty: 0 stun, 11 physical should be -3', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 11,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 0,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, -3);
+    });
+
+    test('CM Penalty: 0 stun, 12 physical (1 overflow) should be -3', () {
+      final testCharacter = character.copyWith(
+        conditionMonitor: const ConditionMonitor(
+          physicalCM: 10,
+          physicalCMFilled: 12,
+          physicalCMOverflow: 4,
+          stunCM: 9,
+          stunCMFilled: 0,
+        ),
+      );
+      
+      expect(testCharacter.conditionMonitorPenalty, -3);
+    });
   });
 }

@@ -750,13 +750,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildConditionMonitor(String label, int filled, int total, int overflow, String status, Color color) {
+    // Calculate if we're in overflow state
+    final isInOverflow = filled > total;
+    final overflowAmount = isInOverflow ? filled - total : 0;
+    final normalFilled = isInOverflow ? total : filled;
+    final isNearDeath = overflowAmount >= overflow && overflow > 0;
+    
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: isNearDeath 
+              ? Colors.red.shade800 
+              : isInOverflow 
+                  ? Colors.red.shade600 
+                  : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          width: isNearDeath ? 2 : 1,
         ),
       ),
       child: Column(
@@ -767,9 +778,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
+                  color: isNearDeath ? Colors.red.shade800 : null,
                 ),
               ),
               Container(
@@ -791,31 +803,55 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 8),
           if (total > 0) ...[
+            // Normal condition monitor progress bar
             LinearProgressIndicator(
-              value: (filled / total).clamp(0.0, 1.0),
+              value: (normalFilled / total).clamp(0.0, 1.0),
               backgroundColor: Colors.grey.shade300,
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 6,
             ),
+            // Overflow progress bar (if applicable)
+            if (overflow > 0 && label == 'Physical') ...[
+              const SizedBox(height: 4),
+              LinearProgressIndicator(
+                value: overflow > 0 ? (overflowAmount / overflow).clamp(0.0, 1.0) : 0.0,
+                backgroundColor: Colors.grey.shade300,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isNearDeath ? Colors.red.shade800 : Colors.red.shade600,
+                ),
+                minHeight: 4,
+              ),
+            ],
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '$filled / $total',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                if (overflow > 0)
-                  Text(
-                    'Overflow: $overflow',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.red.shade700,
-                      fontWeight: FontWeight.w500,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$normalFilled / $total',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
+                    if (isInOverflow && label == 'Physical')
+                      Text(
+                        'Overflow: $overflowAmount / $overflow',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isNearDeath ? Colors.red.shade800 : Colors.red.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                  ],
+                ),
+                if (isNearDeath)
+                  Icon(
+                    Icons.warning,
+                    color: Colors.red.shade800,
+                    size: 16,
                   ),
               ],
             ),
@@ -838,13 +874,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: filled < total ? () => _adjustConditionMonitor(label, 1) : null,
+                  onPressed: (label == 'Physical' ? filled < (total + overflow) : filled < total) 
+                      ? () => _adjustConditionMonitor(label, 1) 
+                      : null,
                   icon: const Icon(Icons.add_circle_outline),
                   iconSize: 20,
                   padding: const EdgeInsets.all(4),
                   constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                   style: IconButton.styleFrom(
-                    foregroundColor: filled < total 
+                    foregroundColor: (label == 'Physical' ? filled < (total + overflow) : filled < total)
                         ? Theme.of(context).colorScheme.primary 
                         : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   ),

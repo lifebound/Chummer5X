@@ -701,13 +701,14 @@ class ShadowrunCharacter {
     
     if (isPhysical) {
       int newPhysicalFilled = currentConditionMonitor.physicalCMFilled;
+      final maxPhysicalDamage = currentConditionMonitor.physicalCMTotal + currentConditionMonitor.physicalCMOverflow;
       
       if (increment) {
-        // Increment but don't exceed total
-        newPhysicalFilled = (newPhysicalFilled + 1).clamp(0, currentConditionMonitor.physicalCMTotal);
+        // Increment but don't exceed total + overflow (death threshold)
+        newPhysicalFilled = (newPhysicalFilled + 1).clamp(0, maxPhysicalDamage);
       } else {
         // Decrement but don't go below zero
-        newPhysicalFilled = (newPhysicalFilled - 1).clamp(0, currentConditionMonitor.physicalCMTotal);
+        newPhysicalFilled = (newPhysicalFilled - 1).clamp(0, maxPhysicalDamage);
       }
       
       // Return new character with updated physical condition monitor
@@ -716,8 +717,10 @@ class ShadowrunCharacter {
           physicalCM: currentConditionMonitor.physicalCM,
           physicalCMFilled: newPhysicalFilled,
           physicalCMOverflow: currentConditionMonitor.physicalCMOverflow,
+          physicalCMThresholdOffset: currentConditionMonitor.physicalCMThresholdOffset,
           stunCM: currentConditionMonitor.stunCM,
           stunCMFilled: currentConditionMonitor.stunCMFilled,
+          stunCMThresholdOffset: currentConditionMonitor.stunCMThresholdOffset,
         ),
       );
     } else {
@@ -737,8 +740,10 @@ class ShadowrunCharacter {
           physicalCM: currentConditionMonitor.physicalCM,
           physicalCMFilled: currentConditionMonitor.physicalCMFilled,
           physicalCMOverflow: currentConditionMonitor.physicalCMOverflow,
+          physicalCMThresholdOffset: currentConditionMonitor.physicalCMThresholdOffset,
           stunCM: currentConditionMonitor.stunCM,
           stunCMFilled: newStunFilled,
+          stunCMThresholdOffset: currentConditionMonitor.stunCMThresholdOffset,
         ),
       );
     }

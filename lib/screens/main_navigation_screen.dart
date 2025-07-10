@@ -722,6 +722,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       itemBuilder: _buildComplexFormCard,
     );
   }
+  Widget _buildAdeptPowersView(BuildContext context) {
+    return _buildMagicalListView<AdeptPower>(
+      context: context,
+      items: _currentCharacter!.adeptPowers,
+      icon: Icons.auto_fix_high,
+      title: 'Adept Powers',
+      singularLabel: 'adept power',
+      emptyMessage: 'No adept powers known',
+      itemBuilder: _buildAdeptPowersCard,
+    );
+  }
 
   Widget _buildMagicalCard({
     required BuildContext context,
@@ -815,7 +826,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     chipBuilder: _buildSpellDetailChip,
     );
   }
-  
+
   Widget _buildComplexFormCard(BuildContext context, ComplexForm form) {
     return _buildMagicalCard(
     context: context,
@@ -830,6 +841,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       MapEntry('Source', form.source),
     ],
     chipBuilder: _buildComplexFormDetailChip,
+    );
+  }
+  Widget _buildAdeptPowersCard(BuildContext context, AdeptPower power) {
+    return _buildMagicalCard(
+      context: context,
+      name: power.name,
+      hasCompleteInfo: power.hasCompleteInfo,
+      incompleteMessage: 'Incomplete adept power information',
+      fields: [
+        MapEntry('Rating', power.rating?.toString() ?? 'N/A'),
+        MapEntry('Action', power.action?.toString() ?? 'N/A'),
+        MapEntry('Source', '${power.source} (${power.page})'),
+      ],
+      chipBuilder: _buildPowerDetailChip,
     );
   }
 
@@ -906,6 +931,42 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
+  Widget _buildPowerDetailChip(
+      BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildSpiritsView(BuildContext context) {
     return Card(
       child: Padding(
@@ -928,27 +989,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildAdeptPowersView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Adept Powers',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Adept Powers section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  
 
   Widget _buildSpritesView(BuildContext context) {
     return Card(

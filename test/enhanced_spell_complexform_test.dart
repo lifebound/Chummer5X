@@ -1,13 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/models/shadowrun_character.dart';
-import '../lib/services/enhanced_chumer_xml_service.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/services/enhanced_chumer_xml_service.dart';
 import 'package:xml/xml.dart';
 
 void main() {
   group('Enhanced Spell and Complex Form Tests', () {
     group('Spell Model Tests', () {
       test('should create spell with all required fields', () {
-        final spell = Spell(
+        const spell = Spell(
           name: 'Manabolt',
           range: 'Line of Sight',
           duration: 'Instant',
@@ -27,7 +28,7 @@ void main() {
       });
 
       test('should create spell with optional description', () {
-        final spell = Spell(
+        const spell = Spell(
           name: 'Heal',
           range: 'Touch',
           duration: 'Permanent',
@@ -60,8 +61,7 @@ void main() {
         expect(spell.source, equals('SR5 284'));
         expect(spell.category, equals('Combat'));
       });
-    });
-    test('should parse spell from XML data', () {
+      test('should parse spell from XML data', () {
         const xmlData = '''<?xml version="1.0" encoding="utf-8"?>
           "<character>
           <spells>
@@ -104,7 +104,8 @@ void main() {
         expect(spell.category, equals('Health'));
         expect(spell.hasCompleteInfo, isTrue);
       });
-
+    });
+    
     group('Complex Form Model Tests', () {
       test('should create complex form with all required fields', () {
         const complexForm = ComplexForm(
@@ -126,7 +127,7 @@ void main() {
       });
 
       test('should create complex form with optional description', () {
-        final complexForm = ComplexForm(
+        const complexForm = ComplexForm(
           name: 'Command',
           target: 'Device',
           duration: 'Instant',
@@ -156,7 +157,220 @@ void main() {
         expect(complexForm.source, equals('SR5 255'));
       });
     });
+    group('Adept Powers Model Tests', () {
+      test('should create adept power with basic fields', () {
+        const adeptPower = AdeptPower(
+          name: 'Improved Reflexes',
+          rating: '3',
+          source: 'SR5',
+          page: '290',
+        );
 
+        expect(adeptPower.name, equals('Improved Reflexes'));
+        expect(adeptPower.rating, equals('3'));
+        expect(adeptPower.extra, isNull);
+      });
+
+      test('should create adept power with extra specification', () {
+        const adeptPower = AdeptPower(
+          name: 'Critical Strike',
+          rating: '1',
+          extra: 'Blades',
+          source: 'SR5',
+          page: '291',
+        );
+
+        expect(adeptPower.name, equals('Critical Strike'));
+        expect(adeptPower.rating, equals('1'));
+        expect(adeptPower.extra, equals('Blades'));
+      });
+
+      test('should parse adept power from JSON data', () {
+        final jsonData = {
+          'name': 'Facial Sculpt',
+          'rating': '1',
+          'extra': 'Complex Action',
+        };
+
+        final adeptPower = AdeptPower.fromJson(jsonData);
+        
+        expect(adeptPower.name, equals('Facial Sculpt'));
+        expect(adeptPower.rating, equals('1'));
+        expect(adeptPower.extra, equals('Complex Action'));
+      });
+
+      test('should handle adept power with no rating', () {
+        const adeptPower = AdeptPower(
+          name: 'Enhanced Perception',
+          page: '290',
+          source: 'SR5',
+        );
+
+        expect(adeptPower.name, equals('Enhanced Perception'));
+        expect(adeptPower.rating, isNull);
+        expect(adeptPower.extra, isNull);
+      });
+
+      test('should parse rating as string from various input types', () {
+        final jsonData1 = {
+          'name': 'Test Power 1',
+          'rating': 2, // int
+        };
+        final jsonData2 = {
+          'name': 'Test Power 2',
+          'rating': '3', // string
+        };
+
+        final adeptPower1 = AdeptPower.fromJson(jsonData1);
+        final adeptPower2 = AdeptPower.fromJson(jsonData2);
+        
+        expect(adeptPower1.rating, equals('2'));
+        expect(adeptPower2.rating, equals('3'));
+      });
+
+      test('should maintain backwards compatibility for simple adept power data', () {
+        final oldData = {
+          'name': 'Enhanced Perception',
+          'source': 'SR5',
+          'page': '290',
+        };
+
+        final adeptPower = AdeptPower.fromJson(oldData);
+        expect(adeptPower.name, equals('Enhanced Perception'));
+        expect(adeptPower.rating, isNull);
+        expect(adeptPower.extra, isNull);
+      });
+
+      test('should parse adept power Cloak with bonus metadata', () {
+        final jsonData = {
+          'name': 'Cloak',
+          'rating': '2',
+          'extra': null,
+          'pointsperlevel': 0.25,
+          'extrapointcost': 0.0,
+          'haslevels': true,
+          'maxlevels': 0,
+          'action': '',
+          'discounted': false,
+          'source': 'SG',
+          'page': '169',
+          'bonus': {
+            'detectionspellresist': 'Rating',
+          },
+        };
+
+        final power = AdeptPower.fromJson(jsonData);
+
+        expect(power.name, equals('Cloak'));
+        expect(power.rating, equals('2'));
+        expect(power.pointsPerLevel, equals(0.25));
+        expect(power.extraPointCost, equals(0.0));
+        expect(power.hasLevels, isTrue);
+        expect(power.maxLevels, equals(0));
+        expect(power.action, isEmpty);
+        expect(power.discounted, isFalse);
+        expect(power.source, equals('SG'));
+        expect(power.page, equals('169'));
+
+        // Check bonus metadata
+        expect(power.bonus, isNotNull);
+        expect(power.bonus!.containsKey('detectionspellresist'), isTrue);
+        expect(power.bonus!['detectionspellresist'], equals('Rating'));
+      });
+
+      test('should handle adept power from basic XML structure', () {
+        // This test simulates the minimal XML we might encounter
+        final jsonData = {
+          'name': 'Cloak',
+          'rating': '2',
+          'extra': '',
+        };
+
+        final adeptPower = AdeptPower.fromJson(jsonData);
+        
+        expect(adeptPower.name, equals('Cloak'));
+        expect(adeptPower.rating, equals('2'));
+        expect(adeptPower.extra, equals(''));
+      });
+
+      test('should handle complex adept power names with parenthetical specifications', () {
+        const adeptPower = AdeptPower(
+          name: 'Improved Ability (skill)',
+          rating: '1',
+          extra: 'Blades',
+          page: '291',
+          source: 'SR5',
+        );
+
+        expect(adeptPower.name, equals('Improved Ability (skill)'));
+        expect(adeptPower.extra, equals('Blades'));
+      });
+
+      test('should handle null and empty values gracefully', () {
+        final jsonData = {
+          'name': 'Test Power',
+          'rating': null,
+          'extra': '',
+        };
+
+        final adeptPower = AdeptPower.fromJson(jsonData);
+        
+        expect(adeptPower.name, equals('Test Power'));
+        expect(adeptPower.rating, isNull);
+        expect(adeptPower.extra, equals(''));
+      });
+      test('should parse adept power from XML data', () {
+        const xmlData = '''<?xml version="1.0" encoding="utf-8"?>
+        <character>
+          <powers>
+            <power>
+              <sourceid>42baa818-50ca-4c6b-b316-780a51df9c97</sourceid>
+              <guid>845dde49-72b8-4f92-86c2-9713541fe4ee</guid>
+              <name>Cloak</name>
+              <extra />
+              <pointsperlevel>0.25</pointsperlevel>
+              <adeptway>0</adeptway>
+              <action />
+              <rating>2</rating>
+              <extrapointcost>0</extrapointcost>
+              <levels>True</levels>
+              <maxlevels>0</maxlevels>
+              <discounted>False</discounted>
+              <discountedgeas>False</discountedgeas>
+              <bonussource />
+              <freepoints>0</freepoints>
+              <source>SG</source>
+              <page>169</page>
+              <bonus>
+                <detectionspellresist>Rating</detectionspellresist>
+              </bonus>
+              <adeptwayrequires></adeptwayrequires>
+              <enhancements />
+              <notes />
+              <notesColor>Chocolate</notesColor>
+            </power>
+          </powers>
+        </character>''';
+
+        final xmlElement = XmlDocument.parse(xmlData).rootElement;
+        final powers = EnhancedChumerXmlService.parseAdeptPowers(xmlElement);
+        final cloak = powers.firstWhere((p) => p.name == 'Cloak');
+        expect(cloak.name, equals('Cloak'));
+        expect(cloak.rating, equals('2'));
+        expect(cloak.pointsPerLevel, equals(0.25));
+        expect(cloak.extraPointCost, equals(0.0));
+        expect(cloak.hasLevels, isTrue);
+        expect(cloak.maxLevels, equals(0));
+        expect(cloak.discounted, isFalse);
+        expect(cloak.source, equals('SG'));
+        expect(cloak.page, equals('169'));
+
+        // Bonus section
+        expect(cloak.bonus, isNotNull);
+        expect(cloak.bonus!.containsKey('detectionspellresist'), isTrue);
+        expect(cloak.bonus!['detectionspellresist'], equals('Rating'));
+      });
+    });
     group('Model Compatibility Tests', () {
       test('should maintain backwards compatibility for existing spell data', () {
         // Test that existing simple spell data still works
@@ -193,7 +407,7 @@ void main() {
 
     group('Display and Utility Tests', () {
       test('should format spell display information correctly', () {
-        final spell = Spell(
+        const spell = Spell(
           name: 'Stunbolt',
           range: 'Line of Sight',
           duration: 'Instant',
@@ -207,7 +421,7 @@ void main() {
       });
 
       test('should format complex form display information correctly', () {
-        final complexForm = ComplexForm(
+        const complexForm = ComplexForm(
           name: 'Analyze',
           target: 'File',
           duration: 'Sustained',
@@ -220,7 +434,7 @@ void main() {
       });
 
       test('should identify incomplete spell information', () {
-        final incompleteSpell = Spell(
+        const incompleteSpell = Spell(
           name: 'Mystery Spell',
           category: 'Unknown',
         );
@@ -229,7 +443,7 @@ void main() {
       });
 
       test('should identify incomplete complex form information', () {
-        final incompleteForm = ComplexForm(
+        const incompleteForm = ComplexForm(
           name: 'Mystery Form',
         );
 

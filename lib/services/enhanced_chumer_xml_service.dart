@@ -67,7 +67,7 @@ class EnhancedChumerXmlService {
       final spells = parseSpells(characterElement);
       final spirits = _parseSpirits(characterElement);
       final complexForms = _parseComplexForms(characterElement);
-      final adeptPowers = _parseAdeptPowers(characterElement);
+      final adeptPowers = parseAdeptPowers(characterElement);
       
       // Parse gear
       final gear = _parseGear(characterElement);
@@ -436,7 +436,7 @@ class EnhancedChumerXmlService {
     return complexForms;
   }
   
-  static List<AdeptPower> _parseAdeptPowers(XmlElement characterElement) {
+  static List<AdeptPower> parseAdeptPowers(XmlElement characterElement) {
     final adeptPowers = <AdeptPower>[];
     final powersElement = characterElement.findElements('powers').firstOrNull;
     
@@ -445,12 +445,32 @@ class EnhancedChumerXmlService {
         final name = _getElementText(powerElement, 'name');
         final rating = _getElementText(powerElement, 'rating');
         final extra = _getElementText(powerElement, 'extra');
+        final source = _getElementText(powerElement, 'source') ?? '';
+        final page = _getElementText(powerElement, 'page') ?? '';
+        final discounted = _getElementText(powerElement, 'discounted')?.toLowerCase() == 'true';
+        final pointsPerLevel = double.tryParse(_getElementText(powerElement, 'pointsperlevel') ?? '') ?? 0.0;
+        final extraPointCost = double.tryParse(_getElementText(powerElement, 'extrapointcost') ?? '') ?? 0.0;
+        final hasLevels = _getElementText(powerElement, 'levels')?.toLowerCase() == 'true';
+        final maxLevels = int.tryParse(_getElementText(powerElement, 'maxlevels') ?? '0') ?? 0;
+        final action = _getElementText(powerElement, 'action');
+        final bonus = _parseBonus(powerElement);
         
         if (name != null) {
           adeptPowers.add(AdeptPower(
             name: name,
             rating: rating,
             extra: extra,
+            source: source,
+            page: page,
+            discounted: discounted,
+            pointsPerLevel: pointsPerLevel,
+            extraPointCost: extraPointCost,
+            hasLevels: hasLevels,
+            maxLevels: maxLevels,
+            action: action,
+            bonus: bonus,
+
+            
           ));
         }
       }
@@ -458,7 +478,24 @@ class EnhancedChumerXmlService {
     
     return adeptPowers;
   }
-  
+
+  static Map<String, String>? _parseBonus(XmlElement powerElement) {
+    final bonusElement = powerElement.getElement('bonus');
+    if (bonusElement == null) return null;
+
+    final Map<String, String> bonusMap = {};
+
+    for (final child in bonusElement.children.whereType<XmlElement>()) {
+      final key = child.name.local.trim();
+      final value = child.innerText.trim();
+      if (key.isNotEmpty && value.isNotEmpty) {
+        bonusMap[key] = value;
+      }
+    }
+
+    return bonusMap.isEmpty ? null : bonusMap;
+  }
+
   static List<Gear> _parseGear(XmlElement characterElement) {
     final allGear = <Gear>[];
     

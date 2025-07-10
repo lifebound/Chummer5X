@@ -206,12 +206,24 @@ class LimitDetail {
 class Spell {
   final String name;
   final String category;
-  final String? improvementSource;
-  final String? grade;
+  final String range;
+  final String duration;
+  final String drain;
+  final String source;
+  final String page;
+  final String description;
+  final String? improvementSource; // Keep for backwards compatibility
+  final String? grade; // Keep for backwards compatibility
 
   const Spell({
     required this.name,
     required this.category,
+    this.range = '',
+    this.duration = '',
+    this.drain = '',
+    this.source = '',
+    this.page = '',
+    this.description = '',
     this.improvementSource,
     this.grade,
   });
@@ -219,9 +231,24 @@ class Spell {
   factory Spell.fromJson(Map<String, dynamic> json) => Spell(
     name: json['name'] ?? '',
     category: json['category'] ?? '',
+    range: json['range'] ?? '',
+    duration: json['duration'] ?? '',
+    drain: json['drain'] ?? '',
+    source: json['source'] ?? '',
+    page: json['page'] ?? '',
+    description: json['description'] ?? '',
     improvementSource: json['improvementsource'],
     grade: json['grade'],
   );
+
+  // Utility getters
+  String get displayName => name;
+  bool get hasCompleteInfo => 
+    name.isNotEmpty && 
+    range.isNotEmpty && 
+    duration.isNotEmpty && 
+    drain.isNotEmpty && 
+    source.isNotEmpty;
 }
 
 class Spirit {
@@ -241,12 +268,41 @@ class Spirit {
 
 class ComplexForm {
   final String name;
+  final String target;
+  final String duration;
+  final String fading;
+  final String source;
+  final String page;
+  final String description;
 
-  const ComplexForm({required this.name});
+  const ComplexForm({
+    required this.name,
+    this.target = '',
+    this.duration = '',
+    this.fading = '',
+    this.source = '',
+    this.description = '',
+    this.page = '',
+  });
 
   factory ComplexForm.fromJson(Map<String, dynamic> json) => ComplexForm(
     name: json['name'] ?? '',
+    target: json['target'] ?? '',
+    duration: json['duration'] ?? '',
+    fading: json['fading'] ?? '',
+    source: json['source'] ?? '',
+    description: json['description'] ?? '',
+    page: json['page'] ?? '',
   );
+
+  // Utility getters
+  String get displayName => name;
+  bool get hasCompleteInfo => 
+    name.isNotEmpty && 
+    target.isNotEmpty && 
+    duration.isNotEmpty && 
+    fading.isNotEmpty && 
+    source.isNotEmpty;
 }
 
 class AdeptPower {

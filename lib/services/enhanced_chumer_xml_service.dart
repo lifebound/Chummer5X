@@ -64,7 +64,7 @@ class EnhancedChumerXmlService {
       final limits = _calculateLimits(attributes, characterElement);
       
       // Parse magic/resonance content
-      final spells = _parseSpells(characterElement);
+      final spells = parseSpells(characterElement);
       final spirits = _parseSpirits(characterElement);
       final complexForms = _parseComplexForms(characterElement);
       final adeptPowers = _parseAdeptPowers(characterElement);
@@ -354,7 +354,7 @@ class EnhancedChumerXmlService {
     return limits;
   }
   
-  static List<Spell> _parseSpells(XmlElement characterElement) {
+  static List<Spell> parseSpells(XmlElement characterElement) {
     final spells = <Spell>[];
     final spellsElement = characterElement.findElements('spells').firstOrNull;
     
@@ -362,15 +362,25 @@ class EnhancedChumerXmlService {
       for (final spellElement in spellsElement.findElements('spell')) {
         final name = _getElementText(spellElement, 'name');
         final category = _getElementText(spellElement, 'category');
+        final range = _getElementText(spellElement, 'range');
+        final target = _getElementText(spellElement, 'target');
+        final duration = _getElementText(spellElement, 'duration');
+        final drain = _getElementText(spellElement, 'dv');
+        final source = _getElementText(spellElement, 'source');
         final improvementSource = _getElementText(spellElement, 'improvementsource');
         final grade = _getElementText(spellElement, 'grade');
-        
+        final page = _getElementText(spellElement, 'page');
         if (name != null && category != null) {
           spells.add(Spell(
             name: name,
             category: category,
+            range: range ?? '',
+            duration: duration ?? '',
+            drain: drain ?? '',
+            source: source ?? '',
             improvementSource: improvementSource,
             grade: grade,
+            page: page ?? '',
           ));
         }
       }
@@ -404,9 +414,21 @@ class EnhancedChumerXmlService {
     if (complexFormsElement != null) {
       for (final formElement in complexFormsElement.findElements('complexform')) {
         final name = _getElementText(formElement, 'name');
-        
+        final target = _getElementText(formElement, 'target');
+        final duration = _getElementText(formElement, 'duration');
+        final fading = _getElementText(formElement, 'fv');
+        final source = _getElementText(formElement, 'source');
+        final page = _getElementText(formElement, 'page');
+        debugPrint('Parsing complex form: $name, Target: $target, Duration: $duration, Fading: $fading, Source: $source, Page: $page');
         if (name != null) {
-          complexForms.add(ComplexForm(name: name));
+          complexForms.add(ComplexForm(
+            name: name,
+            target: target ?? '',
+            duration: duration ?? '',
+            fading: fading ?? '',
+            source: source ?? '',
+            page: page ?? '',
+          ));
         }
       }
     }

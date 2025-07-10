@@ -636,23 +636,124 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildSpellsView(BuildContext context) {
+    final spells = _currentCharacter!.spells;
+    
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Spells',
-              style: Theme.of(context).textTheme.headlineSmall,
+            Row(
+              children: [
+                Icon(Icons.auto_fix_high, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Spells',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const Spacer(),
+                Text(
+                  '${spells.length} spell${spells.length != 1 ? 's' : ''}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            Text(
-              'Spells section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            if (spells.isEmpty)
+              Text(
+                'No spells known',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              )
+            else
+              ...spells.map((spell) => _buildSpellCard(context, spell)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSpellCard(BuildContext context, Spell spell) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8.0),
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    spell.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                if (spell.category.isNotEmpty)
+                  Chip(
+                    label: Text(
+                      spell.category,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (spell.hasCompleteInfo) ...[
+              _buildSpellDetailRow(context, 'Range', spell.range),
+              _buildSpellDetailRow(context, 'Duration', spell.duration),
+              _buildSpellDetailRow(context, 'Drain', spell.drain),
+              if (spell.source.isNotEmpty)
+                _buildSpellDetailRow(context, 'Source', spell.source),
+            ] else ...[
+              Text(
+                'Incomplete spell information',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.orange[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpellDetailRow(BuildContext context, String label, String value) {
+    if (value.isEmpty) return const SizedBox.shrink();
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              '$label:',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -702,23 +803,110 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildComplexFormsView(BuildContext context) {
+    final complexForms = _currentCharacter!.complexForms;
+    
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Complex Forms',
-              style: Theme.of(context).textTheme.headlineSmall,
+            Row(
+              children: [
+                Icon(Icons.memory, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Complex Forms',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const Spacer(),
+                Text(
+                  '${complexForms.length} form${complexForms.length != 1 ? 's' : ''}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            Text(
-              'Complex Forms section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            if (complexForms.isEmpty)
+              Text(
+                'No complex forms known',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              )
+            else
+              ...complexForms.map((form) => _buildComplexFormCard(context, form)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildComplexFormCard(BuildContext context, ComplexForm form) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8.0),
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              form.name,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (form.hasCompleteInfo) ...[
+              _buildComplexFormDetailRow(context, 'Target', form.target),
+              _buildComplexFormDetailRow(context, 'Duration', form.duration),
+              _buildComplexFormDetailRow(context, 'Fading', form.fading),
+              if (form.source.isNotEmpty)
+                _buildComplexFormDetailRow(context, 'Source', form.source),
+            ] else ...[
+              Text(
+                'Incomplete complex form information',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.orange[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildComplexFormDetailRow(BuildContext context, String label, String value) {
+    if (value.isEmpty) return const SizedBox.shrink();
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              '$label:',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }

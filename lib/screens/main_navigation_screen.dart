@@ -42,9 +42,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       drawer: _buildNavigationDrawer(context),
-      body: _currentCharacter != null 
-        ? _buildCharacterContent(context)
-        : _buildEmptyState(context),
+      body: _currentCharacter != null
+          ? _buildCharacterContent(context)
+          : _buildEmptyState(context),
     );
   }
 
@@ -80,8 +80,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     radius: 30,
                     backgroundColor: Theme.of(context).colorScheme.onPrimary,
                     child: Text(
-                      (_currentCharacter!.name?.isNotEmpty == true) 
-                          ? _currentCharacter!.name![0].toUpperCase() 
+                      (_currentCharacter!.name?.isNotEmpty == true)
+                          ? _currentCharacter!.name![0].toUpperCase()
                           : '?',
                       style: TextStyle(
                         fontSize: 24,
@@ -103,7 +103,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Text(
                       '"${_currentCharacter!.alias}"',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimary
+                            .withOpacity(0.8),
                         fontSize: 14,
                         fontStyle: FontStyle.italic,
                       ),
@@ -126,7 +129,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   Text(
                     'Shadowrun Character Viewer',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimary
+                          .withOpacity(0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -134,7 +140,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ],
             ),
           ),
-          
+
           // Character Management Section
           ListTile(
             leading: const Icon(Icons.add),
@@ -144,7 +150,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               _loadCharacterFile();
             },
           ),
-          
+
           ListTile(
             leading: const Icon(Icons.person_add),
             title: const Text('Create Sample Character'),
@@ -153,7 +159,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               _createSampleCharacter();
             },
           ),
-          
+
           // Character Sections (only show if character is loaded)
           if (_currentCharacter != null) ...[
             const Divider(),
@@ -175,7 +181,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Icons.school,
               'Skills',
             ),
-            
+
             // Dynamic navigation tiles based on character type
             if (_currentCharacter!.shouldShowSpellsTab)
               _buildNavigationTile(
@@ -212,7 +218,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Icons.computer,
                 'Sprites',
               ),
-            
+
             _buildNavigationTile(
               context,
               NavigationSection.gear,
@@ -238,7 +244,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               'Notes',
             ),
           ],
-          
+
           // Character List (if multiple characters loaded)
           if (_characters.length > 1) ...[
             const Divider(),
@@ -253,29 +259,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
               ),
             ),
-            
+
             // Character list
             ..._characters.map((character) => ListTile(
-              leading: CircleAvatar(
-                child: Text(
-                  (character.name?.isNotEmpty == true) 
-                    ? character.name![0].toUpperCase() 
-                    : '?',
-                ),
-              ),
-              title: Text(character.name ?? 'Unknown'),
-              subtitle: character.alias?.isNotEmpty == true 
-                ? Text('"${character.alias}"') 
-                : null,
-              selected: _currentCharacter == character,
-              onTap: () {
-                setState(() {
-                  _currentCharacter = character;
-                  _currentSection = NavigationSection.overview; // Reset to overview
-                });
-                Navigator.of(context).pop();
-              },
-            )),
+                  leading: CircleAvatar(
+                    child: Text(
+                      (character.name?.isNotEmpty == true)
+                          ? character.name![0].toUpperCase()
+                          : '?',
+                    ),
+                  ),
+                  title: Text(character.name ?? 'Unknown'),
+                  subtitle: character.alias?.isNotEmpty == true
+                      ? Text('"${character.alias}"')
+                      : null,
+                  selected: _currentCharacter == character,
+                  onTap: () {
+                    setState(() {
+                      _currentCharacter = character;
+                      _currentSection =
+                          NavigationSection.overview; // Reset to overview
+                    });
+                    Navigator.of(context).pop();
+                  },
+                )),
           ],
         ],
       ),
@@ -350,8 +357,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
       if (result != null && result.files.single.bytes != null) {
         final xmlContent = String.fromCharCodes(result.files.single.bytes!);
-        final character = EnhancedChumerXmlService.parseCharacterXml(xmlContent);
-        
+        final character =
+            EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+
         if (character != null) {
           setState(() {
             if (!_characters.contains(character)) {
@@ -384,12 +392,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   void _createSampleCharacter() {
-    final sampleCharacter = ShadowrunCharacter(
+    const sampleCharacter = ShadowrunCharacter(
       name: 'Sample Runner',
       alias: 'Chrome',
       metatype: 'Human',
       skills: [
-        const Skill(
+        Skill(
           name: 'Pistols',
           base: '4',
           karma: '2',
@@ -400,14 +408,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             SkillSpecialization(name: 'Semi-Automatics'),
           ],
         ),
-        const Skill(
+        Skill(
           name: 'Infiltration',
           base: '3',
           karma: '1',
           skillGroupName: 'Stealth',
           skillGroupTotal: 0,
         ),
-        const Skill(
+        Skill(
           name: 'Hacking',
           base: '5',
           karma: '1',
@@ -415,18 +423,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           skillGroupTotal: 0,
           isPrioritySkill: true, // Priority skill gets +2
         ),
-        const Skill(
+        Skill(
           name: 'Perception',
           base: '2',
           karma: '2',
           skillGroupName: '',
           skillGroupTotal: 0,
         ),
-        const Skill(
+        Skill(
           name: 'Palming',
           base: '1',
           karma: '3',
-          skillGroupName: 'Stealth', 
+          skillGroupName: 'Stealth',
           skillGroupTotal: 0,
           specializations: [
             SkillSpecialization(name: 'Pickpocket'),
@@ -436,7 +444,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ],
       limits: {}, // Empty for now
       attributes: [
-        const Attribute(
+        Attribute(
           name: 'Body',
           metatypeCategory: 'Physical',
           totalValue: 4,
@@ -446,7 +454,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 3,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Agility',
           metatypeCategory: 'Physical',
           totalValue: 5,
@@ -456,7 +464,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 4,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Reaction',
           metatypeCategory: 'Physical',
           totalValue: 4,
@@ -466,7 +474,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 3,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Strength',
           metatypeCategory: 'Physical',
           totalValue: 3,
@@ -476,7 +484,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 2,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Charisma',
           metatypeCategory: 'Mental',
           totalValue: 3,
@@ -486,7 +494,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 2,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Intuition',
           metatypeCategory: 'Mental',
           totalValue: 4,
@@ -496,7 +504,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 3,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Logic',
           metatypeCategory: 'Mental',
           totalValue: 5,
@@ -506,7 +514,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 4,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Willpower',
           metatypeCategory: 'Mental',
           totalValue: 3,
@@ -516,7 +524,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           base: 2,
           karma: 1,
         ),
-        const Attribute(
+        Attribute(
           name: 'Edge',
           metatypeCategory: 'Special',
           totalValue: 2,
@@ -527,7 +535,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           karma: 0,
         ),
       ],
-      conditionMonitor: const ConditionMonitor(
+      conditionMonitor: ConditionMonitor(
         physicalCM: 10,
         physicalCMFilled: 2,
         physicalCMOverflow: 4,
@@ -535,10 +543,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         stunCMFilled: 1,
       ),
       magEnabled: false, // Sample character doesn't have magic enabled
-      resEnabled: false, // Sample character doesn't have resonance enabled  
+      resEnabled: false, // Sample character doesn't have resonance enabled
       depEnabled: false, // Sample character doesn't have depth enabled
     );
-    
+
     setState(() {
       if (!_characters.contains(sampleCharacter)) {
         _characters.add(sampleCharacter);
@@ -548,27 +556,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     });
   }
 
-  Widget _buildNavigationTile(BuildContext context, NavigationSection section, IconData icon, String title) {
+  Widget _buildNavigationTile(BuildContext context, NavigationSection section,
+      IconData icon, String title) {
     final isSelected = _currentSection == section;
-    
+
     return ListTile(
       leading: Icon(
         icon,
-        color: isSelected 
-          ? Theme.of(context).colorScheme.primary 
-          : Theme.of(context).colorScheme.onSurfaceVariant,
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       title: Text(
         title,
         style: TextStyle(
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected 
-            ? Theme.of(context).colorScheme.primary 
-            : Theme.of(context).colorScheme.onSurface,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurface,
         ),
       ),
       selected: isSelected,
-      selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+      selectedTileColor:
+          Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
       onTap: () {
         setState(() {
           _currentSection = section;
@@ -613,7 +623,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildOverviewView(BuildContext context) {
     final spacing = ResponsiveLayout.getCardSpacing(context);
-    
+
     return Column(
       children: [
         CharacterInfoCard(character: _currentCharacter!),
@@ -635,55 +645,104 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return SkillsCard(character: _currentCharacter!);
   }
 
+  Widget _buildMagicalListView<T>({
+    required BuildContext context,
+    required List<T> items,
+    required IconData icon,
+    required String title,
+    required String singularLabel,
+    required String emptyMessage,
+    required Widget Function(BuildContext, T) itemBuilder,
+    }) 
+    { 
+      final itemCountText =
+          '${items.length} $singularLabel${items.length == 1 ? '' : 's'}';
+
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, color: Theme.of(context).primaryColor),
+                  const SizedBox(width: 8),
+                  Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                  const Spacer(),
+                  Text(
+                    itemCountText,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (items.isEmpty)
+                Text(
+                  emptyMessage,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                )
+              else
+                ...items.map((e) => itemBuilder(context, e)).toList(),
+            ],
+          ),
+        ),
+      );
+  }
+
   Widget _buildSpellsView(BuildContext context) {
     final spells = _currentCharacter!.spells;
-    
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.auto_fix_high, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  'Spells',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const Spacer(),
-                Text(
-                  '${spells.length} spell${spells.length != 1 ? 's' : ''}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (spells.isEmpty)
-              Text(
-                'No spells known',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
-              )
-            else
-              ...spells.map((spell) => _buildSpellCard(context, spell)),
-          ],
-        ),
-      ),
+
+    return _buildMagicalListView<Spell>(
+      context: context,
+      items: spells,
+      icon: Icons.auto_fix_high,
+      title: 'Spells',
+      singularLabel: 'spell',
+      emptyMessage: 'No spells known',
+      itemBuilder: _buildSpellCard,
     );
   }
 
-  Widget _buildSpellCard(BuildContext context, Spell spell) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+  Widget _buildComplexFormsView(BuildContext context) {
+    final complexForms = _currentCharacter!.complexForms;
+
+    return _buildMagicalListView<ComplexForm>(
+      context: context,
+      items: complexForms,
+      icon: Icons.auto_fix_high,
+      title: 'Complex Forms',
+      singularLabel: 'complex form',
+      emptyMessage: 'No complex forms known',
+      itemBuilder: _buildComplexFormCard,
+    );
+  }
+
+  Widget _buildMagicalCard({
+    required BuildContext context,
+    required String name,
+    String? category,
+    required bool hasCompleteInfo,
+    required List<MapEntry<String, String>> fields, // label -> value
+    required String incompleteMessage,
+    required Widget Function(BuildContext, String label, String value) chipBuilder,
+    }) 
+    {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          ),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -691,73 +750,162 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    spell.name,
+                    name,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ),
-                if (spell.category.isNotEmpty)
-                  Chip(
-                    label: Text(
-                      spell.category,
-                      style: const TextStyle(fontSize: 12),
+                if (category != null && category.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    child: Text(
+                      category,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
                   ),
               ],
             ),
-            const SizedBox(height: 8),
-            if (spell.hasCompleteInfo) ...[
-              _buildSpellDetailRow(context, 'Range', spell.range),
-              _buildSpellDetailRow(context, 'Duration', spell.duration),
-              _buildSpellDetailRow(context, 'Drain', spell.drain),
-              if (spell.source.isNotEmpty)
-                _buildSpellDetailRow(context, 'Source', spell.source),
+            if (hasCompleteInfo) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: fields
+                    .where((entry) => entry.value.isNotEmpty)
+                    .map((entry) => chipBuilder(context, entry.key, entry.value))
+                    .toList(),
+              ),
             ] else ...[
+              const SizedBox(height: 8),
               Text(
-                'Incomplete spell information',
+                incompleteMessage,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.orange[700],
-                  fontStyle: FontStyle.italic,
-                ),
+                      color: Colors.orange[700],
+                      fontStyle: FontStyle.italic,
+                    ),
               ),
             ],
           ],
         ),
-      ),
+      );
+  }
+
+  Widget _buildSpellCard(BuildContext context, Spell spell) {
+    return _buildMagicalCard(
+    context: context,
+    name: spell.name,
+    category: spell.category,
+    hasCompleteInfo: spell.hasCompleteInfo,
+    incompleteMessage: 'Incomplete spell information',
+    fields: [
+      MapEntry('Range', spell.range),
+      MapEntry('Duration', spell.duration),
+      MapEntry('Drain', spell.drain),
+      MapEntry('Source', spell.source),
+    ],
+    chipBuilder: _buildSpellDetailChip,
+    );
+  }
+  
+  Widget _buildComplexFormCard(BuildContext context, ComplexForm form) {
+    return _buildMagicalCard(
+    context: context,
+    name: form.name,
+    category: null,
+    hasCompleteInfo: form.hasCompleteInfo,
+    incompleteMessage: 'Incomplete complex form information',
+    fields: [
+      MapEntry('Target', form.target),
+      MapEntry('Duration', form.duration),
+      MapEntry('Fading', form.fading),
+      MapEntry('Source', form.source),
+    ],
+    chipBuilder: _buildComplexFormDetailChip,
     );
   }
 
-  Widget _buildSpellDetailRow(BuildContext context, String label, String value) {
-    if (value.isEmpty) return const SizedBox.shrink();
-    
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
+  Widget _buildSpellDetailChip(
+      BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 70,
-            child: Text(
-              '$label:',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodySmall,
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
       ),
     );
   }
-
+  
+  Widget _buildComplexFormDetailChip(
+      BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildSpiritsView(BuildContext context) {
     return Card(
       child: Padding(
@@ -798,115 +946,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildComplexFormsView(BuildContext context) {
-    final complexForms = _currentCharacter!.complexForms;
-    
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.memory, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  'Complex Forms',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const Spacer(),
-                Text(
-                  '${complexForms.length} form${complexForms.length != 1 ? 's' : ''}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (complexForms.isEmpty)
-              Text(
-                'No complex forms known',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
-              )
-            else
-              ...complexForms.map((form) => _buildComplexFormCard(context, form)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildComplexFormCard(BuildContext context, ComplexForm form) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              form.name,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            if (form.hasCompleteInfo) ...[
-              _buildComplexFormDetailRow(context, 'Target', form.target),
-              _buildComplexFormDetailRow(context, 'Duration', form.duration),
-              _buildComplexFormDetailRow(context, 'Fading', form.fading),
-              if (form.source.isNotEmpty)
-                _buildComplexFormDetailRow(context, 'Source', form.source),
-            ] else ...[
-              Text(
-                'Incomplete complex form information',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.orange[700],
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildComplexFormDetailRow(BuildContext context, String label, String value) {
-    if (value.isEmpty) return const SizedBox.shrink();
-    
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 70,
-            child: Text(
-              '$label:',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1024,8 +1063,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildConditionMonitorCard() {
     final cm = _currentCharacter!.conditionMonitor;
     final cmPenalty = _currentCharacter!.conditionMonitorPenalty;
-    debugPrint("Condition Monitor: ${cm.physicalCMFilled}/${cm.physicalCMTotal} Physical, ${cm.stunCMFilled}/${cm.stunCMTotal} Stun, CM Penalty: $cmPenalty");
-    
+    debugPrint(
+        "Condition Monitor: ${cm.physicalCMFilled}/${cm.physicalCMTotal} Physical, ${cm.stunCMFilled}/${cm.stunCMTotal} Stun, CM Penalty: $cmPenalty");
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -1038,20 +1078,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Text(
                   'Condition Monitors',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                 ),
                 // CM Penalty indicator
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: cmPenalty < 0 
-                        ? Colors.red.shade100 
+                    color: cmPenalty < 0
+                        ? Colors.red.shade100
                         : Colors.green.shade100,
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: cmPenalty < 0 
-                          ? Colors.red.shade400 
+                      color: cmPenalty < 0
+                          ? Colors.red.shade400
                           : Colors.green.shade400,
                     ),
                   ),
@@ -1060,8 +1101,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: cmPenalty < 0 
-                          ? Colors.red.shade700 
+                      color: cmPenalty < 0
+                          ? Colors.red.shade700
                           : Colors.green.shade700,
                     ),
                   ),
@@ -1100,23 +1141,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildConditionMonitor(String label, int filled, int total, int overflow, String status, Color color) {
+  Widget _buildConditionMonitor(String label, int filled, int total,
+      int overflow, String status, Color color) {
     // Calculate if we're in overflow state
     final isInOverflow = filled > total;
     final overflowAmount = isInOverflow ? filled - total : 0;
     final normalFilled = isInOverflow ? total : filled;
     final isNearDeath = overflowAmount >= overflow && overflow > 0;
-    
+
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isNearDeath 
-              ? Colors.red.shade800 
-              : isInOverflow 
-                  ? Colors.red.shade600 
+          color: isNearDeath
+              ? Colors.red.shade800
+              : isInOverflow
+                  ? Colors.red.shade600
                   : Theme.of(context).colorScheme.outline.withOpacity(0.2),
           width: isNearDeath ? 2 : 1,
         ),
@@ -1165,7 +1207,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             if (overflow > 0 && label == 'Physical') ...[
               const SizedBox(height: 4),
               LinearProgressIndicator(
-                value: overflow > 0 ? (overflowAmount / overflow).clamp(0.0, 1.0) : 0.0,
+                value: overflow > 0
+                    ? (overflowAmount / overflow).clamp(0.0, 1.0)
+                    : 0.0,
                 backgroundColor: Colors.grey.shade300,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   isNearDeath ? Colors.red.shade800 : Colors.red.shade600,
@@ -1192,7 +1236,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         'Overflow: $overflowAmount / $overflow',
                         style: TextStyle(
                           fontSize: 10,
-                          color: isNearDeath ? Colors.red.shade800 : Colors.red.shade600,
+                          color: isNearDeath
+                              ? Colors.red.shade800
+                              : Colors.red.shade600,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1212,30 +1258,44 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: filled > 0 ? () => _adjustConditionMonitor(label, -1) : null,
+                  onPressed: filled > 0
+                      ? () => _adjustConditionMonitor(label, -1)
+                      : null,
                   icon: const Icon(Icons.remove_circle_outline),
                   iconSize: 20,
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
                   style: IconButton.styleFrom(
-                    foregroundColor: filled > 0 
-                        ? Theme.of(context).colorScheme.primary 
-                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                    foregroundColor: filled > 0
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.3),
                   ),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: (label == 'Physical' ? filled < (total + overflow) : filled < total) 
-                      ? () => _adjustConditionMonitor(label, 1) 
+                  onPressed: (label == 'Physical'
+                          ? filled < (total + overflow)
+                          : filled < total)
+                      ? () => _adjustConditionMonitor(label, 1)
                       : null,
                   icon: const Icon(Icons.add_circle_outline),
                   iconSize: 20,
                   padding: const EdgeInsets.all(4),
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
                   style: IconButton.styleFrom(
-                    foregroundColor: (label == 'Physical' ? filled < (total + overflow) : filled < total)
-                        ? Theme.of(context).colorScheme.primary 
-                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                    foregroundColor: (label == 'Physical'
+                            ? filled < (total + overflow)
+                            : filled < total)
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.3),
                   ),
                 ),
               ],
@@ -1289,22 +1349,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               'Derived Attributes',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                  child: _buildDerivedAttribute('Physical Limit', _currentCharacter!.physicalLimit),
+                  child: _buildDerivedAttribute(
+                      'Physical Limit', _currentCharacter!.physicalLimit),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildDerivedAttribute('Mental Limit', _currentCharacter!.mentalLimit),
+                  child: _buildDerivedAttribute(
+                      'Mental Limit', _currentCharacter!.mentalLimit),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildDerivedAttribute('Social Limit', _currentCharacter!.socialLimit),
+                  child: _buildDerivedAttribute(
+                      'Social Limit', _currentCharacter!.socialLimit),
                 ),
               ],
             ),
@@ -1339,15 +1402,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   void _adjustConditionMonitor(String monitorType, int delta) {
     if (_currentCharacter == null) return;
-    
+
     final isPhysical = monitorType == 'Physical';
     final increment = delta > 0;
-    
+
     final updatedCharacter = _currentCharacter!.adjustConditionMonitor(
       isPhysical: isPhysical,
       increment: increment,
     );
-    
+
     setState(() {
       // Update the character in our list
       final characterIndex = _characters.indexOf(_currentCharacter!);
@@ -1356,7 +1419,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         _currentCharacter = updatedCharacter;
       }
     });
-    
+
     debugPrint("Adjusted $monitorType condition monitor by $delta");
   }
 }

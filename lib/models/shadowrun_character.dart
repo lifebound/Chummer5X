@@ -775,8 +775,8 @@ class ShadowrunCharacter {
   // Condition Monitor Penalty calculation
   // For every 3 points of damage on either track (not including overflow), apply -1 penalty
   int get conditionMonitorPenalty {
-    final physicalPenalty = (conditionMonitor.physicalCMFilled.clamp(0, conditionMonitor.physicalCMTotal) / 3).ceil();
-    final stunPenalty = (conditionMonitor.stunCMFilled.clamp(0, conditionMonitor.stunCMTotal) / 3).ceil();
+    final physicalPenalty = (conditionMonitor.physicalCMFilled.clamp(0, conditionMonitor.physicalCMTotal) ~/ 3);
+    final stunPenalty = (conditionMonitor.stunCMFilled.clamp(0, conditionMonitor.stunCMTotal) ~/ 3);
     return -(physicalPenalty + stunPenalty);
   }
   

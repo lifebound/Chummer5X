@@ -61,7 +61,7 @@ class EnhancedChumerXmlService {
       _checkBrokenSkillGroups(skillGroups, skills);
       
       // Calculate and parse limits
-      final limits = _calculateLimits(attributes, characterElement);
+      //final limits = _calculateLimits(attributes, characterElement);
       
       // Parse magic/resonance content
       final spells = parseSpells(characterElement);
@@ -101,7 +101,7 @@ class EnhancedChumerXmlService {
         totalKarma: totalKarma,
         attributes: attributes,
         skills: skills,
-        limits: limits,
+        //limits: limits,
         spells: spells,
         spirits: spirits,
         complexForms: complexForms,
@@ -139,16 +139,16 @@ class EnhancedChumerXmlService {
         final nameFromAttribute = attributeElement.getAttribute('name');
         final nameFromElement = _getElementText(attributeElement, 'name');
         final name = nameFromAttribute ?? nameFromElement;
-        
-        if (name != null) {
+
+        if (name != null && (name != 'Essence' && name != 'ESS')) { // Skip ESS from XML, it will be hard-coded in constructor
           // Parse all the fields from the XML
           final metatypeCategory = _getElementText(attributeElement, 'metatypecategory') ?? '';
-          final totalValue = int.tryParse(_getElementText(attributeElement, 'totalvalue') ?? '0') ?? 0;
-          final metatypeMin = int.tryParse(_getElementText(attributeElement, 'metatypemin') ?? '0') ?? 0;
-          final metatypeMax = int.tryParse(_getElementText(attributeElement, 'metatypemax') ?? '0') ?? 0;
-          final metatypeAugMax = int.tryParse(_getElementText(attributeElement, 'metatypeaugmax') ?? '0') ?? 0;
-          final base = int.tryParse(_getElementText(attributeElement, 'base') ?? '0') ?? 0;
-          final karma = int.tryParse(_getElementText(attributeElement, 'karma') ?? '0') ?? 0;
+          final totalValue = double.tryParse(_getElementText(attributeElement, 'totalvalue') ?? '0') ?? 0.0;
+          final metatypeMin = double.tryParse(_getElementText(attributeElement, 'metatypemin') ?? '0') ?? 0.0;
+          final metatypeMax = double.tryParse(_getElementText(attributeElement, 'metatypemax') ?? '0') ?? 0.0;
+          final metatypeAugMax = double.tryParse(_getElementText(attributeElement, 'metatypeaugmax') ?? '0') ?? 0.0;
+          final base = double.tryParse(_getElementText(attributeElement, 'base') ?? '0') ?? 0.0;
+          final karma = double.tryParse(_getElementText(attributeElement, 'karma') ?? '0') ?? 0.0;
           
           attributes.add(Attribute(
             name: name,
@@ -163,6 +163,8 @@ class EnhancedChumerXmlService {
         }
       }
     }
+    
+    // ESS will be automatically added by the ShadowrunCharacter constructor
     
     return attributes;
   }
@@ -319,40 +321,40 @@ class EnhancedChumerXmlService {
     }
   }
   
-  static Map<String, LimitDetail> _calculateLimits(List<Attribute> attributes, XmlElement characterElement) {
-    final limits = <String, LimitDetail>{};
+  // static Map<String, LimitDetail> _calculateLimits(List<Attribute> attributes, XmlElement characterElement) {
+  //   final limits = <String, LimitDetail>{};
     
-    // Calculate basic limits from attributes
-    int getAttributeValue(String name) {
-      return attributes.firstWhere(
-        (attr) => attr.name.toLowerCase() == name.toLowerCase(),
-        orElse: () => const Attribute(
-          name: '', 
-          metatypeCategory: '', 
-          totalValue: 1,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 1,
-          karma: 0,
-        ),
-      ).totalValue;
-    }
+  //   // Calculate basic limits from attributes
+  //   int getAttributeValue(String name) {
+  //     return attributes.firstWhere(
+  //       (attr) => attr.name.toLowerCase() == name.toLowerCase(),
+  //       orElse: () => const Attribute(
+  //         name: '', 
+  //         metatypeCategory: '', 
+  //         totalValue: 1,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 1,
+  //         karma: 0,
+  //       ),
+  //     ).totalValue;
+  //   }
     
-    final physicalLimit = ((getAttributeValue('Strength') * 2) + getAttributeValue('Body') + getAttributeValue('Reaction')) ~/ 3;
-    final mentalLimit = ((getAttributeValue('Logic') * 2) + getAttributeValue('Intuition') + getAttributeValue('Willpower')) ~/ 3;
-    final socialLimit = ((getAttributeValue('Charisma') * 2) + getAttributeValue('Willpower') + getAttributeValue('Essence')) ~/ 3;
+  //   final physicalLimit = ((getAttributeValue('Strength') * 2) + getAttributeValue('Body') + getAttributeValue('Reaction')) ~/ 3;
+  //   final mentalLimit = ((getAttributeValue('Logic') * 2) + getAttributeValue('Intuition') + getAttributeValue('Willpower')) ~/ 3;
+  //   final socialLimit = ((getAttributeValue('Charisma') * 2) + getAttributeValue('Willpower') + getAttributeValue('Essence')) ~/ 3;
     
-    limits['Physical'] = LimitDetail(total: physicalLimit, modifiers: []);
-    limits['Mental'] = LimitDetail(total: mentalLimit, modifiers: []);
-    limits['Social'] = LimitDetail(total: socialLimit, modifiers: []);
-    limits['Astral'] = LimitDetail(
-      total: mentalLimit > socialLimit ? mentalLimit : socialLimit,
-      modifiers: [],
-    );
+  //   limits['Physical'] = LimitDetail(total: physicalLimit, modifiers: []);
+  //   limits['Mental'] = LimitDetail(total: mentalLimit, modifiers: []);
+  //   limits['Social'] = LimitDetail(total: socialLimit, modifiers: []);
+  //   limits['Astral'] = LimitDetail(
+  //     total: mentalLimit > socialLimit ? mentalLimit : socialLimit,
+  //     modifiers: [],
+  //   );
     
-    return limits;
-  }
+  //   return limits;
+  // }
   
   static List<Spell> parseSpells(XmlElement characterElement) {
     final spells = <Spell>[];

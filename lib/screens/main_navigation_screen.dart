@@ -151,14 +151,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             },
           ),
 
-          ListTile(
-            leading: const Icon(Icons.person_add),
-            title: const Text('Create Sample Character'),
-            onTap: () {
-              Navigator.of(context).pop();
-              _createSampleCharacter();
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.person_add),
+          //   title: const Text('Create Sample Character'),
+          //   onTap: () {
+          //     Navigator.of(context).pop();
+          //     _createSampleCharacter();
+          //   },
+          // ),
 
           // Character Sections (only show if character is loaded)
           if (_currentCharacter != null) ...[
@@ -333,11 +333,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     label: const Text('Load Character File'),
                   ),
                   const SizedBox(width: 16),
-                  OutlinedButton.icon(
-                    onPressed: _createSampleCharacter,
-                    icon: const Icon(Icons.person_add),
-                    label: const Text('Create Sample'),
-                  ),
+                  // OutlinedButton.icon(
+                  //   onPressed: _createSampleCharacter,
+                  //   icon: const Icon(Icons.person_add),
+                  //   label: const Text('Create Sample'),
+                  // ),
                 ],
               ),
             ],
@@ -391,170 +391,180 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
   }
 
-  void _createSampleCharacter() {
-    const sampleCharacter = ShadowrunCharacter(
-      name: 'Sample Runner',
-      alias: 'Chrome',
-      metatype: 'Human',
-      skills: [
-        Skill(
-          name: 'Pistols',
-          base: '4',
-          karma: '2',
-          skillGroupName: 'Firearms',
-          skillGroupTotal: 0,
-          isPrioritySkill: true, // Priority skill gets +2
-          specializations: [
-            SkillSpecialization(name: 'Semi-Automatics'),
-          ],
-        ),
-        Skill(
-          name: 'Infiltration',
-          base: '3',
-          karma: '1',
-          skillGroupName: 'Stealth',
-          skillGroupTotal: 0,
-        ),
-        Skill(
-          name: 'Hacking',
-          base: '5',
-          karma: '1',
-          skillGroupName: 'Cracking',
-          skillGroupTotal: 0,
-          isPrioritySkill: true, // Priority skill gets +2
-        ),
-        Skill(
-          name: 'Perception',
-          base: '2',
-          karma: '2',
-          skillGroupName: '',
-          skillGroupTotal: 0,
-        ),
-        Skill(
-          name: 'Palming',
-          base: '1',
-          karma: '3',
-          skillGroupName: 'Stealth',
-          skillGroupTotal: 0,
-          specializations: [
-            SkillSpecialization(name: 'Pickpocket'),
-            SkillSpecialization(name: 'Legerdemain'),
-          ],
-        ),
-      ],
-      limits: {}, // Empty for now
-      attributes: [
-        Attribute(
-          name: 'Body',
-          metatypeCategory: 'Physical',
-          totalValue: 4,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 3,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Agility',
-          metatypeCategory: 'Physical',
-          totalValue: 5,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 4,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Reaction',
-          metatypeCategory: 'Physical',
-          totalValue: 4,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 3,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Strength',
-          metatypeCategory: 'Physical',
-          totalValue: 3,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Charisma',
-          metatypeCategory: 'Mental',
-          totalValue: 3,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Intuition',
-          metatypeCategory: 'Mental',
-          totalValue: 4,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 3,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Logic',
-          metatypeCategory: 'Mental',
-          totalValue: 5,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 4,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Willpower',
-          metatypeCategory: 'Mental',
-          totalValue: 3,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Edge',
-          metatypeCategory: 'Special',
-          totalValue: 2,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 0,
-        ),
-      ],
-      conditionMonitor: ConditionMonitor(
-        physicalCM: 10,
-        physicalCMFilled: 2,
-        physicalCMOverflow: 4,
-        stunCM: 10,
-        stunCMFilled: 1,
-      ),
-      magEnabled: false, // Sample character doesn't have magic enabled
-      resEnabled: false, // Sample character doesn't have resonance enabled
-      depEnabled: false, // Sample character doesn't have depth enabled
-    );
+  // void _createSampleCharacter() {
+  //   const sampleCharacter = ShadowrunCharacter(
+  //     name: 'Sample Runner',
+  //     alias: 'Chrome',
+  //     metatype: 'Human',
+  //     skills: [
+  //       Skill(
+  //         name: 'Pistols',
+  //         base: '4',
+  //         karma: '2',
+  //         skillGroupName: 'Firearms',
+  //         skillGroupTotal: 0,
+  //         isPrioritySkill: true, // Priority skill gets +2
+  //         specializations: [
+  //           SkillSpecialization(name: 'Semi-Automatics'),
+  //         ],
+  //       ),
+  //       Skill(
+  //         name: 'Infiltration',
+  //         base: '3',
+  //         karma: '1',
+  //         skillGroupName: 'Stealth',
+  //         skillGroupTotal: 0,
+  //       ),
+  //       Skill(
+  //         name: 'Hacking',
+  //         base: '5',
+  //         karma: '1',
+  //         skillGroupName: 'Cracking',
+  //         skillGroupTotal: 0,
+  //         isPrioritySkill: true, // Priority skill gets +2
+  //       ),
+  //       Skill(
+  //         name: 'Perception',
+  //         base: '2',
+  //         karma: '2',
+  //         skillGroupName: '',
+  //         skillGroupTotal: 0,
+  //       ),
+  //       Skill(
+  //         name: 'Palming',
+  //         base: '1',
+  //         karma: '3',
+  //         skillGroupName: 'Stealth',
+  //         skillGroupTotal: 0,
+  //         specializations: [
+  //           SkillSpecialization(name: 'Pickpocket'),
+  //           SkillSpecialization(name: 'Legerdemain'),
+  //         ],
+  //       ),
+  //     ],
+  //     limits: {}, // Empty for now
+  //     attributes: [
+  //       const Attribute(
+  //         name: 'BOD',
+  //         metatypeCategory: 'Physical',
+  //         totalValue: 4,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 3,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'AGI',
+  //         metatypeCategory: 'Physical',
+  //         totalValue: 5,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 4,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'REA',
+  //         metatypeCategory: 'Physical',
+  //         totalValue: 4,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 3,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'STR',
+  //         metatypeCategory: 'Physical',
+  //         totalValue: 3,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 2,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'CHA',
+  //         metatypeCategory: 'Mental',
+  //         totalValue: 3,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 2,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'INT',
+  //         metatypeCategory: 'Mental',
+  //         totalValue: 4,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 3,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'LOG',
+  //         metatypeCategory: 'Mental',
+  //         totalValue: 5,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 4,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'WIL',
+  //         metatypeCategory: 'Mental',
+  //         totalValue: 3,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 2,
+  //         karma: 1,
+  //       ),
+  //       const Attribute(
+  //         name: 'EDG',
+  //         metatypeCategory: 'Special',
+  //         totalValue: 2,
+  //         metatypeMin: 1,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 9,
+  //         base: 2,
+  //         karma: 0,
+  //       ),
+  //       const Attribute(
+  //         name: 'ESS',
+  //         metatypeCategory: 'Special',
+  //         totalValue: 6,
+  //         metatypeMin: 0,
+  //         metatypeMax: 6,
+  //         metatypeAugMax: 6,
+  //         base: 6,
+  //         karma: 0,
+  //       ),
+  //     ],
+  //     conditionMonitor: ConditionMonitor(
+  //       physicalCM: 10,
+  //       physicalCMFilled: 2,
+  //       physicalCMOverflow: 4,
+  //       stunCM: 10,
+  //       stunCMFilled: 1,
+  //     ),
+  //     magEnabled: false, // Sample character doesn't have magic enabled
+  //     resEnabled: false, // Sample character doesn't have resonance enabled
+  //     depEnabled: false, // Sample character doesn't have depth enabled
+  //   );
 
-    setState(() {
-      if (!_characters.contains(sampleCharacter)) {
-        _characters.add(sampleCharacter);
-      }
-      _currentCharacter = sampleCharacter;
-      _currentSection = NavigationSection.overview; // Reset to overview
-    });
-  }
+  //   setState(() {
+  //     if (!_characters.contains(sampleCharacter)) {
+  //       _characters.add(sampleCharacter);
+  //     }
+  //     _currentCharacter = sampleCharacter;
+  //     _currentSection = NavigationSection.overview; // Reset to overview
+  //   });
+  // }
 
   Widget _buildNavigationTile(BuildContext context, NavigationSection section,
       IconData icon, String title) {
@@ -1409,6 +1419,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Expanded(
                   child: _buildDerivedAttribute(
                       'Social Limit', _currentCharacter!.socialLimit),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildDerivedAttribute(
+                      'Astral Limit', _currentCharacter!.astralLimit),
                 ),
               ],
             ),

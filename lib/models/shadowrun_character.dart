@@ -1,16 +1,17 @@
 // Supporting classes for the enhanced model
 import 'package:flutter/foundation.dart';
+import 'dart:math';
 
 class Attribute {
   final String name;
   final String metatypeCategory;
-  final int totalValue;
-  final int metatypeMin;
-  final int metatypeMax;
-  final int metatypeAugMax;
-  final int base;
-  final int karma;
-  final int? adeptMod;
+  final double totalValue;
+  final double metatypeMin;
+  final double metatypeMax;
+  final double metatypeAugMax;
+  final double base;
+  final double karma;
+  final double? adeptMod;
 
   const Attribute({
     required this.name,
@@ -28,16 +29,16 @@ class Attribute {
     return Attribute(
       name: json['name'] ?? '',
       metatypeCategory: json['metatypecategory'] ?? '',
-      totalValue: int.tryParse(json['totalvalue']?.toString() ?? '0') ?? 0,
-      metatypeMin: int.tryParse(json['metatypemin']?.toString() ?? '0') ?? 0,
-      metatypeMax: int.tryParse(json['metatypemax']?.toString() ?? '0') ?? 0,
-      metatypeAugMax: int.tryParse(json['metatypeaugmax']?.toString() ?? '0') ?? 0,
-      base: int.tryParse(json['base']?.toString() ?? '0') ?? 0,
-      karma: int.tryParse(json['karma']?.toString() ?? '0') ?? 0,
+      totalValue: double.tryParse(json['totalvalue']?.toString() ?? '0') ?? 0.0,
+      metatypeMin: double.tryParse(json['metatypemin']?.toString() ?? '0') ?? 0.0,
+      metatypeMax: double.tryParse(json['metatypemax']?.toString() ?? '0') ?? 0.0,
+      metatypeAugMax: double.tryParse(json['metatypeaugmax']?.toString() ?? '0') ?? 0.0,
+      base: double.tryParse(json['base']?.toString() ?? '0') ?? 0.0,
+      karma: double.tryParse(json['karma']?.toString() ?? '0') ?? 0.0,
     );
   }
 
-  Attribute copyWith({int? adeptMod}) {
+  Attribute copyWith({double? adeptMod}) {
     return Attribute(
       name: name,
       metatypeCategory: metatypeCategory,
@@ -99,7 +100,7 @@ class Skill {
   final String? category; // Added category field
   final String skillGroupName;
   final int skillGroupTotal;
-  final int? adeptMod;
+  final double? adeptMod;
   final bool isPrioritySkill;
   final List<SkillSpecialization> specializations;
 
@@ -141,7 +142,7 @@ class Skill {
     );
   }
 
-  Skill copyWith({int? adeptMod, bool? isPrioritySkill}) {
+  Skill copyWith({double? adeptMod, bool? isPrioritySkill}) {
     return Skill(
       name: name,
       karma: karma,
@@ -188,7 +189,7 @@ class LimitModifier {
 class LimitDetail {
   final int total;
   final List<LimitModifier> modifiers;
-  final int? adeptMod;
+  final double? adeptMod;
 
   const LimitDetail({
     required this.total,
@@ -196,7 +197,7 @@ class LimitDetail {
     this.adeptMod,
   });
 
-  LimitDetail copyWith({int? total, List<LimitModifier>? modifiers, int? adeptMod}) {
+  LimitDetail copyWith({int? total, List<LimitModifier>? modifiers, double? adeptMod}) {
     return LimitDetail(
       total: total ?? this.total,
       modifiers: modifiers ?? this.modifiers,
@@ -511,7 +512,7 @@ class ShadowrunCharacter {
   final bool isMagician;
   final bool isTechnomancer;
 
-  const ShadowrunCharacter({
+  ShadowrunCharacter({
     this.name,
     this.alias,
     this.metatype,
@@ -525,9 +526,9 @@ class ShadowrunCharacter {
     this.publicAwareness,
     this.karma,
     this.totalKarma,
-    required this.attributes,
+    required List<Attribute> attributes,
     required this.skills,
-    required this.limits,
+    this.limits = const {},
     this.spells = const [],
     this.spirits = const [],
     this.complexForms = const [],
@@ -541,141 +542,163 @@ class ShadowrunCharacter {
     this.isAdept = false,
     this.isMagician = false,
     this.isTechnomancer = false,
-  });
+  }) : attributes = _ensureEssenceAttribute(attributes);
   
+  // Static helper method to ensure ESS attribute is always present
+  static List<Attribute> _ensureEssenceAttribute(List<Attribute> inputAttributes) {
+    // Check if ESS already exists
+    final hasEssence = inputAttributes.any((attr) => attr.name == 'ESS');
+    
+    if (hasEssence) {
+      return inputAttributes;
+    }
+    
+    // Add hard-coded ESS attribute if not present
+    return [
+      ...inputAttributes,
+      const Attribute(
+        name: 'ESS',
+        metatypeCategory: 'Special',
+        totalValue: 6.0,
+        metatypeMin: 6.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 6.0,
+        base: 6.0,
+        karma: 0.0,
+      ),
+    ];
+  }
+
   // Factory constructor for basic XML parsing (backwards compatible)
   factory ShadowrunCharacter.fromXml(Map<String, dynamic> xmlData) {
     // Create basic attributes from the old format for backwards compatibility
     final attributes = <Attribute>[
       Attribute(
-        name: 'Body',
+        name: 'BOD',
         metatypeCategory: 'Physical',
-        totalValue: int.tryParse(xmlData['body']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['body']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Agility',
+        name: 'AGI',
         metatypeCategory: 'Physical',
-        totalValue: int.tryParse(xmlData['agility']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['agility']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Reaction',
+        name: 'REA',
         metatypeCategory: 'Physical',
-        totalValue: int.tryParse(xmlData['reaction']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['reaction']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Strength',
+        name: 'STR',
         metatypeCategory: 'Physical',
-        totalValue: int.tryParse(xmlData['strength']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['strength']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Charisma',
+        name: 'CHA',
         metatypeCategory: 'Mental',
-        totalValue: int.tryParse(xmlData['charisma']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['charisma']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Intuition',
+        name: 'INT',
         metatypeCategory: 'Mental',
-        totalValue: int.tryParse(xmlData['intuition']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['intuition']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Logic',
+        name: 'LOG',
         metatypeCategory: 'Mental',
-        totalValue: int.tryParse(xmlData['logic']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['logic']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Willpower',
+        name: 'WIL',
         metatypeCategory: 'Mental',
-        totalValue: int.tryParse(xmlData['willpower']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['willpower']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
       Attribute(
-        name: 'Edge',
+        name: 'EDG',
         metatypeCategory: 'Special',
-        totalValue: int.tryParse(xmlData['edge']?.toString() ?? '1') ?? 1,
-        metatypeMin: 1,
-        metatypeMax: 6,
-        metatypeAugMax: 9,
-        base: 1,
-        karma: 0,
+        totalValue: double.tryParse(xmlData['edge']?.toString() ?? '1') ?? 1.0,
+        metatypeMin: 1.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 9.0,
+        base: 1.0,
+        karma: 0.0,
       ),
-      if ((int.tryParse(xmlData['magic']?.toString() ?? '0') ?? 0) > 0)
+      // ESS is always hard-coded, not imported from XML
+      const Attribute(
+        name: 'ESS',
+        metatypeCategory: 'Special',
+        totalValue: 6.0,
+        metatypeMin: 6.0,
+        metatypeMax: 6.0,
+        metatypeAugMax: 6.0,
+        base: 6.0,
+        karma: 0.0,
+      ),
+      if ((double.tryParse(xmlData['magic']?.toString() ?? '0') ?? 0.0) > 0)
         Attribute(
-          name: 'Magic',
+          name: 'MAG',
           metatypeCategory: 'Special',
-          totalValue: int.tryParse(xmlData['magic']?.toString() ?? '0') ?? 0,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 1,
-          karma: 0,
+          totalValue: double.tryParse(xmlData['magic']?.toString() ?? '0') ?? 0.0,
+          metatypeMin: 1.0,
+          metatypeMax: 6.0,
+          metatypeAugMax: 9.0,
+          base: 1.0,
+          karma: 0.0,
         ),
-      if ((int.tryParse(xmlData['resonance']?.toString() ?? '0') ?? 0) > 0)
+      if ((double.tryParse(xmlData['resonance']?.toString() ?? '0') ?? 0.0) > 0)
         Attribute(
-          name: 'Resonance',
+          name: 'RES',
           metatypeCategory: 'Special',
-          totalValue: int.tryParse(xmlData['resonance']?.toString() ?? '0') ?? 0,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 1,
-          karma: 0,
+          totalValue: double.tryParse(xmlData['resonance']?.toString() ?? '0') ?? 0.0,
+          metatypeMin: 1.0,
+          metatypeMax: 6.0,
+          metatypeAugMax: 9.0,
+          base: 1.0,
+          karma: 0.0,
         ),
     ];
 
-    // Create basic limits
-    final limits = <String, LimitDetail>{
-      'Physical': LimitDetail(
-        total: int.tryParse(xmlData['physicallimit']?.toString() ?? '0') ?? 0,
-        modifiers: [],
-      ),
-      'Mental': LimitDetail(
-        total: int.tryParse(xmlData['mentallimit']?.toString() ?? '0') ?? 0,
-        modifiers: [],
-      ),
-      'Social': LimitDetail(
-        total: int.tryParse(xmlData['sociallimit']?.toString() ?? '0') ?? 0,
-        modifiers: [],
-      ),
-    };
+    // Remove limits from XML parsing - use lambda getters only
 
     return ShadowrunCharacter(
       name: xmlData['name'] ?? '',
@@ -693,28 +716,29 @@ class ShadowrunCharacter {
       totalKarma: xmlData['totalkarma'] ?? '0',
       attributes: attributes,
       skills: [], // Will be populated by enhanced parser
-      limits: limits,
       conditionMonitor: ConditionMonitor.fromXml(xmlData, xmlData),
       nuyen: int.tryParse(xmlData['nuyen']?.toString() ?? '0') ?? 0,
     );
   }
 
   // Convenience getters for backwards compatibility
-  int get body => _getAttributeValue('Body');
-  int get agility => _getAttributeValue('Agility');
-  int get reaction => _getAttributeValue('Reaction');
-  int get strength => _getAttributeValue('Strength');
-  int get charisma => _getAttributeValue('Charisma');
-  int get intuition => _getAttributeValue('Intuition');
-  int get logic => _getAttributeValue('Logic');
-  int get willpower => _getAttributeValue('Willpower');
-  int get edge => _getAttributeValue('Edge');
-  int get magic => _getAttributeValue('Magic');
-  int get resonance => _getAttributeValue('Resonance');
+  int get body => _getAttributeValue('BOD').ceil();
+  int get agility => _getAttributeValue('AGI').ceil();
+  int get reaction => _getAttributeValue('REA').ceil();
+  int get strength => _getAttributeValue('STR').ceil();
+  int get charisma => _getAttributeValue('CHA').ceil();
+  int get intuition => _getAttributeValue('INT').ceil();
+  int get logic => _getAttributeValue('LOG').ceil();
+  int get willpower => _getAttributeValue('WIL').ceil();
+  int get edge => _getAttributeValue('EDG').ceil();
+  int get magic => _getAttributeValue('MAG').ceil();
+  int get resonance => _getAttributeValue('RES').ceil();
+  int get essence => _getAttributeValue('ESS').ceil(); 
 
-  int get physicalLimit => limits['Physical']?.total ?? 0;
-  int get mentalLimit => limits['Mental']?.total ?? 0;
-  int get socialLimit => limits['Social']?.total ?? 0;
+  int get physicalLimit => (((strength * 2) + body + reaction)/3).ceil().toInt();
+  int get mentalLimit => (((logic * 2) + willpower + intuition)/3).ceil().toInt();
+  int get socialLimit => (((charisma * 2) + willpower + essence)/3).ceil().toInt();
+  int get astralLimit => max(mentalLimit,socialLimit);
 
   int get physicalDamage => conditionMonitor.physicalCMFilled;
   int get stunDamage => conditionMonitor.stunCMFilled;
@@ -722,21 +746,22 @@ class ShadowrunCharacter {
   int get stunBoxes => conditionMonitor.stunCMTotal;
 
   // Helper method to get attribute values by name
-  int _getAttributeValue(String attributeName) {
+  double _getAttributeValue(String attributeName) {
     final attribute = attributes.firstWhere(
       (attr) => attr.name == attributeName,
       orElse: () => const Attribute(
         name: '', 
         metatypeCategory: '', 
-        totalValue: 0,
-        metatypeMin: 0,
-        metatypeMax: 0,
-        metatypeAugMax: 0,
-        base: 0,
-        karma: 0,
+        totalValue: 0.0,
+        metatypeMin: 0.0,
+        metatypeMax: 0.0,
+        metatypeAugMax: 0.0,
+        base: 0.0,
+        karma: 0.0,
       ),
     );
-    return attribute.totalValue + (attribute.adeptMod ?? 0);
+    debugPrint('Getting value for attribute $attributeName: ${attribute.totalValue} rounded: ${attribute.totalValue.ceil()} (Adept Mod: ${attribute.adeptMod ?? 0})');
+    return attribute.totalValue + (attribute.adeptMod ?? 0.0);
   }
 
   // Derived attributes (calculated)
@@ -750,8 +775,8 @@ class ShadowrunCharacter {
   // Condition Monitor Penalty calculation
   // For every 3 points of damage on either track (not including overflow), apply -1 penalty
   int get conditionMonitorPenalty {
-    final physicalPenalty = (conditionMonitor.physicalCMFilled.clamp(0, conditionMonitor.physicalCMTotal) / 3).floor();
-    final stunPenalty = (conditionMonitor.stunCMFilled.clamp(0, conditionMonitor.stunCMTotal) / 3).floor();
+    final physicalPenalty = (conditionMonitor.physicalCMFilled.clamp(0, conditionMonitor.physicalCMTotal) / 3).ceil();
+    final stunPenalty = (conditionMonitor.stunCMFilled.clamp(0, conditionMonitor.stunCMTotal) / 3).ceil();
     return -(physicalPenalty + stunPenalty);
   }
   
@@ -772,7 +797,6 @@ class ShadowrunCharacter {
     String? totalKarma,
     List<Attribute>? attributes,
     List<Skill>? skills,
-    Map<String, LimitDetail>? limits,
     List<Spell>? spells,
     List<Spirit>? spirits,
     List<ComplexForm>? complexForms,
@@ -803,7 +827,6 @@ class ShadowrunCharacter {
       totalKarma: totalKarma ?? this.totalKarma,
       attributes: attributes ?? this.attributes,
       skills: skills ?? this.skills,
-      limits: limits ?? this.limits,
       spells: spells ?? this.spells,
       spirits: spirits ?? this.spirits,
       complexForms: complexForms ?? this.complexForms,

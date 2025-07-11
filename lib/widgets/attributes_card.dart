@@ -103,7 +103,7 @@ class AttributesCard extends StatelessWidget {
       itemCount: allAttributes.length,
       itemBuilder: (context, index) {
         final attribute = allAttributes[index];
-        final totalValue = attribute.totalValue + (attribute.adeptMod ?? 0);
+        final totalValue = (attribute.totalValue + (attribute.adeptMod ?? 0)).toInt();
         final color = _getAttributeColor(totalValue);
         
         return GestureDetector(
@@ -146,14 +146,14 @@ class AttributesCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 // Show base + karma breakdown
-                if (attribute.base > 0 || attribute.karma > 0)
-                  Text(
-                    '${attribute.base}+${attribute.karma}',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                // if (attribute.base > 0 || attribute.karma > 0)
+                //   Text(
+                //     '${attribute.base}+${attribute.karma}',
+                //     style: TextStyle(
+                //       fontSize: 10,
+                //       color: Theme.of(context).colorScheme.onSurfaceVariant,
+                //     ),
+                //   ),
               ],
             ),
           ),
@@ -185,12 +185,12 @@ class AttributesCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildDetailRow('Category', attribute.metatypeCategory),
-              _buildDetailRow('Total Value', attribute.totalValue.toString()),
-              _buildDetailRow('Base', attribute.base.toString()),
-              _buildDetailRow('Karma', attribute.karma.toString()),
-              _buildDetailRow('Metatype Min', attribute.metatypeMin.toString()),
-              _buildDetailRow('Metatype Max', attribute.metatypeMax.toString()),
-              _buildDetailRow('Aug Max', attribute.metatypeAugMax.toString()),
+              _buildDetailRow('Total Value', attribute.totalValue.toInt().toString()),
+              _buildDetailRow('Base', attribute.base.toInt().toString()),
+              _buildDetailRow('Karma', attribute.karma.toInt().toString()),
+              _buildDetailRow('Metatype Min', attribute.metatypeMin.toInt().toString()),
+              _buildDetailRow('Metatype Max', attribute.metatypeMax.toInt().toString()),
+              _buildDetailRow('Aug Max', attribute.metatypeAugMax.toInt().toString()),
               if (attribute.adeptMod != null)
                 _buildDetailRow('Adept Mod', '+${attribute.adeptMod}'),
             ],

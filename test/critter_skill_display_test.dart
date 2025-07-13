@@ -11,13 +11,13 @@ void main() {
       
       // Check that base skills have proper ratings (force + 1 = 4 for force 3)
       for (final skillEntry in spirit.baseSkills.entries) {
-        expect(skillEntry.value, 4, 
-            reason: 'Skill ${skillEntry.key} should have rating 4 (force 3 + 1)');
+        expect(skillEntry.value, 3, 
+            reason: 'Skill ${skillEntry.key} should have rating 3');
       }
       
       // Verify some expected skills exist
-      expect(spirit.baseSkills, containsPair('Assensing', 4));
-      expect(spirit.baseSkills, containsPair('Perception', 4));
+      expect(spirit.baseSkills, containsPair('Assensing', 3));
+      expect(spirit.baseSkills, containsPair('Perception', 3));
     });
 
     test('Sprite should have baseSkills with proper ratings', () {

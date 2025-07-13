@@ -8,31 +8,20 @@ void main(){
   group('Spirit Tests',(){
     test('Should create a Spirit with all required attributes', () {
       final spirit = CritterFactory.generateSpirit('Spirit of Fire', 3);
-      expect(spirit?.name, 'Spirit of Fire', reason: "name should equal 'Spirit of Fire'"); Spirit(
-        name: 'Test Spirit',
-        type: CritterType.spirit,
-        force: 5,
-        initiativeType: 'Astral',
-        initiativeDice: 4,
-        baseSkills: {'Assensing': 6, 'Astral Combat': 6},
-        powers: ['Accident', 'Astral Form'],
-        attributeModifiers: {},
-
-      );
-
-      expect(spirit?.name, 'Test Spirit');
-      expect(spirit?.type, CritterType.spirit);
-      expect(spirit?.force, 5);
-      expect(spirit?.bod, 5);
-      expect(spirit?.agi, 4);
-      expect(spirit?.rea, 4);
-      expect(spirit?.str, 5);
-      expect(spirit?.wil, 5);
-      expect(spirit?.log, 3);
-      expect(spirit?.intu, 5);
-      expect(spirit?.cha, 5);
-      expect(spirit?.edg, 2);
-      expect(spirit?.powers, containsAll(['Accident', 'Astral Form']));
+      
+      expect(spirit?.name, 'Spirit of Fire', reason: "name should equal 'Spirit of Fire'");
+      expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
+      expect(spirit?.force, 3, reason: "force should equal 3");
+      expect(spirit?.bod, 4, reason: "body should equal 4"); // force(3) + BOD(1) = 4
+      expect(spirit?.agi, 5, reason: "agility should equal 5"); // force(3) + AGI(2) = 5
+      expect(spirit?.rea, 5, reason: "reaction should equal 5"); // force(3) + REA(2) = 5
+      expect(spirit?.str, 5, reason: "strength should equal 5"); // force(3) + STR(2) = 5
+      expect(spirit?.wil, 3, reason: "will should equal 3"); // force(3) + WIL(0) = 3
+      expect(spirit?.log, 2, reason: "logic should equal 2"); // force(3) + LOG(-1) = 2
+      expect(spirit?.intu, 4, reason: "intuition should equal 4"); // force(3) + INT(1) = 4
+      expect(spirit?.cha, 3, reason: "charisma should equal 3"); // force(3) + CHA(0) = 3
+      expect(spirit?.edg, 1, reason: "edge should equal 1"); // force(3) / 2 = 1
+      expect(spirit?.powers, containsAll(['Accident', 'Confusion', 'Elemental Attack', 'Engulf', 'Guard', 'Noxious Breath', 'Search']), reason: "powers should contain all expected Fire Spirit powers");
     });
 
     test('Should calculate initiative correctly for Spirit', () {
@@ -47,45 +36,10 @@ void main(){
         attributeModifiers: {},
       );
 
-      expect(spirit.initiative, '11 + 4D6'); // rea(5) + intu(6) = 11
-      expect(spirit.astralInitiative, '12 + 5D6'); // intu(6) * 2 = 12, dice = 5
+      expect(spirit.initiative, '11 + 4D6', reason: "initiative should be calculated correctly"); // rea(5) + intu(6) = 11
+      expect(spirit.astralInitiative, '12 + 5D6', reason: "astral initiative should be calculated correctly"); // intu(6) * 2 = 12, dice = 5
     });
 
-    // test('Should handle optional powers correctly', () {
-    //   final spirit = Spirit(
-    //     name: 'Spirit with Optional Powers',
-    //     type: CritterType.spirit,
-    //     force: 4,
-    //     initiativeType: 'Astral',
-    //     initiativeDice: 4,
-    //     baseSkills: {},
-    //     powers: ['Accident'],
-    //     attributeModifiers: {},
-    //     bod: 4, agi: 3, rea: 3, str: 4, wil: 4, log: 2, intu: 4, cha: 4, edg: 2, ess: 4, mag: 4,
-    //     optionalPowers: ['Energy Aura', 'Fear'],
-    //   );
-
-    //   expect(spirit.optionalPowers, isNotNull);
-    //   expect(spirit.optionalPowers, containsAll(['Energy Aura', 'Fear']));
-    // });
-
-  //   test('Should handle null optional powers', () {
-  //     final spirit = Spirit(
-  //       name: 'Spirit without Optional Powers',
-  //       type: CritterType.spirit,
-  //       force: 3,
-  //       initiativeType: 'Astral',
-  //       initiativeDice: 4,
-  //       baseSkills: {},
-  //       powers: ['Astral Form'],
-  //       attributeModifiers: {},
-  //       bod: 3, agi: 2, rea: 2, str: 3, wil: 3, log: 1, intu: 3, cha: 3, edg: 1, ess: 3, mag: 3,
-  //       optionalPowers: null,
-  //     );
-
-  //     expect(spirit.optionalPowers, isNull);
-  //   });
-  // });
   group('Sprite Tests', () {
     
     test('Should make a Crack Sprite with correct type and force', () {
@@ -430,38 +384,38 @@ void main(){
   group('CritterFactory Utility Tests', () {
     test('Should provide list of available sprite types', () {
       final types = CritterFactory.availableSpriteTypes;
-      expect(types, containsAll(['Courier Sprite', 'Crack Sprite', 'Data Sprite', 'Fault Sprite', 'Machine Sprite', 'Companion Sprite', 'Generalist Sprite']));
-      expect(types.length, 7);
+      expect(types, containsAll(['Courier Sprite', 'Crack Sprite', 'Data Sprite', 'Fault Sprite', 'Machine Sprite', 'Companion Sprite', 'Generalist Sprite']), reason: "should contain all expected sprite types");
+      expect(types.length, 7, reason: "should have exactly 7 sprite types");
     });
 
     test('Should provide list of available spirit types', () {
       final types = CritterFactory.availableSpiritTypes;
-      expect(types, containsAll(['Spirit of Air', 'Spirit of Earth', 'Spirit of Fire', 'Spirit of Water', 'Spirit of Man', 'Spirit of Beasts', 'Spirit of Plants', 'Spirit of Guidance', 'Spirit of Tasks']));
-      expect(types.length, 9);
+      expect(types, containsAll(['Spirit of Air', 'Spirit of Earth', 'Spirit of Fire', 'Spirit of Water', 'Spirit of Man', 'Spirit of Beasts', 'Spirit of Plants', 'Spirit of Guidance', 'Spirit of Tasks']), reason: "should contain all expected spirit types");
+      expect(types.length, 9, reason: "should have exactly 9 spirit types");
     });
 
     test('Should provide sprite template for valid type', () {
       final template = CritterFactory.getSpriteTemplate('Crack Sprite');
-      expect(template, isNotNull);
-      expect(template?.typeName, 'Crack Sprite');
-      expect(template?.powers, contains('Suppression'));
+      expect(template, isNotNull, reason: "should return a valid template for Crack Sprite");
+      expect(template?.typeName, 'Crack Sprite', reason: "template should have correct type name");
+      expect(template?.powers, contains('Suppression'), reason: "template should contain expected powers");
     });
 
     test('Should provide spirit template for valid type', () {
       final template = CritterFactory.getSpiritTemplate('Spirit of Air');
-      expect(template, isNotNull);
-      expect(template?.typeName, 'Spirit of Air');
-      expect(template?.powers, containsAll(['Accident', 'Confusion', 'Concealment']));
+      expect(template, isNotNull, reason: "should return a valid template for Spirit of Air");
+      expect(template?.typeName, 'Spirit of Air', reason: "template should have correct type name");
+      expect(template?.powers, containsAll(['Accident', 'Confusion', 'Concealment']), reason: "template should contain expected powers");
     });
 
     test('Should return null for invalid sprite template', () {
       final template = CritterFactory.getSpriteTemplate('Invalid Sprite');
-      expect(template, isNull);
+      expect(template, isNull, reason: "should return null for invalid sprite type");
     });
 
     test('Should return null for invalid spirit template', () {
       final template = CritterFactory.getSpiritTemplate('Invalid Sprite');
-      expect(template, isNull);
+      expect(template, isNull, reason: "should return null for invalid spirit type");
     });
   });
 });

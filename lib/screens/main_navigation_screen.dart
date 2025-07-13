@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/shadowrun_character.dart';
 import '../services/enhanced_chumer_xml_service.dart';
 import '../utils/responsive_layout.dart';
+import '../utils/skill_attribute_map.dart';
 import '../widgets/character_info_card.dart';
 import '../widgets/attributes_card.dart';
 import '../widgets/skills_card.dart';
@@ -867,7 +868,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       chipBuilder: _buildPowerDetailChip,
     );
   }
-
+ 
   Widget _buildSpellDetailChip(
       BuildContext context, String label, String value) {
     return Container(
@@ -977,51 +978,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
-  Widget _buildSpiritsView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Spirits',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Spirits section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   
-
-  Widget _buildSpritesView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sprites',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Sprites section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildGearView(BuildContext context) {
     return Card(
@@ -1477,5 +1434,516 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     });
 
     debugPrint("Adjusted $monitorType condition monitor by $delta");
+  }
+
+  Widget _buildCritterListView<T extends Critter>({
+    required BuildContext context,
+    required List<T> critters,
+    required IconData icon,
+    required String title,
+    required String singularLabel,
+    required String emptyMessage,
+    required Widget Function(BuildContext, T) itemBuilder,
+  }) {
+    final itemCountText =
+        '${critters.length} $singularLabel${critters.length == 1 ? '' : 's'}';
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                const Spacer(),
+                Text(
+                  itemCountText,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (critters.isEmpty)
+              Text(
+                emptyMessage,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+              )
+            else
+              ...critters.map((critter) => itemBuilder(context, critter)).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpiritsView(BuildContext context) {
+    final spirits = _currentCharacter!.spirits;
+
+    return _buildCritterListView<Spirit>(
+      context: context,
+      critters: spirits,
+      icon: Icons.pets,
+      title: 'Spirits',
+      singularLabel: 'spirit',
+      emptyMessage: 'No spirits summoned',
+      itemBuilder: _buildSpiritCard,
+    );
+  }
+
+  Widget _buildSpritesView(BuildContext context) {
+    final sprites = _currentCharacter!.sprites;
+
+    return _buildCritterListView<Sprite>(
+      context: context,
+      critters: sprites,
+      icon: Icons.computer,
+      title: 'Sprites',
+      singularLabel: 'sprite',
+      emptyMessage: 'No sprites compiled',
+      itemBuilder: _buildSpriteCard,
+    );
+  }
+
+  Widget _buildCritterCard({
+    required BuildContext context,
+    required Critter critter,
+    required List<MapEntry<String, String>> primaryFields,
+    required List<MapEntry<String, String>> secondaryFields,
+    required String typeLabel,
+    required Color typeColor,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  critter.name,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: typeColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '$typeLabel • Force ${critter.force}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: typeColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Primary stats row
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: primaryFields
+                .where((entry) => entry.value.isNotEmpty)
+                .map((entry) => _buildCritterStatChip(context, entry.key, entry.value))
+                .toList(),
+          ),
+          
+          // Skills section
+          if (critter.baseSkills.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Skills',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: _buildCritterSkillChips(context, critter),
+            ),
+          ],
+          
+          // Powers section
+          if (critter.powers.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Powers',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: critter.powers
+                  .map((power) => _buildPowerChip(context, power))
+                  .toList(),
+            ),
+          ],
+          
+          // Secondary stats row
+          if (secondaryFields.any((entry) => entry.value.isNotEmpty)) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              children: secondaryFields
+                  .where((entry) => entry.value.isNotEmpty)
+                  .map((entry) => _buildCritterDetailChip(context, entry.key, entry.value))
+                  .toList(),
+            ),
+          ],
+          
+          // Special abilities
+          if (critter.special?.isNotEmpty == true) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.star,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      critter.special!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpiritCard(BuildContext context, Spirit spirit) {
+    return _buildCritterCard(
+      context: context,
+      critter: spirit,
+      typeLabel: 'Spirit',
+      typeColor: Colors.purple,
+      primaryFields: [
+        MapEntry('BOD', spirit.bod.toString()),
+        MapEntry('AGI', spirit.agi.toString()),
+        MapEntry('REA', spirit.rea.toString()),
+        MapEntry('STR', spirit.str.toString()),
+        MapEntry('WIL', spirit.wil.toString()),
+        MapEntry('LOG', spirit.log.toString()),
+        MapEntry('INT', spirit.intu.toString()),
+        MapEntry('CHA', spirit.cha.toString()),
+        MapEntry('EDG', spirit.edg.toString()),
+      ],
+      secondaryFields: [
+        MapEntry('Initiative', spirit.initiative),
+        MapEntry('Astral Initiative', spirit.astralInitiative),
+        MapEntry('Initiative Type', spirit.initiativeType),
+      ],
+    );
+  }
+
+  Widget _buildSpriteCard(BuildContext context, Sprite sprite) {
+    return _buildCritterCard(
+      context: context,
+      critter: sprite,
+      typeLabel: 'Sprite',
+      typeColor: Colors.cyan,
+      primaryFields: [
+        MapEntry('ATK', sprite.atk.toString()),
+        MapEntry('SLZ', sprite.slz.toString()),
+        MapEntry('DP', sprite.dp.toString()),
+        MapEntry('FWL', sprite.fwl.toString()),
+      ],
+      secondaryFields: [
+        MapEntry('Initiative', sprite.initiative),
+        MapEntry('Initiative Type', sprite.initiativeType),
+      ],
+    );
+  }
+
+  Widget _buildCritterStatChip(BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCritterDetailChip(BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$label: ',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPowerChip(BuildContext context, String power) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        power,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.onSecondaryContainer,
+        ),
+      ),
+    );
+  }
+
+  /// Builds skill chips for critters showing skill name and dice pool
+  List<Widget> _buildCritterSkillChips(BuildContext context, Critter critter) {
+    final sortedSkills = critter.baseSkills.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    
+    return sortedSkills
+        .map((skillEntry) => _buildCritterSkillChip(context, critter, skillEntry.key, skillEntry.value))
+        .toList();
+  }
+
+  /// Builds a single skill chip for a critter
+  Widget _buildCritterSkillChip(BuildContext context, Critter critter, String skillName, int skillRating) {
+    final dicePool = _calculateCritterSkillDicePool(critter, skillName, skillRating);
+    final isDefaulting = _isCritterSkillDefaulting(skillName, skillRating);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDefaulting 
+            ? Theme.of(context).colorScheme.errorContainer.withOpacity(0.3)
+            : Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: isDefaulting 
+              ? Theme.of(context).colorScheme.error.withOpacity(0.5)
+              : Theme.of(context).colorScheme.tertiary.withOpacity(0.5),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            skillName,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDefaulting 
+                  ? Theme.of(context).colorScheme.onErrorContainer
+                  : Theme.of(context).colorScheme.onTertiaryContainer,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            decoration: BoxDecoration(
+              color: isDefaulting 
+                  ? Theme.of(context).colorScheme.error.withOpacity(0.2)
+                  : Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(3),
+            ),
+            child: Text(
+              dicePool.toString(),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: isDefaulting 
+                    ? Theme.of(context).colorScheme.error
+                    : Theme.of(context).colorScheme.tertiary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Calculates the dice pool for a critter skill
+  int _calculateCritterSkillDicePool(Critter critter, String skillName, int skillRating) {
+    // Get the linked attribute for this skill
+    final linkedAttributeCode = skillAttributeMap[skillName];
+    if (linkedAttributeCode == null) {
+      // Unknown skill, return just the skill rating
+      return skillRating;
+    }
+
+    int attributeValue;
+    
+    // Get attribute value based on critter type
+    if (critter is Spirit) {
+      attributeValue = _getSpiritAttributeValue(critter, linkedAttributeCode);
+    } else if (critter is Sprite) {
+      attributeValue = _getSpriteAttributeValue(critter, linkedAttributeCode);
+    } else {
+      // Fallback - shouldn't happen with current implementation
+      attributeValue = 1;
+    }
+
+    // Handle defaulting
+    if (_isCritterSkillDefaulting(skillName, skillRating)) {
+      return attributeValue - 1; // Defaulting gives attribute - 1
+    }
+
+    return skillRating + attributeValue;
+  }
+
+  /// Gets the appropriate attribute value for a Spirit
+  int _getSpiritAttributeValue(Spirit spirit, String attributeCode) {
+    switch (attributeCode) {
+      case 'BOD':
+        return spirit.bod;
+      case 'AGI':
+        return spirit.agi;
+      case 'REA':
+        return spirit.rea;
+      case 'STR':
+        return spirit.str;
+      case 'WIL':
+        return spirit.wil;
+      case 'LOG':
+        return spirit.log;
+      case 'INT':
+        return spirit.intu;
+      case 'CHA':
+        return spirit.cha;
+      case 'EDG':
+        return spirit.edg;
+      default:
+        return 1;
+    }
+  }
+
+  /// Gets the appropriate attribute value for a Sprite with attribute conversion
+  int _getSpriteAttributeValue(Sprite sprite, String attributeCode) {
+    // Sprites use converted attributes: CHA→ATK, INT→SLZ, LOG→DP, WIL→FWL
+    switch (attributeCode) {
+      case 'CHA':
+        return sprite.atk; // CHA→ATK
+      case 'INT':
+        return sprite.slz; // INT→SLZ
+      case 'LOG':
+        return sprite.dp;  // LOG→DP
+      case 'WIL':
+        return sprite.fwl; // WIL→FWL
+      // Other attributes don't exist for sprites, use the closest equivalent
+      case 'BOD':
+      case 'AGI':
+      case 'REA':
+      case 'STR':
+        return sprite.atk; // Use ATK as fallback for physical attributes
+      case 'EDG':
+        return sprite.force ~/ 2; // Similar to spirit edge calculation
+      default:
+        return 1;
+    }
+  }
+
+  /// Checks if a critter skill is defaulting (skill rating is 0)
+  bool _isCritterSkillDefaulting(String skillName, int skillRating) {
+    // Check if skill doesn't allow defaulting
+    if (noDefaultingSkills.contains(skillName)) {
+      return false; // Can't default, so if rating is 0, it's just 0
+    }
+    
+    return skillRating == 0;
   }
 }

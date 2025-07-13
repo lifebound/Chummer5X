@@ -66,6 +66,7 @@ class EnhancedChumerXmlService {
       // Parse magic/resonance content
       final spells = parseSpells(characterElement);
       final spirits = _parseSpirits(characterElement);
+      final sprites = _parseSprites(characterElement);
       final complexForms = _parseComplexForms(characterElement);
       final adeptPowers = parseAdeptPowers(characterElement);
       
@@ -104,6 +105,7 @@ class EnhancedChumerXmlService {
         //limits: limits,
         spells: spells,
         spirits: spirits,
+        sprites: sprites,
         complexForms: complexForms,
         adeptPowers: adeptPowers,
         gear: gear,
@@ -321,40 +323,6 @@ class EnhancedChumerXmlService {
     }
   }
   
-  // static Map<String, LimitDetail> _calculateLimits(List<Attribute> attributes, XmlElement characterElement) {
-  //   final limits = <String, LimitDetail>{};
-    
-  //   // Calculate basic limits from attributes
-  //   int getAttributeValue(String name) {
-  //     return attributes.firstWhere(
-  //       (attr) => attr.name.toLowerCase() == name.toLowerCase(),
-  //       orElse: () => const Attribute(
-  //         name: '', 
-  //         metatypeCategory: '', 
-  //         totalValue: 1,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 1,
-  //         karma: 0,
-  //       ),
-  //     ).totalValue;
-  //   }
-    
-  //   final physicalLimit = ((getAttributeValue('Strength') * 2) + getAttributeValue('Body') + getAttributeValue('Reaction')) ~/ 3;
-  //   final mentalLimit = ((getAttributeValue('Logic') * 2) + getAttributeValue('Intuition') + getAttributeValue('Willpower')) ~/ 3;
-  //   final socialLimit = ((getAttributeValue('Charisma') * 2) + getAttributeValue('Willpower') + getAttributeValue('Essence')) ~/ 3;
-    
-  //   limits['Physical'] = LimitDetail(total: physicalLimit, modifiers: []);
-  //   limits['Mental'] = LimitDetail(total: mentalLimit, modifiers: []);
-  //   limits['Social'] = LimitDetail(total: socialLimit, modifiers: []);
-  //   limits['Astral'] = LimitDetail(
-  //     total: mentalLimit > socialLimit ? mentalLimit : socialLimit,
-  //     modifiers: [],
-  //   );
-    
-  //   return limits;
-  // }
   
   static List<Spell> parseSpells(XmlElement characterElement) {
     final spells = <Spell>[];
@@ -399,16 +367,40 @@ class EnhancedChumerXmlService {
       for (final spiritElement in spiritsElement.findElements('spirit')) {
         final name = _getElementText(spiritElement, 'name');
         final type = _getElementText(spiritElement, 'type');
-        
-        if (name != null && type != null && type != 'Sprite') {
-          spirits.add(Spirit(name: name, type: type));
+        final force = int.tryParse(_getElementText(spiritElement, 'force') ?? '') ?? 0;
+
+        if (name != null && type != null && type == 'Spirit') {
+          final critter = CritterFactory.generateSpirit(name, force);
+          if(critter is Spirit){
+            spirits.add(critter);
+          }
         }
       }
     }
     
     return spirits;
   }
-  
+  static List<Sprite> _parseSprites(XmlElement characterElement) {
+    final sprites = <Sprite>[];
+    final spiritsElement = characterElement.findElements('spirits').firstOrNull;
+    
+    if (spiritsElement != null) {
+      for (final spiritElement in spiritsElement.findElements('spirit')) {
+        final name = _getElementText(spiritElement, 'name');
+        final type = _getElementText(spiritElement, 'type');
+        final force = int.tryParse(_getElementText(spiritElement, 'force') ?? '') ?? 0;
+
+        if (name != null && type != null && type == 'Sprite') {
+          final critter = CritterFactory.generateSprite(name, force);
+          if(critter is Sprite){
+            sprites.add(critter);
+          }
+        }
+      }
+    }
+    
+    return sprites;
+  }
   static List<ComplexForm> _parseComplexForms(XmlElement characterElement) {
     final complexForms = <ComplexForm>[];
     final complexFormsElement = characterElement.findElements('complexforms').firstOrNull;

@@ -4,7 +4,7 @@ import 'package:chummer5x/models/shadowrun_character.dart';
 void main() {
   group('Critter Skill Display Tests', () {
     test('Spirit should have baseSkills with proper ratings', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 3);
+      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 3, 2, true, false);
       
       expect(spirit, isNotNull);
       expect(spirit!.baseSkills, isNotEmpty);
@@ -21,7 +21,7 @@ void main() {
     });
 
     test('Sprite should have baseSkills with proper ratings', () {
-      final sprite = CritterFactory.generateSprite('Data Sprite', 2);
+      final sprite = CritterFactory.generateSprite('Data Sprite', 2, 1, false, false);
       
       expect(sprite, isNotNull);
       expect(sprite!.baseSkills, isNotEmpty);
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('Spirit attributes should be calculated correctly for dice pools', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 4);
+      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 4, 2, true, false);
       
       expect(spirit, isNotNull);
       
@@ -48,7 +48,7 @@ void main() {
     });
 
     test('Sprite attributes should be available for dice pools', () {
-      final sprite = CritterFactory.generateSprite('Data Sprite', 3);
+      final sprite = CritterFactory.generateSprite('Data Sprite', 3, 1, false, false);
       
       expect(sprite, isNotNull);
       

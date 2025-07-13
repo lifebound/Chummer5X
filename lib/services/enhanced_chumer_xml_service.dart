@@ -365,19 +365,22 @@ class EnhancedChumerXmlService {
     
     if (spiritsElement != null) {
       for (final spiritElement in spiritsElement.findElements('spirit')) {
-        final name = _getElementText(spiritElement, 'name');
+final name = _getElementText(spiritElement, 'name');
         final type = _getElementText(spiritElement, 'type');
+        final services = int.tryParse(_getElementText(spiritElement, 'services') ?? '0') ?? 0;
+        final bound = _getElementText(spiritElement, 'bound')?.toLowerCase() == 'true';
+        final fettered = _getElementText(spiritElement, 'fettered')?.toLowerCase() == 'true';
         final force = int.tryParse(_getElementText(spiritElement, 'force') ?? '') ?? 0;
+        final crittername = _getElementText(spiritElement, 'crittername');
 
         if (name != null && type != null && type == 'Spirit') {
-          final critter = CritterFactory.generateSpirit(name, force);
+          final critter = CritterFactory.generateSpirit(name, force, services, bound, fettered, nameOverride: crittername);
           if(critter is Spirit){
             spirits.add(critter);
           }
         }
       }
-    }
-    
+    } 
     return spirits;
   }
   static List<Sprite> _parseSprites(XmlElement characterElement) {
@@ -388,10 +391,14 @@ class EnhancedChumerXmlService {
       for (final spiritElement in spiritsElement.findElements('spirit')) {
         final name = _getElementText(spiritElement, 'name');
         final type = _getElementText(spiritElement, 'type');
+        final services = int.tryParse(_getElementText(spiritElement, 'services') ?? '0') ?? 0;
+        final bound = _getElementText(spiritElement, 'bound')?.toLowerCase() == 'true';
+        final fettered = _getElementText(spiritElement, 'fettered')?.toLowerCase() == 'true';
         final force = int.tryParse(_getElementText(spiritElement, 'force') ?? '') ?? 0;
+        final crittername = _getElementText(spiritElement, 'crittername');
 
         if (name != null && type != null && type == 'Sprite') {
-          final critter = CritterFactory.generateSprite(name, force);
+          final critter = CritterFactory.generateSprite(name, force, services, bound, fettered, nameOverride: crittername);
           if(critter is Sprite){
             sprites.add(critter);
           }

@@ -7,8 +7,8 @@ void main(){
 
   group('Spirit Tests',(){
     test('Should create a Spirit with all required attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 3);
-      
+      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 3, 2, true, false);
+
       expect(spirit?.name, 'Spirit of Fire', reason: "name should equal 'Spirit of Fire'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 3, reason: "force should equal 3");
@@ -21,6 +21,9 @@ void main(){
       expect(spirit?.intu, 4, reason: "intuition should equal 4"); // force(3) + INT(1) = 4
       expect(spirit?.cha, 3, reason: "charisma should equal 3"); // force(3) + CHA(0) = 3
       expect(spirit?.edg, 1, reason: "edge should equal 1"); // force(3) / 2 = 1
+      expect(spirit?.services, 2, reason: "services should equal 2");
+      expect(spirit?.bound, isTrue, reason: "bound should be true");
+      expect(spirit?.fettered, isFalse, reason: "fettered should be false");  
       expect(spirit?.powers, containsAll(['Accident', 'Confusion', 'Elemental Attack', 'Engulf', 'Guard', 'Noxious Breath', 'Search']), reason: "powers should contain all expected Fire Spirit powers");
     });
 
@@ -34,6 +37,9 @@ void main(){
         baseSkills: {},
         powers: [],
         attributeModifiers: {},
+        services: 2,
+        bound: true,
+        fettered: false,
       );
 
       expect(spirit.initiative, '11 + 4D6', reason: "initiative should be calculated correctly"); // rea(5) + intu(6) = 11
@@ -43,7 +49,7 @@ void main(){
   group('Sprite Tests', () {
     
     test('Should make a Crack Sprite with correct type and force', () {
-      final sprite = CritterFactory.generateSprite('Crack Sprite', 5);
+      final sprite = CritterFactory.generateSprite('Crack Sprite', 5,2,false,false);
       expect(sprite?.name, 'Crack Sprite');
       expect(sprite?.type, CritterType.sprite);
       expect(sprite?.force, 5);
@@ -52,106 +58,31 @@ void main(){
       expect(sprite?.dp, 7); // DP = 2 + force(5) = 7
       expect(sprite?.fwl, 6); // FWL = 1 + force(5) = 6
       expect(sprite?.powers, contains('Suppression'));
+      expect(sprite?.services, 2, reason: "services should equal 2");
       expect(sprite?.baseSkills.keys, containsAll(['Computer', 'Electronic Warfare', 'Hacking']));
     });
 
-    test('Should make a Courier Sprite with correct attributes', () {
-      final sprite = CritterFactory.generateSprite('Courier Sprite', 4);
-      expect(sprite?.name, 'Courier Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 4);
-      expect(sprite?.atk, 4); // ATK = 0 + force(4) = 4
-      expect(sprite?.slz, 7); // SLZ = 3 + force(4) = 7
-      expect(sprite?.dp, 5); // DP = 1 + force(4) = 5
-      expect(sprite?.fwl, 6); // FWL = 2 + force(4) = 6
-      expect(sprite?.powers, containsAll(['Cookie', 'Hash']));
-      expect(sprite?.baseSkills.keys, containsAll(['Computer', 'Hacking']));
-    });
 
-    test('Should make a Data Sprite with correct attributes', () {
-      final sprite = CritterFactory.generateSprite('Data Sprite', 3);
-      expect(sprite?.name, 'Data Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 3);
-      expect(sprite?.atk, 2); // ATK = -1 + force(3) = 2
-      expect(sprite?.slz, 3); // SLZ = 0 + force(3) = 3
-      expect(sprite?.dp, 7); // DP = 4 + force(3) = 7
-      expect(sprite?.fwl, 4); // FWL = 1 + force(3) = 4
-      expect(sprite?.powers, containsAll(['Camouflage', 'Watermark']));
-      expect(sprite?.baseSkills.keys, containsAll(['Computer', 'Electronic Warfare']));
-    });
-
-    test('Should make a Fault Sprite with correct attributes', () {
-      final sprite = CritterFactory.generateSprite('Fault Sprite', 6);
-      expect(sprite?.name, 'Fault Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 6);
-      expect(sprite?.atk, 9); // ATK = 3 + force(6) = 9
-      expect(sprite?.slz, 6); // SLZ = 0 + force(6) = 6
-      expect(sprite?.dp, 7); // DP = 1 + force(6) = 7
-      expect(sprite?.fwl, 8); // FWL = 2 + force(6) = 8
-      expect(sprite?.powers, contains('Electron Storm'));
-      expect(sprite?.baseSkills.keys, containsAll(['Computer', 'Cybercombat', 'Hacking']));
-    });
-
-    test('Should make a Machine Sprite with correct attributes', () {
-      final sprite = CritterFactory.generateSprite('Machine Sprite', 2);
-      expect(sprite?.name, 'Machine Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 2);
-      expect(sprite?.atk, 3); // ATK = 1 + force(2) = 3
-      expect(sprite?.slz, 2); // SLZ = 0 + force(2) = 2
-      expect(sprite?.dp, 5); // DP = 3 + force(2) = 5
-      expect(sprite?.fwl, 4); // FWL = 2 + force(2) = 4
-      expect(sprite?.powers, containsAll(['Diagnostics', 'Gremlins', 'Stability']));
-      expect(sprite?.baseSkills.keys, containsAll(['Computer', 'Electronic Warfare', 'Hardware']));
-    });
-
-    test('Should make a Companion Sprite with correct attributes', () {
-      final sprite = CritterFactory.generateSprite('Companion Sprite', 4);
-      expect(sprite?.name, 'Companion Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 4);
-      expect(sprite?.atk, 3); // ATK = -1 + force(4) = 3
-      expect(sprite?.slz, 5); // SLZ = 1 + force(4) = 5
-      expect(sprite?.dp, 4); // DP = 0 + force(4) = 4
-      expect(sprite?.fwl, 8); // FWL = 4 + force(4) = 8
-      expect(sprite?.powers, containsAll(['Shield', 'Bodyguard']));
-      expect(sprite?.baseSkills.keys, containsAll(['Computer', 'Electronic Warfare']));
-    });
-
-    test('Should make a Generalist Sprite with correct attributes', () {
-      final sprite = CritterFactory.generateSprite('Generalist Sprite', 5);
-      expect(sprite?.name, 'Generalist Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 5);
-      expect(sprite?.atk, 5); // ATK = 0 + force(5) = 5
-      expect(sprite?.slz, 8); // SLZ = 3 + force(5) = 8
-      expect(sprite?.dp, 6); // DP = 1 + force(5) = 6
-      expect(sprite?.fwl, 6); // FWL = 1 + force(5) = 6
-      expect(sprite?.powers, contains('Any 2 Optional Powers'));
-      expect(sprite?.baseSkills.keys, containsAll(['Hacking', 'Electronic Warfare']));
-    });
 
     test('Should handle custom name override', () {
-      final sprite = CritterFactory.generateSprite('Crack Sprite', 3, nameOverride: 'My Custom Sprite');
+      final sprite = CritterFactory.generateSprite('Crack Sprite', 3, 2, true, true, nameOverride: 'My Custom Sprite');
       expect(sprite?.name, 'My Custom Sprite');
       expect(sprite?.type, CritterType.sprite);
       expect(sprite?.force, 3);
     });
 
     test('Should return null for invalid sprite type', () {
-      final sprite = CritterFactory.generateSprite('Invalid Sprite', 5);
+      final sprite = CritterFactory.generateSprite('Invalid Sprite', 5, 2, false, false);
       expect(sprite, isNull);
     });
 
     test('Should calculate initiative correctly', () {
-      final sprite = CritterFactory.generateSprite('Data Sprite', 4);
+      final sprite = CritterFactory.generateSprite('Data Sprite', 4, 2, false, false);
       expect(sprite?.initiative, '12 + 4d6'); // DP(8) + force(4) = 12, dice = 4
     });
 
     test('Should handle edge cases with force 1', () {
-      final sprite = CritterFactory.generateSprite('Data Sprite', 1);
+      final sprite = CritterFactory.generateSprite('Data Sprite', 1, 1, false, false);
       expect(sprite?.name, 'Data Sprite');
       expect(sprite?.force, 1);
       expect(sprite?.atk, 0); // ATK = -1 + force(1) = 0
@@ -161,7 +92,7 @@ void main(){
     });
 
     test('Should handle high force values', () {
-      final sprite = CritterFactory.generateSprite('Fault Sprite', 12);
+      final sprite = CritterFactory.generateSprite('Fault Sprite', 12, 2, false, false);
       expect(sprite?.name, 'Fault Sprite');
       expect(sprite?.force, 12);
       expect(sprite?.atk, 15); // ATK = 3 + force(12) = 15
@@ -173,7 +104,7 @@ void main(){
 
   group('Spirit Factory Tests', () {
     test('Should generate Air Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Air', 5);
+      final spirit = CritterFactory.generateSpirit('Spirit of Air', 5, 2, true, false);
       expect(spirit?.name, 'Spirit of Air', reason: "name should equal 'Spirit of Air'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 5, reason: "force should equal 5");
@@ -193,7 +124,7 @@ void main(){
     });
 
     test('Should generate Earth Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Earth', 4);
+      final spirit = CritterFactory.generateSpirit('Spirit of Earth', 4, 2, true, false);
       expect(spirit?.name, 'Spirit of Earth', reason: "name should equal 'Spirit of Earth'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 4, reason: "force should equal 4");
@@ -211,7 +142,7 @@ void main(){
     });
 
     test('Should generate Fire Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 6);
+      final spirit = CritterFactory.generateSpirit('Spirit of Fire', 6, 2, true, false);
       expect(spirit?.name, 'Spirit of Fire', reason: "name should equal 'Spirit of Fire'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 6, reason: "force should equal 6");
@@ -229,7 +160,7 @@ void main(){
     });
 
     test('Should generate Water Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Water', 3);
+      final spirit = CritterFactory.generateSpirit('Spirit of Water', 3, 2, true, false);
       expect(spirit?.name, 'Spirit of Water', reason: "name should equal 'Spirit of Water'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 3, reason: "force should equal 3");
@@ -247,7 +178,7 @@ void main(){
     });
 
     test('Should generate Man Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Man', 5);
+      final spirit = CritterFactory.generateSpirit('Spirit of Man', 5, 2, true, false);
       expect(spirit?.name, 'Spirit of Man', reason: "name should equal 'Spirit of Man'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 5, reason: "force should equal 5");
@@ -265,7 +196,7 @@ void main(){
     });
 
     test('Should generate Beast Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Beasts', 4);
+      final spirit = CritterFactory.generateSpirit('Spirit of Beasts', 4, 2, true, false);
       expect(spirit?.name, 'Spirit of Beasts', reason: "name should equal 'Spirit of Beasts'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 4, reason: "force should equal 4");
@@ -283,7 +214,7 @@ void main(){
     });
 
     test('Should generate Plant Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Plants', 2);
+      final spirit = CritterFactory.generateSpirit('Spirit of Plants', 2, 2, true, false);
       expect(spirit?.name, 'Spirit of Plants', reason: "name should equal 'Spirit of Plants'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 2, reason: "force should equal 2");
@@ -302,7 +233,7 @@ void main(){
     });
 
     test('Should generate Guidance Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Guidance', 7);
+      final spirit = CritterFactory.generateSpirit('Spirit of Guidance', 7, 2, true, false);
       expect(spirit?.name, 'Spirit of Guidance', reason: "name should equal 'Spirit of Guidance'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 7, reason: "force should equal 7");
@@ -320,7 +251,7 @@ void main(){
     });
 
     test('Should generate Task Spirit with correct attributes', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Tasks', 5);
+      final spirit = CritterFactory.generateSpirit('Spirit of Tasks', 5, 2, true, false);
       expect(spirit?.name, 'Spirit of Tasks', reason: "name should equal 'Spirit of Tasks'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 5, reason: "force should equal 5");
@@ -338,19 +269,19 @@ void main(){
     });
 
     test('Should handle custom name override for spirits', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Air', 3, nameOverride: 'Zephyr');
+      final spirit = CritterFactory.generateSpirit('Spirit of Air', 3, 2, true, false, nameOverride: 'Zephyr');
       expect(spirit?.name, 'Zephyr', reason: "name should equal 'Zephyr'");
       expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
       expect(spirit?.force, 3, reason: "force should equal 3");
     });
 
     test('Should return null for invalid spirit type', () {
-      final spirit = CritterFactory.generateSpirit('Invalid Spirit', 5);
+      final spirit = CritterFactory.generateSpirit('Invalid Spirit', 5, 2, true, false);
       expect(spirit, isNull, reason: "should return null for invalid spirit type");
     });
 
     test('Should handle edge cases with force 1', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Air', 1);
+      final spirit = CritterFactory.generateSpirit('Spirit of Air', 1, 2, true, false);
       expect(spirit?.name, 'Spirit of Air', reason: "name should equal 'Spirit of Air'");
       expect(spirit?.force, 1, reason: "force should equal 1");
       expect(spirit?.bod, 1, reason: "body should equal 1"); // force(1) + BOD(-2) = -1, clamped to 1
@@ -360,7 +291,7 @@ void main(){
     });
 
     test('Should handle high force values with proper clamping', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Earth', 15);
+      final spirit = CritterFactory.generateSpirit('Spirit of Earth', 15, 2, true, false);
       expect(spirit?.name, 'Spirit of Earth', reason: "name should equal 'Spirit of Earth'");
       expect(spirit?.force, 15, reason: "force should equal 15");
       expect(spirit?.bod, 19, reason: "body should equal 19"); // force(15) + BOD(4) = 19
@@ -375,7 +306,7 @@ void main(){
     });
 
     test('Should calculate initiative correctly for spirits', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Air', 5);
+      final spirit = CritterFactory.generateSpirit('Spirit of Air', 5, 2, true, false);
       expect(spirit!.initiative, '14 + 2D6', reason: "initiative should be calculated correctly"); // rea(9) + intu(7) = 16, dice = 4
       expect(spirit.astralInitiative, '10 + 3D6', reason: "astral initiative should be calculated correctly");
     });

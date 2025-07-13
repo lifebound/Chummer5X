@@ -902,6 +902,7 @@ enum CritterType { spirit, sprite }
 
 abstract class Critter {
   final String name;
+  final String? crittername; // Optional critter name for spirits
   final CritterType type;
   final int force;
   final String initiativeType;
@@ -910,9 +911,12 @@ abstract class Critter {
   final Map<String, int> attributeModifiers;
   final List<String> powers;
   final String? special;
-
+  int services;
+  final bool bound;
+  final bool fettered;
   Critter({
     required this.name,
+    this.crittername,
     required this.type,
     required this.force,
     required this.initiativeType,
@@ -921,6 +925,9 @@ abstract class Critter {
     required this.attributeModifiers,
     required this.powers,
     this.special,
+    this.services = 0,
+    this.bound = false,
+    this.fettered = false,
   });
 }
 
@@ -929,6 +936,7 @@ class Spirit extends Critter {
 
   Spirit({
     required String name,
+    String? crittername,
     required CritterType type,
     required int force,
     required String initiativeType,
@@ -937,8 +945,12 @@ class Spirit extends Critter {
     required List<String> powers,
     String? special,
     required Map<String, int> attributeModifiers,
+    required int services,
+    required bool bound,
+    required bool fettered,
   }) : super(
           name: name,
+          crittername: crittername,
           type: type,
           force: force,
           initiativeType: initiativeType,
@@ -946,7 +958,10 @@ class Spirit extends Critter {
           baseSkills: baseSkills,
           powers: powers,
           special: special,
-          attributeModifiers: attributeModifiers
+          attributeModifiers: attributeModifiers,
+          services: services,
+          bound: bound,
+          fettered: fettered,
         );
     int get bod => max((attributeModifiers['BOD'] ?? 0) + force, 1);
     int get agi => max((attributeModifiers['AGI'] ?? -1) + force, 1);
@@ -981,6 +996,9 @@ class SpiritTemplate {
 
   Spirit instantiate({
     required int force,
+    required int services,
+    required bool bound,
+    required bool fettered,
     String? customName
   }) {
     final skills = <String, int>{
@@ -988,7 +1006,8 @@ class SpiritTemplate {
     };
 
     return Spirit(
-      name: customName ?? typeName,
+      name: typeName,
+      crittername: customName,
       force: force,
       type: CritterType.spirit,
       initiativeType: 'Astral',
@@ -997,12 +1016,16 @@ class SpiritTemplate {
       powers: [...powers],
       special: special,
       attributeModifiers: attributeModifiers,
+      services: services,
+      bound: bound,
+      fettered: fettered,
     );
   }
 }
 class Sprite extends Critter {
   Sprite({
     required String name,
+    String? crittername,
     required CritterType type,
     required int force,
     required String initiativeType,
@@ -1011,8 +1034,12 @@ class Sprite extends Critter {
     required List<String> powers,
     String? special,
     required Map<String, int> attributeModifiers,
+    required int services,
+    required bool bound,
+    required bool fettered,
   }) : super(
           name: name,
+          crittername: crittername,
           type: type,
           force: force,
           initiativeType: initiativeType,
@@ -1021,6 +1048,9 @@ class Sprite extends Critter {
           powers: powers,
           special: special,
           attributeModifiers: attributeModifiers,
+          services: services,
+          bound: bound,
+          fettered: fettered,
         );
     int get atk => attributeModifiers['ATK']! + force;
     int get dp => attributeModifiers['DP']! + force;
@@ -1037,6 +1067,7 @@ class SpriteTemplate {
   final String? special;
   final Map<String, int> attributeModifiers;
 
+
   const SpriteTemplate({
     required this.typeName,
     required this.powers,
@@ -1046,15 +1077,15 @@ class SpriteTemplate {
     required this.attributeModifiers,
   });
 
-  Sprite instantiate({required int force, String? customName}) {
-    
+  Sprite instantiate({required int force, required int services, required bool bound, required bool fettered, String? customName}) {
 
     final skills = <String, int>{
       for (var skill in baseSkills) skill: force + 1, // tweak as needed
     };
 
     return Sprite(
-      name: customName ?? typeName,
+      name: typeName,
+      crittername: customName,
       force: force,
       type: CritterType.sprite,
       initiativeType: 'Matrix',
@@ -1063,6 +1094,9 @@ class SpriteTemplate {
       powers: [...powers],
       special: special,
       attributeModifiers: attributeModifiers,
+      services: services,
+      bound: bound,
+      fettered: fettered,
     );
   }
 }
@@ -1326,14 +1360,14 @@ class CritterFactory {
     ),
   };
 
-  static Sprite? generateSprite(String typeName, int force, {String? nameOverride}) {
+  static Sprite? generateSprite(String typeName, int force, int services, bool bound, bool fettered, {String? nameOverride}) {
     final template = _spriteTemplates[typeName];
-    return template?.instantiate(force: force, customName: nameOverride);
+    return template?.instantiate(force: force, services: services, bound: bound, fettered: fettered, customName: nameOverride);
   }
   
-  static Spirit? generateSpirit(String typeName, int force, {String? nameOverride}) {
+  static Spirit? generateSpirit(String typeName, int force, int services, bool bound, bool fettered, {String? nameOverride}) {
     final template = _spiritTemplates[typeName];
-    return template?.instantiate(force: force, customName: nameOverride);
+    return template?.instantiate(force: force, services: services, bound: bound, fettered: fettered, customName: nameOverride);
   }
   
   static List<String> get availableSpriteTypes => _spriteTemplates.keys.toList();

@@ -1870,65 +1870,73 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
           critter.services == 0
-            ? Row(
+            ? StatefulBuilder(
+                builder: (context, setLocalState) {
+                  final controller = TextEditingController();
+                  
+                  void setServices() {
+                    final parsed = int.tryParse(controller.text);
+                    if (parsed != null && parsed > 0) {
+                      setState(() {
+                        critter.services = parsed;
+                      });
+                    }
+                  }
+                  
+                  return Row(
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        child: TextField(
+                          controller: controller,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Services',
+                            isDense: true,
+                          ),
+                          onSubmitted: (val) => setServices(),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: setServices,
+                        child: const Text('Set'),
+                      ),
+                    ],
+                  );
+                },
+              )
+            : Row(
                 children: [
-          SizedBox(
-            width: 90,
-            child: TextField(
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Services',
-                isDense: true,
-              ),
-              onSubmitted: (val) {
-                final parsed = int.tryParse(val);
-                if (parsed != null && parsed > 0) {
-                  setState(() {
-                    critter.services = parsed;
-                  });
-                }
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () {
-              // No-op unless you're capturing the TextField elsewhere.
-            },
-            child: const Text('Set'),
-          ),
-        ],
-            ) : Row(
-                children: [
-          Text('Services: ${critter.services}'),
-          IconButton(
-            icon: const Icon(Icons.remove),
-            onPressed: () {
-              setState(() {
-                if (critter.services > 0) {
-                  critter.services = critter.services - 1;
-                }
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              setState(() {
-                critter.services = critter.services + 1;
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reset',
-            onPressed: () {
-              setState(() {
-                critter.services = 0;
-              });
-            },
-          ),
-        ],
+                  Text('Services: ${critter.services}'),
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () {
+                      setState(() {
+                        if (critter.services > 0) {
+                          critter.services = critter.services - 1;
+                        }
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {
+                      setState(() {
+                        critter.services = critter.services + 1;
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Reset',
+                    onPressed: () {
+                      setState(() {
+                        critter.services = 0;
+                      });
+                    },
+                  ),
+                ],
               ),
           
           // Switches section

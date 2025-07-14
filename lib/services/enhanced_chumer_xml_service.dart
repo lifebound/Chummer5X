@@ -336,7 +336,7 @@ class EnhancedChumerXmlService {
         final name = _getElementText(spellElement, 'name');
         final category = _getElementText(spellElement, 'category');
         final range = _getElementText(spellElement, 'range');
-        final target = _getElementText(spellElement, 'target');
+        //final target = _getElementText(spellElement, 'target');
         final duration = _getElementText(spellElement, 'duration');
         final drain = _getElementText(spellElement, 'dv');
         final source = _getElementText(spellElement, 'source');

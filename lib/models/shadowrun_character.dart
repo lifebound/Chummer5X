@@ -497,6 +497,8 @@ class ShadowrunCharacter {
   final List<Sprite> sprites; // Added sprites for technomancers
   final List<ComplexForm> complexForms;
   final List<AdeptPower> adeptPowers;
+  final List<InitiationGrade> initiationGrades; // Added for magic users
+  final List<SubmersionGrade> submersionGrades; // Added for technomancers
   
   // Equipment
   final List<Gear> gear;
@@ -549,6 +551,8 @@ class ShadowrunCharacter {
     this.isAdept = false,
     this.isMagician = false,
     this.isTechnomancer = false,
+    this.initiationGrades = const [],
+    this.submersionGrades = const [],
   }) : attributes = _ensureEssenceAttribute(attributes);
   
   // Static helper method to ensure ESS attribute is always present
@@ -1430,25 +1434,25 @@ class Metamagic{
 class InitiationGrade {
   final int grade;
   final Metamagic? metamagic;
-  final int karmaCost;
-  final String source;
-  final String page;
+  final bool ordeal;
+  final bool group;
+  final bool schooling;
 
   const InitiationGrade({
     required this.grade,
     this.metamagic,
-    required this.karmaCost,
-    required this.source,
-    required this.page,
+    required this.ordeal,
+    required this.group,
+    required this.schooling,
   });
 
   factory InitiationGrade.fromJson(Map<String, dynamic> json) {
     return InitiationGrade(
       grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
       metamagic: json['metamagic'] != null ? Metamagic.fromJson(json['metamagic']) : null,
-      karmaCost: int.tryParse(json['karmacost']?.toString() ?? '0') ?? 0,
-      source: json['source']?.toString() ?? '',
-      page: json['page']?.toString() ?? '',
+      ordeal: json['ordeal'] == true,
+      group: json['group'] == true,
+      schooling: json['schooling'] == true,
     );
   }
 }
@@ -1457,18 +1461,18 @@ class SubmersionGrade extends InitiationGrade {
   const SubmersionGrade({
     required super.grade,
     super.metamagic,
-    required super.karmaCost,
-    required super.source,
-    required super.page,
+    required super.ordeal,
+    required super.group,
+    required super.schooling
   });
 
   factory SubmersionGrade.fromJson(Map<String, dynamic> json) {
     return SubmersionGrade(
       grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
       metamagic: json['metamagic'] != null ? Metamagic.fromJson(json['metamagic']) : null,
-      karmaCost: int.tryParse(json['karmacost']?.toString() ?? '0') ?? 0,
-      source: json['source']?.toString() ?? '',
-      page: json['page']?.toString() ?? '',
+      ordeal: json['ordeal'] == true,
+      group: json['group'] == true,
+      schooling: json['schooling'] == true,
     );
   }
 }

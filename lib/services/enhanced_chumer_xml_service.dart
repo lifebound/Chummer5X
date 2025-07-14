@@ -71,6 +71,8 @@ class EnhancedChumerXmlService {
       final sprites = _parseSprites(characterElement);
       final complexForms = _parseComplexForms(characterElement);
       final adeptPowers = parseAdeptPowers(characterElement);
+      final initiationGrades = _parseInitiationGrades(characterElement)[0];
+      final submersionGrades = _parseInitiationGrades(characterElement)[1] as List<SubmersionGrade>;
       
       // Parse gear
       final gear = _parseGear(characterElement);
@@ -120,6 +122,8 @@ class EnhancedChumerXmlService {
         isAdept: isAdept,
         isMagician: isMagician,
         isTechnomancer: isTechnomancer,
+        initiationGrades: initiationGrades,
+        submersionGrades: submersionGrades,
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');
@@ -368,7 +372,7 @@ class EnhancedChumerXmlService {
     
     if (spiritsElement != null) {
       for (final spiritElement in spiritsElement.findElements('spirit')) {
-final name = _getElementText(spiritElement, 'name');
+        final name = _getElementText(spiritElement, 'name');
         final type = _getElementText(spiritElement, 'type');
         final services = int.tryParse(_getElementText(spiritElement, 'services') ?? '0') ?? 0;
         final bound = _getElementText(spiritElement, 'bound')?.toLowerCase() == 'true';
@@ -386,6 +390,7 @@ final name = _getElementText(spiritElement, 'name');
     } 
     return spirits;
   }
+
   static List<Sprite> _parseSprites(XmlElement characterElement) {
     final sprites = <Sprite>[];
     final spiritsElement = characterElement.findElements('spirits').firstOrNull;
@@ -411,6 +416,7 @@ final name = _getElementText(spiritElement, 'name');
     
     return sprites;
   }
+
   static List<ComplexForm> _parseComplexForms(XmlElement characterElement) {
     final complexForms = <ComplexForm>[];
     final complexFormsElement = characterElement.findElements('complexforms').firstOrNull;
@@ -577,8 +583,8 @@ final name = _getElementText(spiritElement, 'name');
     }
     return calculatedValues;
   }
-  
-  static _parseQualities(XmlElement characterElement) {
+
+  static List<Quality> _parseQualities(XmlElement characterElement) {
     final qualities = <Quality>[];
     final qualitiesElement = characterElement.findElements('qualities').firstOrNull;
     
@@ -604,5 +610,46 @@ final name = _getElementText(spiritElement, 'name');
     }
     
     return qualities;
+  }
+
+  static List<List<InitiationGrade>> _parseInitiationGrades(XmlElement characterElement){
+    final initiationGrades = <InitiationGrade>[];
+    final submersionGrades = <SubmersionGrade>[];
+
+    final gradesElement = characterElement.findElements('initiationgrades').firstOrNull;
+    
+    if (gradesElement != null) {
+      for (final gradeElement in gradesElement.findElements('grade')) {
+        bool isResEnabled = _getElementText(gradeElement, 'res') == 'True';
+        
+        final level = int.tryParse(_getElementText(gradeElement, 'level') ?? '0') ?? 0;
+        final grade = int.tryParse(_getElementText(gradeElement, 'grade') ?? '0') ?? 0;
+        final ordeal = _getElementText(gradeElement, 'ordeal')?.toLowerCase() == 'true';
+        final group = _getElementText(gradeElement,"group")?.toLowerCase() == 'true';
+        final schooling = _getElementText(gradeElement, 'schooling')?.toLowerCase() == 'true';
+
+        if (grade != null) {
+          if(isResEnabled){
+            submersionGrades.add(SubmersionGrade(
+              grade: grade,
+              ordeal: ordeal,
+              group: group,
+              schooling: schooling
+            ));
+          }
+          else{
+            initiationGrades.add(InitiationGrade(
+              grade: grade,
+            ordeal: group,
+            group: group,
+            schooling: schooling
+          ));
+        }
+          
+        }
+      }
+    }
+
+    return [initiationGrades, submersionGrades];
   }
 }

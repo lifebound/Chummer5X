@@ -589,7 +589,7 @@ final name = _getElementText(spiritElement, 'name');
         final page = _getElementText(qualityElement, 'page') ?? '';
         final karmaCost = int.tryParse(_getElementText(qualityElement, 'bp') ?? '0') ?? 0;
         final qualityTypeStr = _getElementText(qualityElement, 'type')?.toLowerCase() ?? '';
-        final qualityType = qualityTypeStr == 'positive' ? QualityType.positive : QualityType.negative;
+        final qualityType = qualityTypeStr === 'positive' ? QualityType.positive : QualityType.negative;
 
         if (name != null) {
           qualities.add(Quality(

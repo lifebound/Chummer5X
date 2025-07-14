@@ -662,6 +662,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildQualitiesView(BuildContext context) {
+    final qualities = _currentCharacter!.qualities ?? [];
+    final positiveQualities = qualities.where((q) => q.qualityType == QualityType.positive).toList();
+    final negativeQualities = qualities.where((q) => q.qualityType == QualityType.negative).toList();
+    
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -683,13 +687,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'No positive qualities',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
+                  if (positiveQualities.isEmpty)
+                    Text(
+                      'No positive qualities',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  else
+                    ...positiveQualities.map((quality) => _buildQualityCard(context, quality)).toList(),
                 ],
               ),
             ),
@@ -714,13 +721,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'No negative qualities',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
+                  if (negativeQualities.isEmpty)
+                    Text(
+                      'No negative qualities',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  else
+                    ...negativeQualities.map((quality) => _buildQualityCard(context, quality)).toList(),
                 ],
               ),
             ),

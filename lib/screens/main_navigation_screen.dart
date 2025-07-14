@@ -1057,6 +1057,115 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
   
+  Widget _buildQualityCard(BuildContext context, Quality quality) {
+    Color categoryColor;
+    String categoryLabel;
+    
+    switch (quality.qualityType) {
+      case QualityType.positive:
+        categoryColor = Colors.green;
+        categoryLabel = 'Positive';
+        break;
+      case QualityType.negative:
+        categoryColor = Colors.red;
+        categoryLabel = 'Negative';
+        break;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  quality.name,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: categoryColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  categoryLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: categoryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Quality details
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              _buildQualityDetailChip(context, 'Karma Cost', quality.karmaCost.toString()),
+              if (quality.source.isNotEmpty)
+                _buildQualityDetailChip(context, 'Source', quality.source),
+              if (quality.page.isNotEmpty)
+                _buildQualityDetailChip(context, 'Page', quality.page),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQualityDetailChip(BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildGearView(BuildContext context) {
     return Card(

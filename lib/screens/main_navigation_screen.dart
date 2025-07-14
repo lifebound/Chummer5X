@@ -18,6 +18,8 @@ enum NavigationSection {
   adeptPowers,
   complexForms,
   sprites,
+  initiationGrades,
+  submersionGrades,
   gear,
   combat,
   contacts,
@@ -225,6 +227,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 NavigationSection.sprites,
                 Icons.computer,
                 'Sprites',
+              ),
+            if (_currentCharacter!.shouldShowInitiationGradesTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.initiationGrades,
+                Icons.trending_up,
+                'Initiation',
+              ),
+            if (_currentCharacter!.shouldShowSubmersionGradesTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.submersionGrades,
+                Icons.trending_up,
+                'Submersion',
               ),
 
             _buildNavigationTile(
@@ -630,6 +646,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return _buildComplexFormsView(context);
       case NavigationSection.sprites:
         return _buildSpritesView(context);
+      case NavigationSection.initiationGrades:
+        return _buildInitiationGradesView(context);
+      case NavigationSection.submersionGrades:
+        return _buildSubmersionGradesView(context);
       case NavigationSection.gear:
         return _buildGearView(context);
       case NavigationSection.combat:
@@ -1265,6 +1285,50 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
+  Widget _buildInitiationGradesView(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Initiation Grades',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Initiation grades section coming soon...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmersionGradesView(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Submersion Grades',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Submersion grades section coming soon...',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildConditionMonitorCard() {
     final cm = _currentCharacter!.conditionMonitor;
     final cmPenalty = _currentCharacter!.conditionMonitorPenalty;
@@ -1630,50 +1694,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     });
 
-    debugPrint("Adjusted $monitorType condition monitor by $delta");
-  }
-
-  Widget _buildCritterListView<T extends Critter>({
-    required BuildContext context,
-    required List<T> critters,
-    required IconData icon,
-    required String title,
-    required String singularLabel,
-    required String emptyMessage,
-    required Widget Function(BuildContext, T) itemBuilder,
-  }) {
-    final itemCountText =
-        '${critters.length} $singularLabel${critters.length == 1 ? '' : 's'}';
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
-                Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                const Spacer(),
-                Text(
-                  itemCountText,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (critters.isEmpty)
-              Text(
-                emptyMessage,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-              )
             else
               ...critters.map((critter) => itemBuilder(context, critter)).toList(),
           ],

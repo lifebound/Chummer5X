@@ -865,6 +865,8 @@ class ShadowrunCharacter {
   bool get shouldShowAdeptPowersTab => isAdept;
   bool get shouldShowComplexFormsTab => isTechnomancer;
   bool get shouldShowSpritesTab => isTechnomancer;
+  bool get shouldShowInitiationGradesTab => isMagician;
+  bool get shouldShowSubmersionGradesTab => isTechnomancer;
   //check if the character has the spell "Bind"
   bool get canFetterSpirit => spells.any((spell) => spell.name == "Bind");
   //technomancers can fetter sprites only if the have the quality "Resonant Stream: Technoshaman"

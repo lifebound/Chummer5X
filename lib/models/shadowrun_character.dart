@@ -52,7 +52,17 @@ class Attribute {
     );
   }
 }
+class Quality{
+  final String name;
+  final String source;
+  final String page;
 
+  const Quality({
+    required this.name,
+    required this.source,
+    required this.page,
+  });
+}
 class SkillGroup {
   final String name;
   final String? base;
@@ -253,8 +263,6 @@ class Spell {
     drain.isNotEmpty && 
     source.isNotEmpty;
 }
-
-
 
 class ComplexForm {
   final String name;
@@ -473,6 +481,7 @@ class ShadowrunCharacter {
   final List<Attribute> attributes;
   final List<Skill> skills;
   final Map<String, LimitDetail> limits;
+  final List<Quality>? qualities; // Added qualities for character traits
   
   // Magic/Resonance
   final List<Spell> spells;
@@ -515,6 +524,7 @@ class ShadowrunCharacter {
     this.karma,
     this.totalKarma,
     required List<Attribute> attributes,
+    this.qualities,
     required this.skills,
     this.limits = const {},
     this.spells = const [],
@@ -785,6 +795,7 @@ class ShadowrunCharacter {
     String? karma,
     String? totalKarma,
     List<Attribute>? attributes,
+    List<Quality>? qualities,
     List<Skill>? skills,
     List<Spell>? spells,
     List<Spirit>? spirits,
@@ -800,6 +811,7 @@ class ShadowrunCharacter {
     bool? isAdept,
     bool? isMagician,
     bool? isTechnomancer,
+
   }) {
     return ShadowrunCharacter(
       name: name ?? this.name,
@@ -840,6 +852,10 @@ class ShadowrunCharacter {
   bool get shouldShowAdeptPowersTab => isAdept;
   bool get shouldShowComplexFormsTab => isTechnomancer;
   bool get shouldShowSpritesTab => isTechnomancer;
+  //check if the character has the spell "Bind"
+  bool get canFetterSpirit => spells.any((spell) => spell.name == "Bind");
+  //technomancers can fetter sprites only if the have the quality "Resonant Stream: Technoshaman"
+  bool get canFetterSprite => qualities?.any((quality) => quality.name == "Resonant Stream: Technoshaman") ?? false;
 
   // Method to adjust condition monitor filled values
   ShadowrunCharacter adjustConditionMonitor({
@@ -912,8 +928,8 @@ abstract class Critter {
   final List<String> powers;
   final String? special;
   int services;
-  final bool bound;
-  final bool fettered;
+  bool bound;
+  bool fettered;
   Critter({
     required this.name,
     this.crittername,

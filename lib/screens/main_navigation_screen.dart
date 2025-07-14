@@ -1520,7 +1520,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required List<MapEntry<String, String>> secondaryFields,
     required String typeLabel,
     required Color typeColor,
-    required String serviceNameSingle
+    required String serviceNameSingle,
+    required ShadowrunCharacter character,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -1537,14 +1538,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  critter.name,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      critter.crittername?.isNotEmpty == true
+                          ? critter.crittername!
+                          : critter.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                       ),
+                  ),
+                  if (critter.crittername?.isNotEmpty == true)
+                    Text(
+                    '  (${critter.name})',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                        color: typeColor.withOpacity(0.3),
+                      ),
+                    ),
+                  ],
                 ),
-
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1692,8 +1708,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: const Icon(Icons.remove),
             onPressed: () {
               setState(() {
-                if (critter.services! > 0) {
-                  critter.services = critter.services! - 1;
+                if (critter.services > 0) {
+                  critter.services = critter.services - 1;
                 }
               });
             },
@@ -1702,7 +1718,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: const Icon(Icons.add),
             onPressed: () {
               setState(() {
-                critter.services = critter.services! + 1;
+                critter.services = critter.services + 1;
               });
             },
           ),
@@ -1716,7 +1732,76 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             },
           ),
         ],
-              ),       
+              ),
+          
+          // Switches section
+          const SizedBox(height: 12),
+          
+          // Bound/Registered switch
+          Row(
+            children: [
+              Text(
+                critter.type == CritterType.spirit ? 'Bound' : 'Registered',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Switch(
+                value: critter.bound,
+                onChanged: (value) {
+                  setState(() {
+                    critter.bound = value;
+                    // Update the character's list to trigger UI rebuild
+                    if (critter.type == CritterType.spirit) {
+                      _currentCharacter = _currentCharacter!.copyWith(
+                        spirits: List.from(_currentCharacter!.spirits),
+                      );
+                    } else {
+                      _currentCharacter = _currentCharacter!.copyWith(
+                        sprites: List.from(_currentCharacter!.sprites),
+                      );
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          
+          // Fettered/Pet switch (conditional)
+          if ((critter.type == CritterType.spirit && character.canFetterSpirit) ||
+              (critter.type == CritterType.sprite && character.canFetterSprite)) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  critter.type == CritterType.spirit ? 'Fettered' : 'Sprite Pet',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Switch(
+                  value: critter.fettered,
+                  onChanged: (value) {
+                    setState(() {
+                      critter.fettered = value;
+                      // Update the character's list to trigger UI rebuild
+                      if (critter.type == CritterType.spirit) {
+                        _currentCharacter = _currentCharacter!.copyWith(
+                          spirits: List.from(_currentCharacter!.spirits),
+                        );
+                      } else {
+                        _currentCharacter = _currentCharacter!.copyWith(
+                          sprites: List.from(_currentCharacter!.sprites),
+                        );
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -1745,6 +1830,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         MapEntry('Initiative Type', spirit.initiativeType),
       ],
       serviceNameSingle: 'service',
+      character: _currentCharacter!,
     );
   }
 
@@ -1764,6 +1850,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         MapEntry('Matrix Initiative', sprite.initiative),
       ],
       serviceNameSingle: 'task',
+      character: _currentCharacter!,
     );
   }
 

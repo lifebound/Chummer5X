@@ -52,15 +52,23 @@ class Attribute {
     );
   }
 }
+enum QualityType {
+  positive,
+  negative
+} 
 class Quality{
   final String name;
   final String source;
   final String page;
+  final int karmaCost;
+  final QualityType qualityType;
 
   const Quality({
     required this.name,
     required this.source,
     required this.page,
+    required this.karmaCost,
+    required this.qualityType,
   });
 }
 class SkillGroup {
@@ -524,7 +532,7 @@ class ShadowrunCharacter {
     this.karma,
     this.totalKarma,
     required List<Attribute> attributes,
-    this.qualities,
+    this.qualities = const [],
     required this.skills,
     this.limits = const {},
     this.spells = const [],
@@ -828,6 +836,7 @@ class ShadowrunCharacter {
       karma: karma ?? this.karma,
       totalKarma: totalKarma ?? this.totalKarma,
       attributes: attributes ?? this.attributes,
+      qualities: qualities ?? this.qualities,
       skills: skills ?? this.skills,
       spells: spells ?? this.spells,
       spirits: spirits ?? this.spirits,

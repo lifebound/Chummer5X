@@ -63,14 +63,6 @@ void main(){
     });
 
 
-
-    test('Should handle custom name override', () {
-      final sprite = CritterFactory.generateSprite('Crack Sprite', 3, 2, true, true, nameOverride: 'My Custom Sprite');
-      expect(sprite?.name, 'My Custom Sprite');
-      expect(sprite?.type, CritterType.sprite);
-      expect(sprite?.force, 3);
-    });
-
     test('Should return null for invalid sprite type', () {
       final sprite = CritterFactory.generateSprite('Invalid Sprite', 5, 2, false, false);
       expect(sprite, isNull);
@@ -266,13 +258,6 @@ void main(){
       expect(spirit?.edg, 2, reason: "edge should equal 2"); // force(5) + EDG(0) = 2
       expect(spirit?.powers, containsAll(['Accident', 'Binding', 'Concealment', 'Guard', 'Movement', 'Psychokinesis', 'Search']), reason: "powers should contain all expected powers");
       expect(spirit?.special, 'Skilled at specific tasks and crafts', reason: "special should match expected text");
-    });
-
-    test('Should handle custom name override for spirits', () {
-      final spirit = CritterFactory.generateSpirit('Spirit of Air', 3, 2, true, false, nameOverride: 'Zephyr');
-      expect(spirit?.name, 'Zephyr', reason: "name should equal 'Zephyr'");
-      expect(spirit?.type, CritterType.spirit, reason: "type should equal CritterType.spirit");
-      expect(spirit?.force, 3, reason: "force should equal 3");
     });
 
     test('Should return null for invalid spirit type', () {

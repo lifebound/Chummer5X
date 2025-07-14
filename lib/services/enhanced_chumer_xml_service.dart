@@ -47,6 +47,8 @@ class EnhancedChumerXmlService {
       
       // Parse attributes
       final attributes = _parseAttributes(characterElement);
+
+      final qualities = _parseQualities(characterElement);
       
       // Parse skill groups
       final skillGroups = _parseSkillGroups(characterElement);
@@ -101,6 +103,7 @@ class EnhancedChumerXmlService {
         karma: karma,
         totalKarma: totalKarma,
         attributes: attributes,
+        qualities: qualities,
         skills: skills,
         //limits: limits,
         spells: spells,
@@ -573,5 +576,33 @@ final name = _getElementText(spiritElement, 'name');
       calculatedValues[element.name.local] = element.innerText;
     }
     return calculatedValues;
+  }
+  
+  static _parseQualities(XmlElement characterElement) {
+    final qualities = <Quality>[];
+    final qualitiesElement = characterElement.findElements('qualities').firstOrNull;
+    
+    if (qualitiesElement != null) {
+      for (final qualityElement in qualitiesElement.findElements('quality')) {
+        final name = _getElementText(qualityElement, 'name');
+        final source = _getElementText(qualityElement, 'source') ?? '';
+        final page = _getElementText(qualityElement, 'page') ?? '';
+        final karmaCost = int.tryParse(_getElementText(qualityElement, 'bp') ?? '0') ?? 0;
+        final qualityTypeStr = _getElementText(qualityElement, 'type')?.toLowerCase() ?? '';
+        final qualityType = qualityTypeStr == 'positive' ? QualityType.positive : QualityType.negative;
+
+        if (name != null) {
+          qualities.add(Quality(
+            name: name,
+            source: source,
+            page: page,
+            karmaCost: karmaCost,
+            qualityType: qualityType,
+          ));
+        }
+      }
+    }
+    
+    return qualities;
   }
 }

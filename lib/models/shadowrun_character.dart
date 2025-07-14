@@ -1401,3 +1401,74 @@ class CritterFactory {
   static SpriteTemplate? getSpriteTemplate(String typeName) => _spriteTemplates[typeName];
   static SpiritTemplate? getSpiritTemplate(String typeName) => _spiritTemplates[typeName];
 }
+
+class Metamagic{
+  final String name;
+  final String source;
+  final String page;
+  // bonuses need to be handled here, but they're complex, so that's for another time.
+  final Map<String, int> bonuses;
+
+  const Metamagic({
+    required this.name,
+    required this.source,
+    required this.page,
+    this.bonuses = const {},
+  });
+
+  factory Metamagic.fromJson(Map<String, dynamic> json) {
+    return Metamagic(
+      name: json['name']?.toString() ?? '',
+      source: json['source']?.toString() ?? '',
+      page: json['page']?.toString() ?? '',
+      bonuses: (json['bonuses'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, int.tryParse(value.toString()) ?? 0)) ?? {},
+    );
+  }
+}
+
+// Initiation and Submersion classes
+class InitiationGrade {
+  final int grade;
+  final Metamagic? metamagic;
+  final int karmaCost;
+  final String source;
+  final String page;
+
+  const InitiationGrade({
+    required this.grade,
+    this.metamagic,
+    required this.karmaCost,
+    required this.source,
+    required this.page,
+  });
+
+  factory InitiationGrade.fromJson(Map<String, dynamic> json) {
+    return InitiationGrade(
+      grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
+      metamagic: json['metamagic'] != null ? Metamagic.fromJson(json['metamagic']) : null,
+      karmaCost: int.tryParse(json['karmacost']?.toString() ?? '0') ?? 0,
+      source: json['source']?.toString() ?? '',
+      page: json['page']?.toString() ?? '',
+    );
+  }
+}
+
+class SubmersionGrade extends InitiationGrade {
+  const SubmersionGrade({
+    required super.grade,
+    super.metamagic,
+    required super.karmaCost,
+    required super.source,
+    required super.page,
+  });
+
+  factory SubmersionGrade.fromJson(Map<String, dynamic> json) {
+    return SubmersionGrade(
+      grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
+      metamagic: json['metamagic'] != null ? Metamagic.fromJson(json['metamagic']) : null,
+      karmaCost: int.tryParse(json['karmacost']?.toString() ?? '0') ?? 0,
+      source: json['source']?.toString() ?? '',
+      page: json['page']?.toString() ?? '',
+    );
+  }
+}

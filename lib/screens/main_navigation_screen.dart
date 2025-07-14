@@ -1694,6 +1694,50 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     });
 
+    debugPrint("Adjusted $monitorType condition monitor by $delta");
+  }
+
+  Widget _buildCritterListView<T extends Critter>({
+    required BuildContext context,
+    required List<T> critters,
+    required IconData icon,
+    required String title,
+    required String singularLabel,
+    required String emptyMessage,
+    required Widget Function(BuildContext, T) itemBuilder,
+  }) {
+    final itemCountText =
+        '${critters.length} $singularLabel${critters.length == 1 ? '' : 's'}';
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                const Spacer(),
+                Text(
+                  itemCountText,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (critters.isEmpty)
+              Text(
+                emptyMessage,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+              )
             else
               ...critters.map((critter) => itemBuilder(context, critter)).toList(),
           ],
@@ -2310,7 +2354,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return sprite.force ~/ 2; // Similar to spirit edge calculation
       default:
         return 1;
-    }
+  }
   }
 
   /// Checks if a critter skill is defaulting (skill rating is 0)

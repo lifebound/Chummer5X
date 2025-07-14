@@ -11,6 +11,7 @@ import 'package:file_picker/file_picker.dart';
 enum NavigationSection {
   overview,
   attributes,
+  qualities,
   skills,
   spells,
   spirits,
@@ -175,6 +176,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               NavigationSection.attributes,
               Icons.fitness_center,
               'Attributes',
+            ),
+            _buildNavigationTile(
+              context,
+              NavigationSection.qualities,
+              Icons.star,
+              'Qualities',
             ),
             _buildNavigationTile(
               context,
@@ -609,6 +616,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return _buildOverviewView(context);
       case NavigationSection.attributes:
         return _buildAttributesView(context);
+      case NavigationSection.qualities:
+        return _buildQualitiesView(context);
       case NavigationSection.skills:
         return _buildSkillsView(context);
       case NavigationSection.spells:
@@ -650,6 +659,75 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildAttributesView(BuildContext context) {
     return AttributesCard(character: _currentCharacter!);
+  }
+
+  Widget _buildQualitiesView(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Positive Qualities Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.add_circle, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Positive Qualities',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No positive qualities',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Negative Qualities Section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.remove_circle, color: Colors.red),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Negative Qualities',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No negative qualities',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSkillsView(BuildContext context) {

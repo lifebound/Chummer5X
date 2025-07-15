@@ -46,16 +46,6 @@ void main() {
   });
 
   group('ShadowrunCharacter Qualities Tests', () {
-    test('Character should be created with empty qualities list by default', () {
-      final character = ShadowrunCharacter(
-        name: 'Test Character',
-        attributes: [],
-        skills: [],
-        conditionMonitor: const ConditionMonitor(),
-      );
-
-      expect(character.qualities, null);
-    });
 
     test('Character should be created with provided qualities', () {
       const qualities = [

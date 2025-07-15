@@ -747,26 +747,7 @@ class EnhancedChumerXmlService {
         }
       }
     }
-    // final ritualsElement = characterElement.findElements('rituals').firstOrNull;
-    // if (ritualsElement != null) {
-    //   for (final ritualElement in ritualsElement.findElements('ritual')) {
-    //     final name = _getElementText(ritualElement, 'name');
-    //     final source = _getElementText(ritualElement, 'source') ?? '';
-    //     final page = _getElementText(ritualElement, 'page') ?? '';
-    //     final improvementSource = _getElementText(ritualElement, 'improvementsource') ?? '';
-    //     final grade = _getElementText(ritualElement, 'grade');
-    //     debugPrint('name: $name, source: $source, page: $page, improvement source: $improvementSource, grade: $grade');
-    //     if (name != null) {
-    //       metamagics.add(Metamagic(
-    //         name: name,
-    //         source: source,
-    //         page: page,
-    //         improvementSource: improvementSource,
-    //         grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
-    //       ));
-    //     }
-    //   }
-    // }
+
     return metamagics;
   }
   static List<Metamagic> _parseMetamagicType(XmlElement characterElement, String type) {

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/models/shadowrun_character.dart';
+import 'package:chummer5x/models/condition_monitor.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
 
 void main() {
   group('Dynamic Navigation Tests', () {

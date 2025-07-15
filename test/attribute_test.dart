@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:chummer5x/models/attributes.dart';
 import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/models/condition_monitor.dart';
 
 void main() {
   // Test cases for attribute calculations

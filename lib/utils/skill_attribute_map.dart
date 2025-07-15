@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/shadowrun_character.dart';
+import 'package:chummer5x/models/attributes.dart';
 
 /// Mapping of skill names to their associated attributes in Shadowrun 5th Edition
 /// This is used to calculate total skill ratings by adding the base skill + attribute bonus

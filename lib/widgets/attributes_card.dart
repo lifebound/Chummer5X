@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/shadowrun_character.dart';
 import '../utils/responsive_layout.dart';
+import 'package:chummer5x/models/attributes.dart';
 
 class AttributesCard extends StatelessWidget {
   final ShadowrunCharacter character;

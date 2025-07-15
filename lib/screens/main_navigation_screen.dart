@@ -7,6 +7,17 @@ import '../widgets/character_info_card.dart';
 import '../widgets/attributes_card.dart';
 import '../widgets/skills_card.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:chummer5x/models/spells.dart';
+import 'package:chummer5x/models/complex_forms.dart';
+import 'package:chummer5x/models/adept_powers.dart';
+import 'package:chummer5x/models/qualities.dart';
+import 'package:chummer5x/models/initiation.dart';
+import 'package:chummer5x/models/submersion.dart';
+import 'package:chummer5x/models/metamagic.dart';
+import 'package:chummer5x/models/critter_base.dart';
+import 'package:chummer5x/models/gear.dart';
+import 'package:chummer5x/models/spirit.dart';
+import 'package:chummer5x/models/sprite.dart';
 
 enum NavigationSection {
   overview,
@@ -414,181 +425,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     }
   }
-
-  // void _createSampleCharacter() {
-  //   const sampleCharacter = ShadowrunCharacter(
-  //     name: 'Sample Runner',
-  //     alias: 'Chrome',
-  //     metatype: 'Human',
-  //     skills: [
-  //       Skill(
-  //         name: 'Pistols',
-  //         base: '4',
-  //         karma: '2',
-  //         skillGroupName: 'Firearms',
-  //         skillGroupTotal: 0,
-  //         isPrioritySkill: true, // Priority skill gets +2
-  //         specializations: [
-  //           SkillSpecialization(name: 'Semi-Automatics'),
-  //         ],
-  //       ),
-  //       Skill(
-  //         name: 'Infiltration',
-  //         base: '3',
-  //         karma: '1',
-  //         skillGroupName: 'Stealth',
-  //         skillGroupTotal: 0,
-  //       ),
-  //       Skill(
-  //         name: 'Hacking',
-  //         base: '5',
-  //         karma: '1',
-  //         skillGroupName: 'Cracking',
-  //         skillGroupTotal: 0,
-  //         isPrioritySkill: true, // Priority skill gets +2
-  //       ),
-  //       Skill(
-  //         name: 'Perception',
-  //         base: '2',
-  //         karma: '2',
-  //         skillGroupName: '',
-  //         skillGroupTotal: 0,
-  //       ),
-  //       Skill(
-  //         name: 'Palming',
-  //         base: '1',
-  //         karma: '3',
-  //         skillGroupName: 'Stealth',
-  //         skillGroupTotal: 0,
-  //         specializations: [
-  //           SkillSpecialization(name: 'Pickpocket'),
-  //           SkillSpecialization(name: 'Legerdemain'),
-  //         ],
-  //       ),
-  //     ],
-  //     limits: {}, // Empty for now
-  //     attributes: [
-  //       const Attribute(
-  //         name: 'BOD',
-  //         metatypeCategory: 'Physical',
-  //         totalValue: 4,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 3,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'AGI',
-  //         metatypeCategory: 'Physical',
-  //         totalValue: 5,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 4,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'REA',
-  //         metatypeCategory: 'Physical',
-  //         totalValue: 4,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 3,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'STR',
-  //         metatypeCategory: 'Physical',
-  //         totalValue: 3,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 2,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'CHA',
-  //         metatypeCategory: 'Mental',
-  //         totalValue: 3,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 2,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'INT',
-  //         metatypeCategory: 'Mental',
-  //         totalValue: 4,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 3,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'LOG',
-  //         metatypeCategory: 'Mental',
-  //         totalValue: 5,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 4,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'WIL',
-  //         metatypeCategory: 'Mental',
-  //         totalValue: 3,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 2,
-  //         karma: 1,
-  //       ),
-  //       const Attribute(
-  //         name: 'EDG',
-  //         metatypeCategory: 'Special',
-  //         totalValue: 2,
-  //         metatypeMin: 1,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 9,
-  //         base: 2,
-  //         karma: 0,
-  //       ),
-  //       const Attribute(
-  //         name: 'ESS',
-  //         metatypeCategory: 'Special',
-  //         totalValue: 6,
-  //         metatypeMin: 0,
-  //         metatypeMax: 6,
-  //         metatypeAugMax: 6,
-  //         base: 6,
-  //         karma: 0,
-  //       ),
-  //     ],
-  //     conditionMonitor: ConditionMonitor(
-  //       physicalCM: 10,
-  //       physicalCMFilled: 2,
-  //       physicalCMOverflow: 4,
-  //       stunCM: 10,
-  //       stunCMFilled: 1,
-  //     ),
-  //     magEnabled: false, // Sample character doesn't have magic enabled
-  //     resEnabled: false, // Sample character doesn't have resonance enabled
-  //     depEnabled: false, // Sample character doesn't have depth enabled
-  //   );
-
-  //   setState(() {
-  //     if (!_characters.contains(sampleCharacter)) {
-  //       _characters.add(sampleCharacter);
-  //     }
-  //     _currentCharacter = sampleCharacter;
-  //     _currentSection = NavigationSection.overview; // Reset to overview
-  //   });
-  // }
 
   Widget _buildNavigationTile(BuildContext context, NavigationSection section,
       IconData icon, String title) {

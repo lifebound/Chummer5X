@@ -10,6 +10,7 @@
 .svn/
 migrate_working_dir/
 RESPONSIVE_DESIGN.md
+generate_coverage.sh
 
 # IntelliJ related
 *.iml
@@ -31,6 +32,7 @@ RESPONSIVE_DESIGN.md
 .pub-cache/
 .pub/
 /build/
+coverage/
 
 # Symbolication related
 app.*.symbols

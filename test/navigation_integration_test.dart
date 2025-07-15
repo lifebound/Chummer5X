@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/models/shadowrun_character.dart';
-
+import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/models/condition_monitor.dart';
 void main() {
   group('Navigation Integration Tests', () {
     testWidgets('should show only basic tabs for mundane character', (WidgetTester tester) async {

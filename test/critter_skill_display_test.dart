@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/models/critter_factory.dart';
 
 void main() {
   group('Critter Skill Display Tests', () {

@@ -2,8 +2,23 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
-import '../models/shadowrun_character.dart';
-import '../utils/skill_group_map.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/utils/skill_group_map.dart';
+import 'package:chummer5x/models/attributes.dart';
+import 'package:chummer5x/models/condition_monitor.dart';
+import 'package:chummer5x/models/spells.dart';
+import 'package:chummer5x/models/spirit.dart';
+import 'package:chummer5x/models/sprite.dart';
+import 'package:chummer5x/models/complex_forms.dart';
+import 'package:chummer5x/models/gear.dart';
+import 'package:chummer5x/models/adept_powers.dart';
+import 'package:chummer5x/models/initiation.dart';
+import 'package:chummer5x/models/submersion.dart';
+import 'package:chummer5x/models/critter_factory.dart';
+import 'package:chummer5x/models/metamagic.dart';
+import 'package:chummer5x/models/skills.dart';
+import 'package:chummer5x/models/qualities.dart';
+
 
 class EnhancedChumerXmlService {
   /// Parse a Chummer XML file and return a comprehensive ShadowrunCharacter

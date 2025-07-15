@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/models/critter_factory.dart';
+import 'package:chummer5x/models/critter_base.dart';
+import 'package:chummer5x/models/spirit.dart';
 
 void main(){
 

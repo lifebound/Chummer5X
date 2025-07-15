@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chummer5x/models/shadowrun_character.dart';
 import 'package:chummer5x/services/enhanced_chumer_xml_service.dart';
 import 'package:xml/xml.dart';
+import 'package:chummer5x/models/spells.dart';
+import 'package:chummer5x/models/complex_forms.dart';
+import 'package:chummer5x/models/adept_powers.dart';
 
 void main() {
   group('Enhanced Spell and Complex Form Tests', () {

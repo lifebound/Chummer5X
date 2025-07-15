@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chummer5x/models/shadowrun_character.dart';
 import 'package:chummer5x/utils/skill_attribute_map.dart';
+import 'package:chummer5x/models/attributes.dart';
 
 void main() {
   group('Skill CM Penalty Tests', () {

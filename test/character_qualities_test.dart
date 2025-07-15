@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/models/qualities.dart';
+import 'package:chummer5x/models/condition_monitor.dart';
 
 void main() {
   group('Quality Tests', () {

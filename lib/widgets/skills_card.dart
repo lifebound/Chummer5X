@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/shadowrun_character.dart';
-import '../utils/skill_attribute_map.dart';
-import '../utils/skill_group_map.dart';
-import '../utils/responsive_layout.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/utils/skill_attribute_map.dart';
+import 'package:chummer5x/models/skills.dart';
+import 'package:chummer5x/utils/skill_group_map.dart';
+import 'package:chummer5x/utils/responsive_layout.dart';
 
 enum SkillOrganization {
   alphabetical('Alphabetical'),

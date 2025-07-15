@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
 import '../models/shadowrun_character.dart';
@@ -613,43 +614,184 @@ class EnhancedChumerXmlService {
   }
 
   static List<List<InitiationGrade>> _parseInitiationGrades(XmlElement characterElement){
+    debugPrint('Parsing initiation grades...');
     final initiationGrades = <InitiationGrade>[];
     final submersionGrades = <SubmersionGrade>[];
 
     final gradesElement = characterElement.findElements('initiationgrades').firstOrNull;
     
     if (gradesElement != null) {
-      for (final gradeElement in gradesElement.findElements('grade')) {
+
+      for (final gradeElement in gradesElement.findElements('initiationgrade')) {
+        debugPrint('Parsing grade element: $gradeElement');
         bool isResEnabled = _getElementText(gradeElement, 'res') == 'True';
         
-        final level = int.tryParse(_getElementText(gradeElement, 'level') ?? '0') ?? 0;
         final grade = int.tryParse(_getElementText(gradeElement, 'grade') ?? '0') ?? 0;
         final ordeal = _getElementText(gradeElement, 'ordeal')?.toLowerCase() == 'true';
         final group = _getElementText(gradeElement,"group")?.toLowerCase() == 'true';
         final schooling = _getElementText(gradeElement, 'schooling')?.toLowerCase() == 'true';
 
-        if (grade != null) {
-          if(isResEnabled){
-            submersionGrades.add(SubmersionGrade(
-              grade: grade,
-              ordeal: ordeal,
-              group: group,
-              schooling: schooling
-            ));
-          }
-          else{
-            initiationGrades.add(InitiationGrade(
-              grade: grade,
-            ordeal: group,
+        if(isResEnabled){
+          debugPrint('Adding to submersion grades: $grade');
+          submersionGrades.add(SubmersionGrade(
+            grade: grade,
+            ordeal: ordeal,
             group: group,
-            schooling: schooling
+            schooling: schooling,
+            metamagics: <Metamagic>[],
           ));
         }
-          
+        else{
+          debugPrint('Adding to initiation grades: $grade');
+          initiationGrades.add(InitiationGrade(
+            grade: grade,
+            ordeal: ordeal,
+            group: group,
+            schooling: schooling,
+            metamagics: <Metamagic>[],
+          ));
+        }
+      }
+      final metamagics = _parseMetamagics(characterElement);
+
+        //go through all the returned metamagics; if their improvementSouce is 'Echo',
+        //we'll handle it with the SubmersionGrades; if not, we'll handle it with the Initiation Grades
+        for (Metamagic metamagic in metamagics) {
+          debugPrint('metamagic name: ${metamagic.name}');
+          if (metamagic.improvementSource.toLowerCase() == 'echo') {
+            //find the submersion grade that matches the current grade
+            try{
+              debugPrint('${metamagic.name} is an Echo, adding to the list');
+              final matchingGrade = submersionGrades.where((grade) => grade.grade == metamagic.grade);
+              matchingGrade.firstOrNull?.metamagics.add(metamagic);
+            }
+            catch(e){
+              debugPrint("echo ${metamagic.name} failed to attach to submersion");
+            }
+            
+          } else {
+            try{
+              debugPrint('${metamagic.name} is not an Echo');
+              final matchingGrade = initiationGrades.where((grade) => grade.grade == metamagic.grade);
+              matchingGrade.firstOrNull?.metamagics.add(metamagic);
+            }
+            catch(e) {
+              debugPrint("${metamagic.name} failed to attach to initiation");
+            }
+            
+          }
+        }
+
+    }
+    debugPrint('Total initiation grades: ${initiationGrades.length}, Total submersion grades: ${submersionGrades.length}');
+    return [initiationGrades, submersionGrades];
+  }
+
+  static List<Metamagic> _parseMetamagics(XmlElement characterElement) {
+    final metamagics = <Metamagic>[];
+
+    metamagics.addAll(_parseMetamagicType(characterElement, 'metamagic'));
+    //run the same logic for Arts, Enchantments, Enhancements, and Rituals, and put them into the same list
+    metamagics.addAll(_parseMetamagicType(characterElement, 'art'));
+
+
+    final enchantmentsElement = characterElement.findElements('spells').firstOrNull;
+    debugPrint('Parsing enchantments...');
+    if (enchantmentsElement != null) {
+      debugPrint('Found enchantments element, processing spells...');
+      for (final enchantmentElement in enchantmentsElement.findElements('spell')) {
+        final category = _getElementText(enchantmentElement, 'category');
+        debugPrint('Processing enchantment: ${_getElementText(enchantmentElement, 'name')} with category $category');
+        if (category == null && category?.toLowerCase() != 'enchantments' && category?.toLowerCase() != 'rituals') {
+          debugPrint('Skipping non-enchantment spell: ${_getElementText(enchantmentElement, 'name')}');
+          continue;
+        }
+        final name = _getElementText(enchantmentElement, 'name');
+        final descriptor = _getElementText(enchantmentElement, 'descriptors') ?? '';
+        final trueName = '$category: $name';
+        final source = _getElementText(enchantmentElement, 'source') ?? '';
+        final page = _getElementText(enchantmentElement, 'page') ?? '';
+        final improvementSource = _getElementText(enchantmentElement, 'improvementsource') ?? '';
+        final grade = _getElementText(enchantmentElement, 'grade');
+        debugPrint('name: $name, source: $source, page: $page, improvement source: $improvementSource, grade: $grade');
+        if (name != null) {
+          metamagics.add(Metamagic(
+            name: trueName,
+            source: source,
+            page: page,
+            improvementSource: improvementSource,
+            grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+          ));
         }
       }
     }
 
-    return [initiationGrades, submersionGrades];
+
+    final enhancementsElement = characterElement.findElements('enhancements').firstOrNull;
+    if (enhancementsElement != null) {
+      for (final enhancementElement in enhancementsElement.findElements('enhancement')) {
+        final name = _getElementText(enhancementElement, 'name');
+        final source = _getElementText(enhancementElement, 'source') ?? '';
+        final page = _getElementText(enhancementElement, 'page') ?? '';
+        final improvementSource = _getElementText(enhancementElement, 'improvementsource') ?? '';
+        final grade = _getElementText(enhancementElement, 'grade');
+        debugPrint('name: $name, source: $source, page: $page, improvement source: $improvementSource, grade: $grade');
+        if (name != null) {
+          metamagics.add(Metamagic(
+            name: name,
+            source: source,
+            page: page,
+            improvementSource: improvementSource,
+            grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+          ));
+        }
+      }
+    }
+    // final ritualsElement = characterElement.findElements('rituals').firstOrNull;
+    // if (ritualsElement != null) {
+    //   for (final ritualElement in ritualsElement.findElements('ritual')) {
+    //     final name = _getElementText(ritualElement, 'name');
+    //     final source = _getElementText(ritualElement, 'source') ?? '';
+    //     final page = _getElementText(ritualElement, 'page') ?? '';
+    //     final improvementSource = _getElementText(ritualElement, 'improvementsource') ?? '';
+    //     final grade = _getElementText(ritualElement, 'grade');
+    //     debugPrint('name: $name, source: $source, page: $page, improvement source: $improvementSource, grade: $grade');
+    //     if (name != null) {
+    //       metamagics.add(Metamagic(
+    //         name: name,
+    //         source: source,
+    //         page: page,
+    //         improvementSource: improvementSource,
+    //         grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+    //       ));
+    //     }
+    //   }
+    // }
+    return metamagics;
+  }
+  static List<Metamagic> _parseMetamagicType(XmlElement characterElement, String type) {
+    final metamagics = <Metamagic>[];
+    final metamagicsElement = characterElement.findElements('${type}s').firstOrNull;
+    
+    if (metamagicsElement != null) {
+      for (final metamagicElement in metamagicsElement.findElements(type)) {
+        final name = _getElementText(metamagicElement, 'name');
+        final source = _getElementText(metamagicElement, 'source') ?? '';
+        final page = _getElementText(metamagicElement, 'page') ?? '';
+        final improvementSource = _getElementText(metamagicElement, 'improvementsource') ?? '';
+        final grade = _getElementText(metamagicElement, 'grade');
+        
+        if (name != null) {
+          metamagics.add(Metamagic(
+            name: name,
+            source: source,
+            page: page,
+            improvementSource: improvementSource,
+            grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+          ));
+        }
+      }
+    } 
+    return metamagics;
   }
 }

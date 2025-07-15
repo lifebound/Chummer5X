@@ -1286,45 +1286,245 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildInitiationGradesView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Initiation Grades',
-              style: Theme.of(context).textTheme.headlineSmall,
+    final grades = _currentCharacter!.initiationGrades;
+    
+    // Sort grades from highest to lowest
+    final sortedGrades = [...grades]..sort((a, b) => b.grade.compareTo(a.grade));
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Icon(Icons.trending_up, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Initiation Grades',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const Spacer(),
+                Text(
+                  '${grades.length} grade${grades.length == 1 ? '' : 's'}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Initiation grades section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
+          ),
+          if (grades.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'No initiation grades',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )
+          else
+            ...sortedGrades.map((grade) => _buildInitiationGradeItem(context, grade)).toList(),
+        ],
       ),
     );
   }
 
   Widget _buildSubmersionGradesView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Submersion Grades',
-              style: Theme.of(context).textTheme.headlineSmall,
+    final grades = _currentCharacter!.submersionGrades;
+    
+    // Sort grades from highest to lowest
+    final sortedGrades = [...grades]..sort((a, b) => b.grade.compareTo(a.grade));
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Icon(Icons.trending_up, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  'Submersion Grades',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const Spacer(),
+                Text(
+                  '${grades.length} grade${grades.length == 1 ? '' : 's'}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+          ),
+          if (grades.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'No submersion grades',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )
+          else
+            ...sortedGrades.map((grade) => _buildSubmersionGradeItem(context, grade)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInitiationGradeItem(BuildContext context, InitiationGrade grade) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Grade ${grade.grade}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Grade type chips
+              if (grade.group) _buildGradeChip(context, 'group', Colors.blue),
+              if (grade.ordeal) _buildGradeChip(context, 'ordeal', Colors.orange),
+              if (grade.schooling) _buildGradeChip(context, 'schooling', Colors.green),
+            ],
+          ),
+          // Metamagic display
+          if (grade.metamagics != null && grade.metamagics!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            // Build a metamagic item for each item in the list
+            ...grade.metamagics!.map((metamagic) => Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: _buildMetamagicItem(context, metamagic),
+            )).toList(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubmersionGradeItem(BuildContext context, SubmersionGrade grade) {
+    debugPrint('creating submerion grade item $grade');
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Grade ${grade.grade}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Grade type chips (with submersion-specific labels)
+              if (grade.group) _buildGradeChip(context, 'network', Colors.blue),
+              if (grade.ordeal) _buildGradeChip(context, 'task', Colors.orange),
+              if (grade.schooling) _buildGradeChip(context, 'schooling', Colors.green),
+            ],
+          ),
+          // Metamagic display (these would be Echo powers for submersion)
+          if (grade.metamagics != null && grade.metamagics!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            // Build a metamagic item for each item in the list
+            ...grade.metamagics!.map((metamagic) => Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: _buildMetamagicItem(context, metamagic),
+            )).toList(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGradeChip(BuildContext context, String label, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetamagicItem(BuildContext context, Metamagic metamagic) {
+    debugPrint('entering build metamagic Item $metamagic');
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.auto_fix_high,
+            size: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              metamagic.name,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ),
+          if (metamagic.source.isNotEmpty) ...[
             Text(
-              'Submersion grades section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
+              '${metamagic.source}${metamagic.page.isNotEmpty ? ' p${metamagic.page}' : ''}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
+              ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

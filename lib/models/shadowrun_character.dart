@@ -1412,6 +1412,8 @@ class Metamagic{
   final String name;
   final String source;
   final String page;
+  final String improvementSource;
+  final int grade;
   // bonuses need to be handled here, but they're complex, so that's for another time.
   final Map<String, int> bonuses;
 
@@ -1419,6 +1421,8 @@ class Metamagic{
     required this.name,
     required this.source,
     required this.page,
+    required this.improvementSource,
+    required this.grade,
     this.bonuses = const {},
   });
 
@@ -1427,6 +1431,8 @@ class Metamagic{
       name: json['name']?.toString() ?? '',
       source: json['source']?.toString() ?? '',
       page: json['page']?.toString() ?? '',
+      improvementSource: json['improvementSource']?.toString() ?? '',
+      grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
       bonuses: (json['bonuses'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, int.tryParse(value.toString()) ?? 0)) ?? {},
     );
   }
@@ -1435,14 +1441,14 @@ class Metamagic{
 // Initiation and Submersion classes
 class InitiationGrade {
   final int grade;
-  final Metamagic? metamagic;
+  List<Metamagic> metamagics;
   final bool ordeal;
   final bool group;
   final bool schooling;
 
-  const InitiationGrade({
+  InitiationGrade({
     required this.grade,
-    this.metamagic,
+    required this.metamagics,
     required this.ordeal,
     required this.group,
     required this.schooling,
@@ -1451,18 +1457,18 @@ class InitiationGrade {
   factory InitiationGrade.fromJson(Map<String, dynamic> json) {
     return InitiationGrade(
       grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
-      metamagic: json['metamagic'] != null ? Metamagic.fromJson(json['metamagic']) : null,
+      metamagics: (json['metamagics'] as List).map((item) => Metamagic.fromJson(item)).toList(),
       ordeal: json['ordeal'] == true,
       group: json['group'] == true,
-      schooling: json['schooling'] == true,
+      schooling: json['schooling'] == true
     );
   }
 }
 
 class SubmersionGrade extends InitiationGrade {
-  const SubmersionGrade({
+  SubmersionGrade({
     required super.grade,
-    super.metamagic,
+    required super.metamagics,
     required super.ordeal,
     required super.group,
     required super.schooling
@@ -1471,10 +1477,10 @@ class SubmersionGrade extends InitiationGrade {
   factory SubmersionGrade.fromJson(Map<String, dynamic> json) {
     return SubmersionGrade(
       grade: int.tryParse(json['grade']?.toString() ?? '0') ?? 0,
-      metamagic: json['metamagic'] != null ? Metamagic.fromJson(json['metamagic']) : null,
+      metamagics: (json['metamagics'] as List).map((item) => Metamagic.fromJson(item)).toList(),
       ordeal: json['ordeal'] == true,
       group: json['group'] == true,
-      schooling: json['schooling'] == true,
+      schooling: false
     );
   }
 }

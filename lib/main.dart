@@ -22,7 +22,7 @@ class Chummer5XApp extends StatelessWidget {
           centerTitle: true,
           elevation: 2,
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -39,7 +39,7 @@ class Chummer5XApp extends StatelessWidget {
           centerTitle: true,
           elevation: 2,
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

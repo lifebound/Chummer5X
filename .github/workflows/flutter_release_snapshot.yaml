@@ -77,7 +77,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: snapshot-windows
-          path: build/windows/runner/Release/
+          path: build/windows/x64/runner/Release/
           retention-days: 60
 
   build-android:

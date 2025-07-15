@@ -20,7 +20,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.5
+          flutter-version: 3.32.6
 
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.5
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build web --release
       - uses: actions/upload-artifact@v4
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.5
+          flutter-version: 3.32.6
       - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
       - run: flutter config --enable-linux-desktop
       - run: flutter pub get
@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.5
+          flutter-version: 3.32.6
       - run: flutter config --enable-windows-desktop
       - run: flutter pub get
       - run: flutter build windows
@@ -88,7 +88,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.24.5
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4

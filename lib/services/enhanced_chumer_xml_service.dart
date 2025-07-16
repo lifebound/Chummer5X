@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chummer5x/models/expense_entry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
@@ -18,6 +19,8 @@ import 'package:chummer5x/models/critter_factory.dart';
 import 'package:chummer5x/models/metamagic.dart';
 import 'package:chummer5x/models/skills.dart';
 import 'package:chummer5x/models/qualities.dart';
+import 'package:chummer5x/models/calendar.dart';
+import 'package:chummer5x/models/game_notes.dart';
 
 
 class EnhancedChumerXmlService {
@@ -106,6 +109,13 @@ class EnhancedChumerXmlService {
       final isMagician = _getElementText(characterElement, 'magician')?.toLowerCase() == 'true';
       final isTechnomancer = _getElementText(characterElement, 'technomancer')?.toLowerCase() == 'true';
       
+      // Parse calendar and game notes
+      final calendar = _parseCalendar(characterElement);
+      final gameNotes = _parseGameNotes(characterElement);
+      final allExpenseEntries = _parseExpenseEntries(characterElement);
+      final karmaExpenseEntries = allExpenseEntries.where((entry) => entry.type == ExpenseType.karma).toList();
+      final nuyenExpenseEntries = allExpenseEntries.where((entry) => entry.type == ExpenseType.nuyen).toList();
+      
       return ShadowrunCharacter(
         name: name,
         alias: name, // In Chummer, alias is often the main name
@@ -132,6 +142,8 @@ class EnhancedChumerXmlService {
         gear: gear,
         conditionMonitor: conditionMonitor,
         nuyen: nuyen,
+        calendar: calendar,
+        gameNotes: gameNotes,
         magEnabled: magEnabled,
         resEnabled: resEnabled,
         depEnabled: depEnabled,
@@ -140,6 +152,8 @@ class EnhancedChumerXmlService {
         isTechnomancer: isTechnomancer,
         initiationGrades: initiationGrades,
         submersionGrades: submersionGrades,
+        karmaExpenseEntries: karmaExpenseEntries,
+        nuyenExpenseEntries: nuyenExpenseEntries,
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');
@@ -789,5 +803,57 @@ class EnhancedChumerXmlService {
       }
     } 
     return metamagics;
+  }
+  
+  /// Parse calendar from XML
+  static Calendar? _parseCalendar(XmlElement characterElement) {
+    final calendarElement = characterElement.findElements('calendar').firstOrNull;
+    if (calendarElement == null) return null;
+    
+    final weeks = <CalendarWeek>[];
+    
+    for (final weekElement in calendarElement.findElements('week')) {
+      final guid = _getElementText(weekElement, 'guid') ?? '';
+      final year = int.tryParse(_getElementText(weekElement, 'year') ?? '0') ?? 0;
+      final week = int.tryParse(_getElementText(weekElement, 'week') ?? '0') ?? 0;
+      final notes = _getElementText(weekElement, 'notes');
+      final notesColor = _getElementText(weekElement, 'notesColor');
+      
+      weeks.add(CalendarWeek(
+        guid: guid,
+        year: year,
+        week: week,
+        notes: notes?.trim().isEmpty == true ? null : notes,
+        notesColor: notesColor,
+      ));
+    }
+    
+    return Calendar(weeks: weeks);
+  }
+  
+  /// Parse game notes from XML
+  static GameNotes? _parseGameNotes(XmlElement characterElement) {
+    final gameNotesElement = characterElement.findElements('gamenotes').firstOrNull;
+    if (gameNotesElement == null) return null;
+    
+    final rtfContent = gameNotesElement.innerText;
+    if (rtfContent.trim().isEmpty) return null;
+    
+    return GameNotes.fromRtf(rtfContent);
+  }
+  static List<ExpenseEntry> _parseExpenseEntries(XmlElement characterElement) {
+    debugPrint('Parsing expense entries...');
+    final entries = <ExpenseEntry>[];
+    final expenseEntriesElement = characterElement.findElements('expenses').firstOrNull;
+
+    if (expenseEntriesElement != null) {
+      for (final entryElement in expenseEntriesElement.findElements('expense')) {
+          var exp = ExpenseEntry.fromXml(entryElement);
+          entries.add(exp);
+          debugPrint('Parsed expense entry: ${exp.toString()}');
+
+      }
+    }
+    return entries;
   }
 }

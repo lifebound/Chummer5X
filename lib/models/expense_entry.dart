@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import 'package:xml/xml.dart';
 
 // Expense tracking for XML modification
 enum ExpenseType { karma, nuyen }
@@ -50,25 +51,16 @@ class ExpenseEntry {
     </expense>''';
   }
 
-  factory ExpenseEntry.fromXml(String xmlString) {
+  factory ExpenseEntry.fromXml(XmlElement xmlString) {
     // Parse all the XML fields
-    final guidMatch = RegExp(r'<guid>(.*?)</guid>').firstMatch(xmlString);
-    final typeMatch = RegExp(r'<type>(.*?)</type>').firstMatch(xmlString);
-    final amountMatch = RegExp(r'<amount>(.*?)</amount>').firstMatch(xmlString);
-    final reasonMatch = RegExp(r'<reason>(.*?)</reason>').firstMatch(xmlString);
-    final dateMatch = RegExp(r'<date>(.*?)</date>').firstMatch(xmlString);
-    final refundMatch = RegExp(r'<refund>(.*?)</refund>').firstMatch(xmlString);
-    final forceCareerVisibleMatch = RegExp(r'<forcecareervisible>(.*?)</forcecareervisible>').firstMatch(xmlString);
+    final guid = _getElementText(xmlString, 'guid') ?? _generateGuid();
+    final typeString = _getElementText(xmlString, 'type');
+    final amount = int.tryParse(_getElementText(xmlString, 'amount') ?? '0') ?? 0;
+    final reason = _getElementText(xmlString, 'reason') ?? '';
+    final dateString = _getElementText(xmlString, 'date');
+    final refund = _getElementText(xmlString, 'refund')?.toLowerCase() == 'true';
+    final forceCareerVisible = _getElementText(xmlString, 'forcecareervisible')?.toLowerCase() == 'true';
 
-    final guid = guidMatch?.group(1) ?? '';
-    final typeString = typeMatch?.group(1) ?? '';
-    final type = typeString.toLowerCase() == 'karma' ? ExpenseType.karma : ExpenseType.nuyen;
-    final amount = int.tryParse(amountMatch?.group(1) ?? '0') ?? 0;
-    final reason = reasonMatch?.group(1) ?? '';
-    final dateString = dateMatch?.group(1);
-    final refund = refundMatch?.group(1)?.toLowerCase() == 'true';
-    final forceCareerVisible = forceCareerVisibleMatch?.group(1)?.toLowerCase() == 'true';
-    
     DateTime? parsedDate;
     if (dateString != null) {
       parsedDate = DateTime.tryParse(dateString);
@@ -76,7 +68,7 @@ class ExpenseEntry {
 
     return ExpenseEntry(
       guid: guid.isNotEmpty ? guid : null, // Let it generate a new GUID if empty
-      type: type,
+      type: typeString?.toLowerCase() == 'karma' ? ExpenseType.karma : ExpenseType.nuyen,
       amount: amount,
       reason: reason,
       date: parsedDate,
@@ -84,6 +76,43 @@ class ExpenseEntry {
       forceCareerVisible: forceCareerVisible,
     );
   }
+
+  static String? _getElementText(XmlElement parent, String elementName) {
+    final element = parent.findElements(elementName).firstOrNull;
+    return element?.innerText;
+  }
+// }
+//     final typeMatch = RegExp(r'<type>(.*?)</type>').firstMatch(xmlString);
+//     final amountMatch = RegExp(r'<amount>(.*?)</amount>').firstMatch(xmlString);
+//     final reasonMatch = RegExp(r'<reason>(.*?)</reason>').firstMatch(xmlString);
+//     final dateMatch = RegExp(r'<date>(.*?)</date>').firstMatch(xmlString);
+//     final refundMatch = RegExp(r'<refund>(.*?)</refund>').firstMatch(xmlString);
+//     final forceCareerVisibleMatch = RegExp(r'<forcecareervisible>(.*?)</forcecareervisible>').firstMatch(xmlString);
+
+//     final guid = guidMatch?.group(1) ?? '';
+//     final typeString = typeMatch?.group(1) ?? '';
+//     final type = typeString.toLowerCase() == 'karma' ? ExpenseType.karma : ExpenseType.nuyen;
+//     final amount = int.tryParse(amountMatch?.group(1) ?? '0') ?? 0;
+//     final reason = reasonMatch?.group(1) ?? '';
+//     final dateString = dateMatch?.group(1);
+//     final refund = refundMatch?.group(1)?.toLowerCase() == 'true';
+//     final forceCareerVisible = forceCareerVisibleMatch?.group(1)?.toLowerCase() == 'true';
+    
+//     DateTime? parsedDate;
+//     if (dateString != null) {
+//       parsedDate = DateTime.tryParse(dateString);
+//     }
+
+//     return ExpenseEntry(
+//       guid: guid.isNotEmpty ? guid : null, // Let it generate a new GUID if empty
+//       type: type,
+//       amount: amount,
+//       reason: reason,
+//       date: parsedDate,
+//       refund: refund,
+//       forceCareerVisible: forceCareerVisible,
+//     );
+//   }
 
   @override
   String toString() => 'ExpenseEntry(guid: $guid, type: $type, amount: $amount, reason: $reason, date: $date, refund: $refund, forceCareerVisible: $forceCareerVisible)';

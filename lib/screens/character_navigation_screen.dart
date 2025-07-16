@@ -330,21 +330,63 @@ class _CharacterNavigationScreenState extends State<CharacterNavigationScreen> {
   }
 
   Widget _buildNotesView(BuildContext context) {
-    return const Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return DefaultTabController(
+      length: 3,
+      child: Card(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Notes',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+              ),
+              child: const TabBar(
+                tabs: [
+                  Tab(
+                    icon: Icon(Icons.notes),
+                    text: 'Game Notes',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.calendar_month),
+                    text: 'Calendar',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.currency_yen),
+                    text: 'Karma & ¥',
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 16),
-            Text('No notes implementation yet'),
+            const Expanded(
+              child: TabBarView(
+                children: [
+                  // Game Notes tab content
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text('Game Notes content will go here'),
+                    ),
+                  ),
+                  // Calendar tab content
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text('Calendar content will go here'),
+                    ),
+                  ),
+                  // Karma & Nuyen tab content
+                  Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text('Karma & Nuyen content will go here'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

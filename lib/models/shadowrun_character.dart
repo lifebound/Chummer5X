@@ -16,6 +16,9 @@ import 'package:chummer5x/models/spirit.dart';
 import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/initiation.dart';
 import 'package:chummer5x/models/submersion.dart';
+import 'package:chummer5x/models/calendar.dart';
+import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/models/expense_entry.dart';
 
 
 
@@ -60,6 +63,14 @@ class ShadowrunCharacter {
   // Character progression
   final int nuyen;
   
+  // Expense tracking
+  final List<ExpenseEntry> karmaExpenseEntries;
+  final List<ExpenseEntry> nuyenExpenseEntries;
+  
+  // Calendar and notes
+  final Calendar? calendar;
+  final GameNotes? gameNotes;
+  
   // Attribute enabled flags
   final bool magEnabled;
   final bool resEnabled;
@@ -96,6 +107,10 @@ class ShadowrunCharacter {
     this.gear = const [],
     required this.conditionMonitor,
     this.nuyen = 0,
+    this.karmaExpenseEntries = const [],
+    this.nuyenExpenseEntries = const [],
+    this.calendar,
+    this.gameNotes,
     this.magEnabled = false,
     this.resEnabled = false,
     this.depEnabled = false,
@@ -368,6 +383,8 @@ class ShadowrunCharacter {
     List<Gear>? gear,
     ConditionMonitor? conditionMonitor,
     int? nuyen,
+    List<ExpenseEntry>? karmaExpenseEntries,
+    List<ExpenseEntry>? nuyenExpenseEntries,
     bool? magEnabled,
     bool? resEnabled,
     bool? depEnabled,
@@ -401,6 +418,8 @@ class ShadowrunCharacter {
       gear: gear ?? this.gear,
       conditionMonitor: conditionMonitor ?? this.conditionMonitor,
       nuyen: nuyen ?? this.nuyen,
+      karmaExpenseEntries: karmaExpenseEntries ?? this.karmaExpenseEntries,
+      nuyenExpenseEntries: nuyenExpenseEntries ?? this.nuyenExpenseEntries,
       magEnabled: magEnabled ?? this.magEnabled,
       resEnabled: resEnabled ?? this.resEnabled,
       depEnabled: depEnabled ?? this.depEnabled,

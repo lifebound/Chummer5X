@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../models/shadowrun_character.dart';
 import '../services/enhanced_chumer_xml_service.dart';
 import '../utils/responsive_layout.dart';
@@ -15,9 +16,11 @@ import 'package:chummer5x/models/initiation.dart';
 import 'package:chummer5x/models/submersion.dart';
 import 'package:chummer5x/models/metamagic.dart';
 import 'package:chummer5x/models/critter_base.dart';
-import 'package:chummer5x/models/gear.dart';
 import 'package:chummer5x/models/spirit.dart';
 import 'package:chummer5x/models/sprite.dart';
+import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/models/calendar.dart';
+import '../models/expense_entry.dart';
 
 enum NavigationSection {
   overview,
@@ -48,6 +51,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   List<ShadowrunCharacter> _characters = [];
   ShadowrunCharacter? _currentCharacter;
   NavigationSection _currentSection = NavigationSection.overview;
+  
+  // Chart toggle states for Karma & Nuyen tab
+  bool _showKarmaChart = false;
+  bool _showNuyenChart = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +71,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildCharacterContent(BuildContext context) {
+    // For Notes section, use minimal constraints to maximize space usage
+    if (_currentSection == NavigationSection.notes) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0), // Minimal padding for Notes
+        child: _buildCurrentView(context),
+      );
+    }
+
+    // For other sections, use standard responsive layout
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -519,9 +535,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildQualitiesView(BuildContext context) {
     final qualities = _currentCharacter!.qualities ?? [];
-    final positiveQualities = qualities.where((q) => q.qualityType == QualityType.positive).toList();
-    final negativeQualities = qualities.where((q) => q.qualityType == QualityType.negative).toList();
-    
+    final positiveQualities =
+        qualities.where((q) => q.qualityType == QualityType.positive).toList();
+    final negativeQualities =
+        qualities.where((q) => q.qualityType == QualityType.negative).toList();
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -547,18 +565,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Text(
                       'No positive qualities',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                        fontStyle: FontStyle.italic,
-                      ),
+                            color: Colors.grey[600],
+                            fontStyle: FontStyle.italic,
+                          ),
                     )
                   else
-                    ...positiveQualities.map((quality) => _buildQualityCard(context, quality)).toList(),
+                    ...positiveQualities
+                        .map((quality) => _buildQualityCard(context, quality))
+                        .toList(),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Negative Qualities Section
           Card(
             child: Padding(
@@ -581,12 +601,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Text(
                       'No negative qualities',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                        fontStyle: FontStyle.italic,
-                      ),
+                            color: Colors.grey[600],
+                            fontStyle: FontStyle.italic,
+                          ),
                     )
                   else
-                    ...negativeQualities.map((quality) => _buildQualityCard(context, quality)).toList(),
+                    ...negativeQualities
+                        .map((quality) => _buildQualityCard(context, quality))
+                        .toList(),
                 ],
               ),
             ),
@@ -608,46 +630,45 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required String singularLabel,
     required String emptyMessage,
     required Widget Function(BuildContext, T) itemBuilder,
-    }) 
-    { 
-      final itemCountText =
-          '${items.length} $singularLabel${items.length == 1 ? '' : 's'}';
+  }) {
+    final itemCountText =
+        '${items.length} $singularLabel${items.length == 1 ? '' : 's'}';
 
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, color: Theme.of(context).primaryColor),
-                  const SizedBox(width: 8),
-                  Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                  const Spacer(),
-                  Text(
-                    itemCountText,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              if (items.isEmpty)
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 8),
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                const Spacer(),
                 Text(
-                  emptyMessage,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                        fontStyle: FontStyle.italic,
+                  itemCountText,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).primaryColor,
                       ),
-                )
-              else
-                ...items.map((e) => itemBuilder(context, e)).toList(),
-            ],
-          ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (items.isEmpty)
+              Text(
+                emptyMessage,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+              )
+            else
+              ...items.map((e) => itemBuilder(context, e)).toList(),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildSpellsView(BuildContext context) {
@@ -677,6 +698,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       itemBuilder: _buildComplexFormCard,
     );
   }
+
   Widget _buildAdeptPowersView(BuildContext context) {
     return _buildMagicalListView<AdeptPower>(
       context: context,
@@ -696,108 +718,110 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required bool hasCompleteInfo,
     required List<MapEntry<String, String>> fields, // label -> value
     required String incompleteMessage,
-    required Widget Function(BuildContext, String label, String value) chipBuilder,
-    }) 
-    {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 16.0),
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-          ),
+    required Widget Function(BuildContext, String label, String value)
+        chipBuilder,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  name,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              if (category != null && category.isNotEmpty)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                   child: Text(
-                    name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    category,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
                   ),
                 ),
-                if (category != null && category.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      category,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            if (hasCompleteInfo) ...[
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                children: fields
-                    .where((entry) => entry.value.isNotEmpty)
-                    .map((entry) => chipBuilder(context, entry.key, entry.value))
-                    .toList(),
-              ),
-            ] else ...[
-              const SizedBox(height: 8),
-              Text(
-                incompleteMessage,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.orange[700],
-                      fontStyle: FontStyle.italic,
-                    ),
-              ),
             ],
+          ),
+          if (hasCompleteInfo) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              children: fields
+                  .where((entry) => entry.value.isNotEmpty)
+                  .map((entry) => chipBuilder(context, entry.key, entry.value))
+                  .toList(),
+            ),
+          ] else ...[
+            const SizedBox(height: 8),
+            Text(
+              incompleteMessage,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.orange[700],
+                    fontStyle: FontStyle.italic,
+                  ),
+            ),
           ],
-        ),
-      );
+        ],
+      ),
+    );
   }
 
   Widget _buildSpellCard(BuildContext context, Spell spell) {
     return _buildMagicalCard(
-    context: context,
-    name: spell.name,
-    category: spell.category,
-    hasCompleteInfo: spell.hasCompleteInfo,
-    incompleteMessage: 'Incomplete spell information',
-    fields: [
-      MapEntry('Range', spell.range),
-      MapEntry('Duration', spell.duration),
-      MapEntry('Drain', spell.drain),
-      MapEntry('Source', spell.source),
-    ],
-    chipBuilder: _buildSpellDetailChip,
+      context: context,
+      name: spell.name,
+      category: spell.category,
+      hasCompleteInfo: spell.hasCompleteInfo,
+      incompleteMessage: 'Incomplete spell information',
+      fields: [
+        MapEntry('Range', spell.range),
+        MapEntry('Duration', spell.duration),
+        MapEntry('Drain', spell.drain),
+        MapEntry('Source', spell.source),
+      ],
+      chipBuilder: _buildSpellDetailChip,
     );
   }
 
   Widget _buildComplexFormCard(BuildContext context, ComplexForm form) {
     return _buildMagicalCard(
-    context: context,
-    name: form.name,
-    category: null,
-    hasCompleteInfo: form.hasCompleteInfo,
-    incompleteMessage: 'Incomplete complex form information',
-    fields: [
-      MapEntry('Target', form.target),
-      MapEntry('Duration', form.duration),
-      MapEntry('Fading', form.fading),
-      MapEntry('Source', form.source),
-    ],
-    chipBuilder: _buildComplexFormDetailChip,
+      context: context,
+      name: form.name,
+      category: null,
+      hasCompleteInfo: form.hasCompleteInfo,
+      incompleteMessage: 'Incomplete complex form information',
+      fields: [
+        MapEntry('Target', form.target),
+        MapEntry('Duration', form.duration),
+        MapEntry('Fading', form.fading),
+        MapEntry('Source', form.source),
+      ],
+      chipBuilder: _buildComplexFormDetailChip,
     );
   }
+
   Widget _buildAdeptPowersCard(BuildContext context, AdeptPower power) {
     return _buildMagicalCard(
       context: context,
@@ -812,7 +836,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       chipBuilder: _buildPowerDetailChip,
     );
   }
- 
+
   Widget _buildSpellDetailChip(
       BuildContext context, String label, String value) {
     return Container(
@@ -849,7 +873,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
-  
+
   Widget _buildComplexFormDetailChip(
       BuildContext context, String label, String value) {
     return Container(
@@ -886,6 +910,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
+
   Widget _buildPowerDetailChip(
       BuildContext context, String label, String value) {
     return Container(
@@ -922,11 +947,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
-  
+
   Widget _buildQualityCard(BuildContext context, Quality quality) {
     Color categoryColor;
     String categoryLabel;
-    
+
     switch (quality.qualityType) {
       case QualityType.positive:
         categoryColor = Colors.green;
@@ -979,13 +1004,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          
+
           // Quality details
           Wrap(
             spacing: 12,
             runSpacing: 8,
             children: [
-              _buildQualityDetailChip(context, 'Karma Cost', quality.karmaCost.toString()),
+              _buildQualityDetailChip(
+                  context, 'Karma Cost', quality.karmaCost.toString()),
               if (quality.source.isNotEmpty)
                 _buildQualityDetailChip(context, 'Source', quality.source),
               if (quality.page.isNotEmpty)
@@ -997,7 +1023,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildQualityDetailChip(BuildContext context, String label, String value) {
+  Widget _buildQualityDetailChip(
+      BuildContext context, String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
@@ -1100,32 +1127,52 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildNotesView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Notes',
-              style: Theme.of(context).textTheme.headlineSmall,
+    return DefaultTabController(
+      length: 3,
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Notes section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
+            child: const TabBar(
+              tabs: [
+                Tab(
+                  icon: Icon(Icons.notes),
+                  text: 'Game Notes',
+                ),
+                Tab(
+                  icon: Icon(Icons.calendar_month),
+                  text: 'Calendar',
+                ),
+                Tab(
+                  icon: Icon(Icons.currency_yen),
+                  text: 'Karma & Nuyen',
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _buildGameNotesTabContent(context),
+                _buildCalendarTabContent(context),
+                _buildKarmaNuyenTabContent(context),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildInitiationGradesView(BuildContext context) {
     final grades = _currentCharacter!.initiationGrades;
-    
+
     // Sort grades from highest to lowest
-    final sortedGrades = [...grades]..sort((a, b) => b.grade.compareTo(a.grade));
+    final sortedGrades = [...grades]
+      ..sort((a, b) => b.grade.compareTo(a.grade));
 
     return SingleChildScrollView(
       child: Column(
@@ -1145,8 +1192,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Text(
                   '${grades.length} grade${grades.length == 1 ? '' : 's'}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).primaryColor,
-                  ),
+                        color: Theme.of(context).primaryColor,
+                      ),
                 ),
               ],
             ),
@@ -1157,13 +1204,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: Text(
                 'No initiation grades',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
               ),
             )
           else
-            ...sortedGrades.map((grade) => _buildInitiationGradeItem(context, grade)).toList(),
+            ...sortedGrades
+                .map((grade) => _buildInitiationGradeItem(context, grade))
+                .toList(),
         ],
       ),
     );
@@ -1171,9 +1220,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildSubmersionGradesView(BuildContext context) {
     final grades = _currentCharacter!.submersionGrades;
-    
+
     // Sort grades from highest to lowest
-    final sortedGrades = [...grades]..sort((a, b) => b.grade.compareTo(a.grade));
+    final sortedGrades = [...grades]
+      ..sort((a, b) => b.grade.compareTo(a.grade));
 
     return SingleChildScrollView(
       child: Column(
@@ -1193,8 +1243,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Text(
                   '${grades.length} grade${grades.length == 1 ? '' : 's'}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).primaryColor,
-                  ),
+                        color: Theme.of(context).primaryColor,
+                      ),
                 ),
               ],
             ),
@@ -1205,19 +1255,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: Text(
                 'No submersion grades',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
               ),
             )
           else
-            ...sortedGrades.map((grade) => _buildSubmersionGradeItem(context, grade)).toList(),
+            ...sortedGrades
+                .map((grade) => _buildSubmersionGradeItem(context, grade))
+                .toList(),
         ],
       ),
     );
   }
 
-  Widget _buildInitiationGradeItem(BuildContext context, InitiationGrade grade) {
+  Widget _buildInitiationGradeItem(
+      BuildContext context, InitiationGrade grade) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       padding: const EdgeInsets.all(16.0),
@@ -1236,31 +1289,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Text(
                 'Grade ${grade.grade}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(width: 12),
               // Grade type chips
               if (grade.group) _buildGradeChip(context, 'group', Colors.blue),
-              if (grade.ordeal) _buildGradeChip(context, 'ordeal', Colors.orange),
-              if (grade.schooling) _buildGradeChip(context, 'schooling', Colors.green),
+              if (grade.ordeal)
+                _buildGradeChip(context, 'ordeal', Colors.orange),
+              if (grade.schooling)
+                _buildGradeChip(context, 'schooling', Colors.green),
             ],
           ),
           // Metamagic display
-          if (grade.metamagics != null && grade.metamagics!.isNotEmpty) ...[
+          if (grade.metamagics.isNotEmpty) ...[
             const SizedBox(height: 12),
             // Build a metamagic item for each item in the list
-            ...grade.metamagics!.map((metamagic) => Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: _buildMetamagicItem(context, metamagic),
-            )).toList(),
+            ...grade.metamagics
+                .map((metamagic) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: _buildMetamagicItem(context, metamagic),
+                    ))
+                .toList(),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildSubmersionGradeItem(BuildContext context, SubmersionGrade grade) {
+  Widget _buildSubmersionGradeItem(
+      BuildContext context, SubmersionGrade grade) {
     debugPrint('creating submerion grade item $grade');
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
@@ -1280,24 +1338,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Text(
                 'Grade ${grade.grade}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(width: 12),
               // Grade type chips (with submersion-specific labels)
               if (grade.group) _buildGradeChip(context, 'network', Colors.blue),
               if (grade.ordeal) _buildGradeChip(context, 'task', Colors.orange),
-              if (grade.schooling) _buildGradeChip(context, 'schooling', Colors.green),
+              if (grade.schooling)
+                _buildGradeChip(context, 'schooling', Colors.green),
             ],
           ),
           // Metamagic display (these would be Echo powers for submersion)
-          if (grade.metamagics != null && grade.metamagics!.isNotEmpty) ...[
+          if (grade.metamagics.isNotEmpty) ...[
             const SizedBox(height: 12),
             // Build a metamagic item for each item in the list
-            ...grade.metamagics!.map((metamagic) => Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: _buildMetamagicItem(context, metamagic),
-            )).toList(),
+            ...grade.metamagics
+                .map((metamagic) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: _buildMetamagicItem(context, metamagic),
+                    ))
+                .toList(),
           ],
         ],
       ),
@@ -1347,17 +1408,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             child: Text(
               metamagic.name,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
             ),
           ),
           if (metamagic.source.isNotEmpty) ...[
             Text(
               '${metamagic.source}${metamagic.page.isNotEmpty ? ' p${metamagic.page}' : ''}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onPrimaryContainer
+                        .withOpacity(0.7),
+                  ),
             ),
           ],
         ],
@@ -1775,7 +1839,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
               )
             else
-              ...critters.map((critter) => itemBuilder(context, critter)).toList(),
+              ...critters
+                  .map((critter) => itemBuilder(context, critter))
+                  .toList(),
           ],
         ),
       ),
@@ -1835,7 +1901,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           Row(
             children: [
-                Expanded(
+              Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1843,19 +1909,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       critter.crittername?.isNotEmpty == true
                           ? critter.crittername!
                           : critter.name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      ),
-                  ),
-                  if (critter.crittername?.isNotEmpty == true)
-                    Text(
-                    '  (${critter.name})',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        fontSize: 12,
-                        color: typeColor.withOpacity(0.3),
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
+                    if (critter.crittername?.isNotEmpty == true)
+                      Text(
+                        '  (${critter.name})',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                              color: typeColor.withOpacity(0.3),
+                            ),
+                      ),
                   ],
                 ),
               ),
@@ -1877,17 +1943,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          
+
           // Primary stats row
           Wrap(
             spacing: 12,
             runSpacing: 8,
             children: primaryFields
                 .where((entry) => entry.value.isNotEmpty)
-                .map((entry) => _buildCritterStatChip(context, entry.key, entry.value))
+                .map((entry) =>
+                    _buildCritterStatChip(context, entry.key, entry.value))
                 .toList(),
           ),
-          
+
           // Skills section
           if (critter.baseSkills.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -1896,7 +1963,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                  ),
             ),
             const SizedBox(height: 4),
             Wrap(
@@ -1905,7 +1972,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               children: _buildCritterSkillChips(context, critter),
             ),
           ],
-          
+
           // Powers section
           if (critter.powers.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -1914,7 +1981,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                  ),
             ),
             const SizedBox(height: 4),
             Wrap(
@@ -1925,7 +1992,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   .toList(),
             ),
           ],
-          
+
           // Secondary stats row
           if (secondaryFields.any((entry) => entry.value.isNotEmpty)) ...[
             const SizedBox(height: 12),
@@ -1934,18 +2001,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               runSpacing: 8,
               children: secondaryFields
                   .where((entry) => entry.value.isNotEmpty)
-                  .map((entry) => _buildCritterDetailChip(context, entry.key, entry.value))
+                  .map((entry) =>
+                      _buildCritterDetailChip(context, entry.key, entry.value))
                   .toList(),
             ),
           ],
-          
+
           // Special abilities
           if (critter.special?.isNotEmpty == true) ...[
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withOpacity(0.3),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
@@ -1961,8 +2032,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       critter.special!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                          ),
                     ),
                   ),
                 ],
@@ -1970,86 +2043,86 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
           critter.services == 0
-            ? StatefulBuilder(
-                builder: (context, setLocalState) {
-                  final controller = TextEditingController();
-                  
-                  void setServices() {
-                    final parsed = int.tryParse(controller.text);
-                    if (parsed != null && parsed > 0) {
-                      setState(() {
-                        critter.services = parsed;
-                      });
+              ? StatefulBuilder(
+                  builder: (context, setLocalState) {
+                    final controller = TextEditingController();
+
+                    void setServices() {
+                      final parsed = int.tryParse(controller.text);
+                      if (parsed != null && parsed > 0) {
+                        setState(() {
+                          critter.services = parsed;
+                        });
+                      }
                     }
-                  }
-                  
-                  return Row(
-                    children: [
-                      SizedBox(
-                        width: 90,
-                        child: TextField(
-                          controller: controller,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Services',
-                            isDense: true,
+
+                    return Row(
+                      children: [
+                        SizedBox(
+                          width: 90,
+                          child: TextField(
+                            controller: controller,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Services',
+                              isDense: true,
+                            ),
+                            onSubmitted: (val) => setServices(),
                           ),
-                          onSubmitted: (val) => setServices(),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: setServices,
-                        child: const Text('Set'),
-                      ),
-                    ],
-                  );
-                },
-              )
-            : Row(
-                children: [
-                  Text('Services: ${critter.services}'),
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: () {
-                      setState(() {
-                        if (critter.services > 0) {
-                          critter.services = critter.services - 1;
-                        }
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      setState(() {
-                        critter.services = critter.services + 1;
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    tooltip: 'Reset',
-                    onPressed: () {
-                      setState(() {
-                        critter.services = 0;
-                      });
-                    },
-                  ),
-                ],
-              ),
-          
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: setServices,
+                          child: const Text('Set'),
+                        ),
+                      ],
+                    );
+                  },
+                )
+              : Row(
+                  children: [
+                    Text('Services: ${critter.services}'),
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          if (critter.services > 0) {
+                            critter.services = critter.services - 1;
+                          }
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        setState(() {
+                          critter.services = critter.services + 1;
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      tooltip: 'Reset',
+                      onPressed: () {
+                        setState(() {
+                          critter.services = 0;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+
           // Switches section
           const SizedBox(height: 12),
-          
+
           // Bound/Registered switch
           Row(
             children: [
               Text(
                 critter.type == CritterType.spirit ? 'Bound' : 'Registered',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
               const SizedBox(width: 8),
               Switch(
@@ -2072,18 +2145,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ),
             ],
           ),
-          
+
           // Fettered/Pet switch (conditional)
-          if ((critter.type == CritterType.spirit && character.canFetterSpirit) ||
-              (critter.type == CritterType.sprite && character.canFetterSprite)) ...[
+          if ((critter.type == CritterType.spirit &&
+                  character.canFetterSpirit) ||
+              (critter.type == CritterType.sprite &&
+                  character.canFetterSprite)) ...[
             const SizedBox(height: 8),
             Row(
               children: [
                 Text(
-                  critter.type == CritterType.spirit ? 'Fettered' : 'Sprite Pet',
+                  critter.type == CritterType.spirit
+                      ? 'Fettered'
+                      : 'Sprite Pet',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
                 const SizedBox(width: 8),
                 Switch(
@@ -2159,7 +2236,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildCritterStatChip(BuildContext context, String label, String value) {
+  Widget _buildCritterStatChip(
+      BuildContext context, String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -2195,7 +2273,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildCritterDetailChip(BuildContext context, String label, String value) {
+  Widget _buildCritterDetailChip(
+      BuildContext context, String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -2233,7 +2312,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
+        color:
+            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -2251,26 +2331,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   List<Widget> _buildCritterSkillChips(BuildContext context, Critter critter) {
     final sortedSkills = critter.baseSkills.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
-    
+
     return sortedSkills
-        .map((skillEntry) => _buildCritterSkillChip(context, critter, skillEntry.key, skillEntry.value))
+        .map((skillEntry) => _buildCritterSkillChip(
+            context, critter, skillEntry.key, skillEntry.value))
         .toList();
   }
 
   /// Builds a single skill chip for a critter
-  Widget _buildCritterSkillChip(BuildContext context, Critter critter, String skillName, int skillRating) {
-    final dicePool = _calculateCritterSkillDicePool(critter, skillName, skillRating);
+  Widget _buildCritterSkillChip(BuildContext context, Critter critter,
+      String skillName, int skillRating) {
+    final dicePool =
+        _calculateCritterSkillDicePool(critter, skillName, skillRating);
     final isDefaulting = _isCritterSkillDefaulting(skillName, skillRating);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isDefaulting 
+        color: isDefaulting
             ? Theme.of(context).colorScheme.errorContainer.withOpacity(0.3)
             : Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.7),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: isDefaulting 
+          color: isDefaulting
               ? Theme.of(context).colorScheme.error.withOpacity(0.5)
               : Theme.of(context).colorScheme.tertiary.withOpacity(0.5),
         ),
@@ -2283,7 +2366,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: isDefaulting 
+              color: isDefaulting
                   ? Theme.of(context).colorScheme.onErrorContainer
                   : Theme.of(context).colorScheme.onTertiaryContainer,
             ),
@@ -2292,7 +2375,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
             decoration: BoxDecoration(
-              color: isDefaulting 
+              color: isDefaulting
                   ? Theme.of(context).colorScheme.error.withOpacity(0.2)
                   : Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(3),
@@ -2302,7 +2385,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isDefaulting 
+                color: isDefaulting
                     ? Theme.of(context).colorScheme.error
                     : Theme.of(context).colorScheme.tertiary,
               ),
@@ -2314,7 +2397,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   /// Calculates the dice pool for a critter skill
-  int _calculateCritterSkillDicePool(Critter critter, String skillName, int skillRating) {
+  int _calculateCritterSkillDicePool(
+      Critter critter, String skillName, int skillRating) {
     // Get the linked attribute for this skill
     final linkedAttributeCode = skillAttributeMap[skillName];
     if (linkedAttributeCode == null) {
@@ -2323,7 +2407,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     int attributeValue;
-    
+
     // Get attribute value based on critter type
     if (critter is Spirit) {
       attributeValue = _getSpiritAttributeValue(critter, linkedAttributeCode);
@@ -2377,7 +2461,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       case 'INT':
         return sprite.slz; // INT→SLZ
       case 'LOG':
-        return sprite.dp;  // LOG→DP
+        return sprite.dp; // LOG→DP
       case 'WIL':
         return sprite.fwl; // WIL→FWL
       // Other attributes don't exist for sprites, use the closest equivalent
@@ -2390,7 +2474,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return sprite.force ~/ 2; // Similar to spirit edge calculation
       default:
         return 1;
-  }
+    }
   }
 
   /// Checks if a critter skill is defaulting (skill rating is 0)
@@ -2399,7 +2483,1279 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (noDefaultingSkills.contains(skillName)) {
       return false; // Can't default, so if rating is 0, it's just 0
     }
-    
+
     return skillRating == 0;
+  }
+
+  Widget _buildGameNotesTabContent(BuildContext context) {
+    final GameNotes? gameNotes = _currentCharacter?.gameNotes;
+
+    if (gameNotes == null || !gameNotes.hasContent) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.notes,
+              size: 64,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Game Notes',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Game notes from the character file will appear here',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withOpacity(0.7),
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      padding:
+          const EdgeInsets.all(8.0), // Reduced padding for full-screen TabView
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.article,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Game Notes',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  gameNotes.markdownContent != null
+                      ? 'RTF Content'
+                      : 'Plain Text',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Content container
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: SelectableText(
+              gameNotes.displayContent,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    height: 1.6,
+                    fontSize: 14,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarTabContent(BuildContext context) {
+    final Calendar? calendar = _currentCharacter?.calendar;
+
+    if (calendar == null || calendar.weeks.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.calendar_month,
+              size: 64,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Calendar Events',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Calendar events from the character file will appear here',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withOpacity(0.7),
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Group weeks by year for better organization
+    final weeksByYear = <int, List<CalendarWeek>>{};
+    for (final week in calendar.weeks) {
+      weeksByYear.putIfAbsent(week.year, () => []).add(week);
+    }
+
+    // Sort years in descending order (most recent first)
+    final sortedYears = weeksByYear.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    return SingleChildScrollView(
+      padding:
+          const EdgeInsets.all(8.0), // Reduced padding for full-screen TabView
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_month,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Calendar Events',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${calendar.weeks.length} ${calendar.weeks.length == 1 ? 'entry' : 'entries'}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Years and weeks
+          ...sortedYears.map((year) {
+            final weeksInYear = weeksByYear[year]!;
+            // Sort weeks within year in descending order (most recent first)
+            weeksInYear.sort((a, b) => b.week.compareTo(a.week));
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Year header
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        year.toString(),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer,
+                                ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${weeksInYear.length} ${weeksInYear.length == 1 ? 'week' : 'weeks'}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer
+                                  .withOpacity(0.7),
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Weeks in this year
+                ...weeksInYear.map((calendarWeek) =>
+                    _buildCalendarWeekCard(context, calendarWeek)),
+
+                const SizedBox(height: 24),
+              ],
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarWeekCard(
+      BuildContext context, CalendarWeek calendarWeek) {
+    final hasNotes = calendarWeek.notes?.isNotEmpty == true;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Week header
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Week ${calendarWeek.week}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onTertiaryContainer,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              if (hasNotes)
+                Icon(
+                  Icons.note_outlined,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+            ],
+          ),
+
+          // Notes content
+          if (hasNotes) ...[
+            const SizedBox(height: 12),
+            SelectableText(
+              calendarWeek.notes!,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                  ),
+            ),
+          ] else ...[
+            const SizedBox(height: 8),
+            Text(
+              'No notes for this week',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withOpacity(0.6),
+                    fontStyle: FontStyle.italic,
+                  ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKarmaNuyenTabContent(BuildContext context) {
+    final karmaEntries = _currentCharacter?.karmaExpenseEntries ?? [];
+    final nuyenEntries = _currentCharacter?.nuyenExpenseEntries ?? [];
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.currency_yen,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Karma & Nuyen Management',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Entry form
+          _buildExpenseEntryForm(context),
+          
+          const SizedBox(height: 24),
+          
+          // Ledger sections
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Karma section
+              Expanded(
+                child: _buildKarmaLedgerSection(context, karmaEntries),
+              ),
+              const SizedBox(width: 16),
+              // Nuyen section  
+              Expanded(
+                child: _buildNuyenLedgerSection(context, nuyenEntries),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpenseEntryForm(BuildContext context) {
+    // Controllers for the form fields
+    final karmaController = TextEditingController();
+    final nuyenController = TextEditingController();
+    final reasonController = TextEditingController();
+    
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Add New Entry',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          Row(
+            children: [
+              // Karma field
+              Expanded(
+                child: TextField(
+                  controller: karmaController,
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
+                  decoration: InputDecoration(
+                    labelText: 'Karma',
+                    hintText: 'e.g., -5, +10',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.psychology),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // Nuyen field
+              Expanded(
+                child: TextField(
+                  controller: nuyenController,
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
+                  decoration: InputDecoration(
+                    labelText: 'Nuyen',
+                    hintText: 'e.g., -1000, +5000',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.attach_money),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // Reason field
+              Expanded(
+                flex: 2,
+                child: TextField(
+                  controller: reasonController,
+                  decoration: InputDecoration(
+                    labelText: 'Reason',
+                    hintText: 'Reason for expense/income',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.description),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // Submit button
+              ElevatedButton.icon(
+                onPressed: () => _submitExpenseEntry(context, karmaController, nuyenController, reasonController),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Entry'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKarmaLedgerSection(BuildContext context, List<ExpenseEntry> karmaEntries) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.psychology,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Karma Ledger',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  children: [
+                    Text(
+                      'Show Chart',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(width: 8),
+                    Switch(
+                      value: _showKarmaChart,
+                      onChanged: (value) {
+                        debugPrint('Karma chart toggle: $value');
+                        setState(() {
+                          _showKarmaChart = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Content area
+          Container(
+            height: 400, // Fixed height for consistent layout
+            padding: const EdgeInsets.all(16.0),
+            child: _showKarmaChart 
+                ? _buildKarmaChart(context, karmaEntries)
+                : _buildKarmaTable(context, karmaEntries),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNuyenLedgerSection(BuildContext context, List<ExpenseEntry> nuyenEntries) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.attach_money,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Nuyen Ledger',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  children: [
+                    Text(
+                      'Show Chart',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(width: 8),
+                    Switch(
+                      value: _showNuyenChart,
+                      onChanged: (value) {
+                        debugPrint('Nuyen chart toggle: $value');
+                        setState(() {
+                          _showNuyenChart = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Content area
+          Container(
+            height: 400, // Fixed height for consistent layout
+            padding: const EdgeInsets.all(16.0),
+            child: _showNuyenChart 
+                ? _buildNuyenChart(context, nuyenEntries)
+                : _buildNuyenTable(context, nuyenEntries),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKarmaTable(BuildContext context, List<ExpenseEntry> karmaEntries) {
+    if (karmaEntries.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.psychology_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No Karma Entries',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Add your first karma entry above',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Table header
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              const Expanded(flex: 2, child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(flex: 1, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(flex: 3, child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold))),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        
+        // Table content
+        Expanded(
+          child: ListView.builder(
+            itemCount: karmaEntries.length,
+            itemBuilder: (context, index) {
+              final entry = karmaEntries[index];
+              return _buildKarmaEntryRow(context, entry, index);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNuyenTable(BuildContext context, List<ExpenseEntry> nuyenEntries) {
+    if (nuyenEntries.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.attach_money_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No Nuyen Entries',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Add your first nuyen entry above',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Table header
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              const Expanded(flex: 2, child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(flex: 1, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(flex: 3, child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold))),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        
+        // Table content
+        Expanded(
+          child: ListView.builder(
+            itemCount: nuyenEntries.length,
+            itemBuilder: (context, index) {
+              final entry = nuyenEntries[index];
+              return _buildNuyenEntryRow(context, entry, index);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKarmaEntryRow(BuildContext context, ExpenseEntry entry, int index) {
+    final date = entry.date;
+    final amount = entry.amount.toString();
+    final reason = entry.reason;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      decoration: BoxDecoration(
+        color: index.isEven 
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 2, child: Text(date.toIso8601String(), style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 1, child: Text(amount, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 3, child: Text(reason, style: Theme.of(context).textTheme.bodySmall)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNuyenEntryRow(BuildContext context, ExpenseEntry entry, int index) {
+    final date = entry.date;
+    final amount = entry.amount.toString();
+    final reason = entry.reason;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      decoration: BoxDecoration(
+        color: index.isEven 
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 2, child: Text(date.toIso8601String(), style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 1, child: Text(amount, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 3, child: Text(reason, style: Theme.of(context).textTheme.bodySmall)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKarmaChart(BuildContext context, List<ExpenseEntry> karmaEntries) {
+    if (karmaEntries.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.show_chart,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Karma Data',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add karma entries to see the chart',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Calculate running total for karma over time
+    final chartData = <FlSpot>[];
+    int runningTotal = 0;
+    
+    // Sort entries by date
+    final sortedEntries = [...karmaEntries]
+      ..sort((a, b) => a.date.compareTo(b.date));
+    
+    for (int i = 0; i < sortedEntries.length; i++) {
+      runningTotal += sortedEntries[i].amount;
+      chartData.add(FlSpot(i.toDouble(), runningTotal.toDouble()));
+    }
+
+    // Find min/max values for better scaling
+    final maxY = chartData.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
+    final minY = chartData.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
+    final padding = (maxY - minY) * 0.1; // 10% padding
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Karma Over Time',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: true,
+                  drawHorizontalLine: true,
+                  horizontalInterval: (maxY - minY) / 5,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      strokeWidth: 1,
+                    );
+                  },
+                  getDrawingVerticalLine: (value) {
+                    return FlLine(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 32,
+                      getTitlesWidget: (value, meta) {
+                        final index = value.toInt();
+                        if (index >= 0 && index < sortedEntries.length) {
+                          final date = sortedEntries[index].date;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              '${date.month}/${date.day}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontSize: 10,
+                              ),
+                            ),
+                          );
+                        }
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          value.toInt().toString(),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                minX: 0,
+                maxX: (chartData.length - 1).toDouble(),
+                minY: minY - padding,
+                maxY: maxY + padding,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: chartData,
+                    isCurved: true,
+                    color: Theme.of(context).colorScheme.primary,
+                    barWidth: 3,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 4,
+                          color: Theme.of(context).colorScheme.primary,
+                          strokeWidth: 2,
+                          strokeColor: Theme.of(context).colorScheme.surface,
+                        );
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    ),
+                  ),
+                ],
+                lineTouchData: LineTouchData(
+                  enabled: true,
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        final index = spot.x.toInt();
+                        if (index >= 0 && index < sortedEntries.length) {
+                          final entry = sortedEntries[index];
+                          return LineTooltipItem(
+                            '${entry.date.month}/${entry.date.day}/${entry.date.year}\n'
+                            'Total: ${spot.y.toInt()} karma\n'
+                            'Entry: ${entry.amount > 0 ? '+' : ''}${entry.amount}\n'
+                            '${entry.reason}',
+                            TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 12,
+                            ),
+                          );
+                        }
+                        return null;
+                      }).toList();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNuyenChart(BuildContext context, List<ExpenseEntry> nuyenEntries) {
+    if (nuyenEntries.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.show_chart,
+              size: 64,
+              color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Nuyen Data',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add nuyen entries to see the chart',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Calculate running total for nuyen over time
+    final chartData = <FlSpot>[];
+    int runningTotal = 0;
+    
+    // Sort entries by date
+    final sortedEntries = [...nuyenEntries]
+      ..sort((a, b) => a.date.compareTo(b.date));
+    
+    for (int i = 0; i < sortedEntries.length; i++) {
+      runningTotal += sortedEntries[i].amount;
+      chartData.add(FlSpot(i.toDouble(), runningTotal.toDouble()));
+    }
+
+    // Find min/max values for better scaling
+    final maxY = chartData.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
+    final minY = chartData.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
+    final padding = (maxY - minY) * 0.1; // 10% padding
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Nuyen Over Time',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: true,
+                  drawHorizontalLine: true,
+                  horizontalInterval: (maxY - minY) / 5,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      strokeWidth: 1,
+                    );
+                  },
+                  getDrawingVerticalLine: (value) {
+                    return FlLine(
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 32,
+                      getTitlesWidget: (value, meta) {
+                        final index = value.toInt();
+                        if (index >= 0 && index < sortedEntries.length) {
+                          final date = sortedEntries[index].date;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              '${date.month}/${date.day}',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontSize: 10,
+                              ),
+                            ),
+                          );
+                        }
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 60,
+                      getTitlesWidget: (value, meta) {
+                        // Format large numbers with K suffix
+                        final intValue = value.toInt();
+                        String displayValue;
+                        if (intValue.abs() >= 1000) {
+                          displayValue = '${(intValue / 1000).toStringAsFixed(0)}K';
+                        } else {
+                          displayValue = intValue.toString();
+                        }
+                        return Text(
+                          '¥$displayValue',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                minX: 0,
+                maxX: (chartData.length - 1).toDouble(),
+                minY: minY - padding,
+                maxY: maxY + padding,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: chartData,
+                    isCurved: true,
+                    color: Theme.of(context).colorScheme.secondary,
+                    barWidth: 3,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 4,
+                          color: Theme.of(context).colorScheme.secondary,
+                          strokeWidth: 2,
+                          strokeColor: Theme.of(context).colorScheme.surface,
+                        );
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                    ),
+                  ),
+                ],
+                lineTouchData: LineTouchData(
+                  enabled: true,
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        final index = spot.x.toInt();
+                        if (index >= 0 && index < sortedEntries.length) {
+                          final entry = sortedEntries[index];
+                          // Format the amount with commas for readability
+                          final totalFormatted = spot.y.toInt().toString().replaceAllMapped(
+                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]},');
+                          final entryFormatted = entry.amount.toString().replaceAllMapped(
+                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]},');
+                          
+                          return LineTooltipItem(
+                            '${entry.date.month}/${entry.date.day}/${entry.date.year}\n'
+                            'Total: ¥$totalFormatted\n'
+                            'Entry: ${entry.amount > 0 ? '+' : ''}¥$entryFormatted\n'
+                            '${entry.reason}',
+                            TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 12,
+                            ),
+                          );
+                        }
+                        return null;
+                      }).toList();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitExpenseEntry(BuildContext context, TextEditingController karmaController, 
+      TextEditingController nuyenController, TextEditingController reasonController) {
+    
+    final karmaText = karmaController.text.trim();
+    final nuyenText = nuyenController.text.trim();
+    final reason = reasonController.text.trim();
+    
+    // Validation
+    if (reason.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide a reason for this entry'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    if (karmaText.isEmpty && nuyenText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter either a karma or nuyen amount'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    // Parse amounts
+    int? karmaAmount;
+    int? nuyenAmount;
+    
+    if (karmaText.isNotEmpty) {
+      karmaAmount = int.tryParse(karmaText);
+      if (karmaAmount == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid karma amount. Please enter a number.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+    
+    if (nuyenText.isNotEmpty) {
+      nuyenAmount = int.tryParse(nuyenText);
+      if (nuyenAmount == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid nuyen amount. Please enter a number.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+    
+    // TODO: Implement actual expense entry creation and XML modification
+    // For now, just show a success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Entry added: K${karmaAmount ?? 0}, ¥${nuyenAmount ?? 0} - $reason'),
+        backgroundColor: Colors.green,
+      ),
+    );
+    
+    // Clear the form
+    karmaController.clear();
+    nuyenController.clear();
+    reasonController.clear();
   }
 }

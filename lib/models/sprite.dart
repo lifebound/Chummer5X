@@ -3,34 +3,20 @@ import 'dart:math';
 
 class Sprite extends Critter {
   Sprite({
-    required String name,
-    String? crittername,
-    required CritterType type,
-    required int force,
-    required String initiativeType,
-    required int initiativeDice,
-    required Map<String, int> baseSkills,
-    required List<String> powers,
-    String? special,
-    required Map<String, int> attributeModifiers,
-    required int services,
-    required bool bound,
-    required bool fettered,
-  }) : super(
-          name: name,
-          crittername: crittername,
-          type: type,
-          force: force,
-          initiativeType: initiativeType,
-          initiativeDice: initiativeDice,
-          baseSkills: baseSkills,
-          powers: powers,
-          special: special,
-          attributeModifiers: attributeModifiers,
-          services: services,
-          bound: bound,
-          fettered: fettered,
-        );
+    required super.name,
+    super.crittername,
+    required super.type,
+    required super.force,
+    required super.initiativeType,
+    required super.initiativeDice,
+    required super.baseSkills,
+    required super.powers,
+    super.special,
+    required super.attributeModifiers,
+    required super.services,
+    required super.bound,
+    required super.fettered,
+  });
     int get atk => attributeModifiers['ATK']! + force;
     int get dp => attributeModifiers['DP']! + force;
     int get slz => attributeModifiers['SLZ']! + force;

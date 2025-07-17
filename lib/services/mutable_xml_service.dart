@@ -123,7 +123,7 @@ class MutableXmlService extends EnhancedChumerXmlService {
   }
 
   /// Export modified XML using platform-appropriate method
-  Future<String> exportModifiedXmlForSharing(String filename) async {
+  Future<String?> exportModifiedXmlForSharing(String filename) async {
     final modifiedXml = exportModifiedXml();
     final fileHandler = PlatformFileHandler.create();
     return await fileHandler.exportXmlForSharing(modifiedXml, filename);

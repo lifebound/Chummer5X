@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +23,7 @@ import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
+import 'dart:typed_data';
 
 enum NavigationSection {
   overview,
@@ -404,6 +406,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   void _loadCharacterFile() async {
     try {
+      
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['xml', 'chum5'],
@@ -411,10 +414,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
 
       if (result != null && result.files.single.bytes != null) {
-        final xmlContent = String.fromCharCodes(result.files.single.bytes!);
+        final Uint8List bytes = result.files.single.bytes!;
         
+        final String xmlContent = utf8.decode(bytes);
+        String cleanXmlContent = xmlContent;
+        if (cleanXmlContent.startsWith('\uFEFF')) {
+          cleanXmlContent = cleanXmlContent.substring(1);
+          debugPrint('Explicit BOM \\uFEFF stripped after UTF-8 decode.');
+        } else {
+          debugPrint('No \\uFEFF BOM found at the beginning of content after UTF-8 decode.');
+        }
         // Use MutableXmlService to parse and cache the XML for modification
-        final character = _xmlService.parseAndCacheCharacterXml(xmlContent);
+        final character = _xmlService.parseAndCacheCharacterXml(cleanXmlContent);
 
         if (character != null) {
           setState(() {
@@ -2841,10 +2852,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final allKarmaEntries = _currentCharacter?.karmaExpenseEntries ?? [];
     final allNuyenEntries = _currentCharacter?.nuyenExpenseEntries ?? [];
     
-    // Filter out entries with zero amounts
-    final karmaEntries = allKarmaEntries.where((entry) => entry.amount != 0).toList();
-    final nuyenEntries = allNuyenEntries.where((entry) => entry.amount != 0).toList();
-    
+    // Filter out entries with zero amounts. Sort by date descending.
+    final karmaEntries = allKarmaEntries.where((entry) => entry.amount != 0).toList()..sort((a, b) => b.date.compareTo(a.date));
+    final nuyenEntries = allNuyenEntries.where((entry) => entry.amount != 0).toList()..sort((a, b) => b.date.compareTo(a.date));
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -3923,12 +3934,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         final filename = '${_currentCharacter?.name ?? 'character'}_modified.xml';
         final exportPath = await _xmlService.exportModifiedXmlForSharing(filename);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Modified character exported to: $exportPath'),
-              backgroundColor: Colors.blue,
-            ),
-          );
+          if (exportPath != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Modified character exported to: $exportPath'),
+                backgroundColor: Colors.blue,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Export cancelled by user'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
         }
       }
     } catch (e) {

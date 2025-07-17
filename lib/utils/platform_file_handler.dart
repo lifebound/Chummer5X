@@ -1,11 +1,16 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:file_picker/file_picker.dart';
+
+// Web-specific import
+import 'package:universal_html/html.dart' as html;
 
 /// Abstract interface for platform-specific file operations
 abstract class FileHandler {
   Future<bool> canWriteToFile(String path);
   Future<void> writeXmlToFile(String path, String xmlContent);
-  Future<String> exportXmlForSharing(String xmlContent, String filename);
+  Future<String?> exportXmlForSharing(String xmlContent, String filename);
 }
 
 /// Factory to create appropriate file handler for current platform
@@ -50,24 +55,36 @@ class DesktopFileHandler implements FileHandler {
     final file = File(path);
     // Ensure parent directory exists
     await file.parent.create(recursive: true);
-    await file.writeAsString(xmlContent);
+    
+    // Strip any existing BOM from the content
+    String cleanContent = xmlContent;
+    if (cleanContent.startsWith('\uFEFF')) {
+      cleanContent = cleanContent.substring(1);
+    }
+    
+    // Write with explicit UTF-8 encoding without BOM
+    await file.writeAsString(cleanContent, encoding: Encoding.getByName('utf-8')!);
   }
 
   @override
-  Future<String> exportXmlForSharing(String xmlContent, String filename) async {
-    // For desktop, we can save directly to Downloads or let user choose location
-    final downloadsPath = _getDownloadsPath();
-    final filePath = '$downloadsPath/$filename';
-    await writeXmlToFile(filePath, xmlContent);
-    return filePath;
-  }
-
-  String _getDownloadsPath() {
-    if (Platform.isWindows) {
-      return '${Platform.environment['USERPROFILE']}\\Downloads';
-    } else {
-      return '${Platform.environment['HOME']}/Downloads';
+  Future<String?> exportXmlForSharing(String xmlContent, String filename) async {
+    // Show save file dialog to let user choose location and filename
+    final result = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save Character File',
+      fileName: filename,
+      type: FileType.custom,
+      allowedExtensions: ['chum5', 'xml'],
+      lockParentWindow: true,
+    );
+    
+    if (result != null) {
+      // User selected a location, write the file
+      await writeXmlToFile(result, xmlContent);
+      return result;
     }
+    
+    // User cancelled the dialog
+    return null;
   }
 }
 
@@ -86,7 +103,7 @@ class MobileFileHandler implements FileHandler {
   }
 
   @override
-  Future<String> exportXmlForSharing(String xmlContent, String filename) async {
+  Future<String?> exportXmlForSharing(String xmlContent, String filename) async {
     // On mobile, we would use the share_plus package to share the file
     // For now, return a placeholder path indicating sharing should be used
     return 'share://$filename';
@@ -107,9 +124,42 @@ class WebFileHandler implements FileHandler {
   }
 
   @override
-  Future<String> exportXmlForSharing(String xmlContent, String filename) async {
-    // On web, we would trigger a download
-    // For now, return a placeholder indicating download should be triggered
-    return 'download://$filename';
+  Future<String?> exportXmlForSharing(String xmlContent, String filename) async {
+    try {
+      if (kIsWeb) {
+        // Strip any existing BOM from the content
+        String cleanContent = xmlContent;
+        if (cleanContent.startsWith('\uFEFF')) {
+          cleanContent = cleanContent.substring(1);
+        }
+        
+        // Create a blob with the XML content
+        final bytes = utf8.encode(cleanContent);
+        final blob = html.Blob([bytes], 'application/xml');
+        
+        // Create a download URL
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        
+        // Create a temporary anchor element to trigger download
+        final anchor = html.AnchorElement(href: url);
+        anchor.download = filename;
+        anchor.style.display = 'none';
+        
+        // Add to document, click, and remove
+        html.document.body!.append(anchor);
+        anchor.click();
+        anchor.remove();
+        
+        // Clean up the URL
+        html.Url.revokeObjectUrl(url);
+        
+        return filename; // Return filename to indicate success
+      } else {
+        return 'download://$filename';
+      }
+    } catch (e) {
+      debugPrint('Error triggering web download: $e');
+      return null;
+    }
   }
 }

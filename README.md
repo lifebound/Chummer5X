@@ -1,5 +1,7 @@
 # Chummer5X
-
+[![Flutter Snapshot CI](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml/badge.svg)](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml)[![Flutter Snapshot CI](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml/badge.svg)](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml)
+[![Flutter Snapshot CI](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml/badge.svg)](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml)
+[![Flutter Snapshot CI](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml/badge.svg)](https://github.com/lifebound/Chummer5X/actions/workflows/flutter_release_snapshot.yaml)
 A modern, platform-agnostic Flutter application for viewing and interacting with Shadowrun character files from the Chummer character creation application.
 
 ## Features
@@ -100,8 +102,8 @@ flutter run
 
 ## Supported File Formats
 
-- `.xml` - Standard Chummer character files
-- `.chum5` - Chummer 5th Edition files
+- `.chum5` - Chummer5a files. This MAY work with legacy Chummer 5 files; I have not tested it. YMMV. 
+
 
 ## Project Structure
 

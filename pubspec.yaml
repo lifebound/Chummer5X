@@ -34,6 +34,7 @@ dependencies:
   # UI and State Management
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
+  flutter_launcher_icons: ^0.13.1
   
   # XML Parsing
   xml: ^6.5.0
@@ -78,8 +79,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

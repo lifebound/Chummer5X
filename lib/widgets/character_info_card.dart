@@ -77,11 +77,11 @@ class CharacterInfoCard extends StatelessWidget {
 
   Widget _buildInfoGrid(BuildContext context) {
     final infoItems = [
-      if (character.ethnicity?.isNotEmpty == true) ('Ethnicity', character.ethnicity!),
-      if (character.age?.isNotEmpty == true) ('Age', character.age!),
-      if (character.sex?.isNotEmpty == true) ('Sex', character.sex!),
-      if (character.height?.isNotEmpty == true) ('Height', character.height!),
-      if (character.weight?.isNotEmpty == true) ('Weight', character.weight!),
+      // if (character.ethnicity?.isNotEmpty == true) ('Ethnicity', character.ethnicity!),
+      // if (character.age?.isNotEmpty == true) ('Age', character.age!),
+      // if (character.sex?.isNotEmpty == true) ('Sex', character.sex!),
+      // if (character.height?.isNotEmpty == true) ('Height', character.height!),
+      // if (character.weight?.isNotEmpty == true) ('Weight', character.weight!),
       if (character.karma?.isNotEmpty == true) ('Karma', character.karma!),
       if (character.totalKarma?.isNotEmpty == true) ('Total Karma', character.totalKarma!),
       if (character.streetCred?.isNotEmpty == true) ('Street Cred', character.streetCred!),

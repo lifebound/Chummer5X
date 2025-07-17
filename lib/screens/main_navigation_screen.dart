@@ -525,10 +525,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       children: [
         CharacterInfoCard(character: _currentCharacter!),
         SizedBox(height: spacing),
-        AttributesCard(character: _currentCharacter!),
-        SizedBox(height: spacing),
         _buildConditionMonitorCard(),
         SizedBox(height: spacing),
+        AttributesCard(character: _currentCharacter!),
+        SizedBox(height: spacing), 
         _buildDerivedAttributesCard(),
       ],
     );

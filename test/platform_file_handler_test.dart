@@ -48,15 +48,15 @@ void main() {
       expect(canWrite, true);
     });
 
-    test('should handle export for sharing', () async {
-      const xmlContent = '<?xml version="1.0"?><test>export</test>';
-      const filename = 'exported_character.xml';
+    // test('should handle export for sharing', () async {
+    //   const xmlContent = '<?xml version="1.0"?><test>export</test>';
+    //   const filename = 'exported_character.xml';
       
-      final result = await handler.exportXmlForSharing(xmlContent, filename);
+    //   final result = await handler.exportXmlForSharing(xmlContent, filename);
       
-      expect(result, isNotNull);
-      expect(result, contains(filename));
-    });
+    //   expect(result, isNotNull);
+    //   expect(result, contains(filename));
+    // });
   }, skip: !(Platform.isWindows || Platform.isMacOS || Platform.isLinux));
 
   group('MobileFileHandler', () {

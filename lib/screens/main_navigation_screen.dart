@@ -191,6 +191,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             },
           ),
 
+          // Save Character (only show if character is loaded and has modifications)
+          if (_currentCharacter != null && _xmlService.hasLoadedDocument) ...[
+            ListTile(
+              leading: const Icon(Icons.save),
+              title: const Text('Save Character'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _saveCharacterFile();
+              },
+            ),
+          ],
+
           // ListTile(
           //   leading: const Icon(Icons.person_add),
           //   title: const Text('Create Sample Character'),
@@ -3906,7 +3918,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     }
     
-    // TODO: Implement actual expense entry creation and XML modification
+    // If both amounts are zero, show warning
     try {
       // Add expense entries to the XML service
       if (karmaAmount != null && karmaAmount != 0) {
@@ -3927,19 +3939,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         );
       }
 
-      // Try to save or export the modified XML
-      await _saveOrExportModifiedXml(context);
-
       // Update the current character with new expense entries by re-parsing
       await _refreshCharacterData();
 
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Entry added: K${karmaAmount ?? 0}, ¥${nuyenAmount ?? 0} - $reason'),
-          backgroundColor: Colors.green,
-        ),
-      );
+
       
       // Clear the form
       karmaController.clear();
@@ -3957,8 +3961,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
   }
 
-  /// Save the modified XML or offer export options
-  Future<void> _saveOrExportModifiedXml(BuildContext context) async {
+  /// Save the character file
+  Future<void> _saveCharacterFile() async {
     try {
       // Check if we can save directly to the original file
       if (await _xmlService.canSaveToOriginalFile()) {
@@ -4002,7 +4006,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error saving file: $e'),
-            backgroundColor: Colors.orange,
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -4014,7 +4018,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     try {
       if (_xmlService.hasLoadedDocument) {
         final modifiedXml = _xmlService.exportModifiedXml();
-        final updatedCharacter = EnhancedChummerXmlService.parseCharacterXml(modifiedXml);
+        final updatedCharacter = _xmlService.parseAndCacheCharacterXml(modifiedXml);
 
         if (updatedCharacter != null) {
           setState(() {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../models/shadowrun_character.dart';
-import '../services/enhanced_chumer_xml_service.dart';
+import '../services/mutable_xml_service.dart';
 import '../utils/responsive_layout.dart';
 import '../utils/skill_attribute_map.dart';
 import '../widgets/character_info_card.dart';
@@ -55,6 +56,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Chart toggle states for Karma & Nuyen tab
   bool _showKarmaChart = false;
   bool _showNuyenChart = false;
+
+  // XML modification service
+  final MutableXmlService _xmlService = MutableXmlService();
 
   @override
   Widget build(BuildContext context) {
@@ -408,8 +412,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
       if (result != null && result.files.single.bytes != null) {
         final xmlContent = String.fromCharCodes(result.files.single.bytes!);
-        final character =
-            EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+        
+        // Use MutableXmlService to parse and cache the XML for modification
+        final character = _xmlService.parseAndCacheCharacterXml(xmlContent);
 
         if (character != null) {
           setState(() {
@@ -2833,8 +2838,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildKarmaNuyenTabContent(BuildContext context) {
-    final karmaEntries = _currentCharacter?.karmaExpenseEntries ?? [];
-    final nuyenEntries = _currentCharacter?.nuyenExpenseEntries ?? [];
+    final allKarmaEntries = _currentCharacter?.karmaExpenseEntries ?? [];
+    final allNuyenEntries = _currentCharacter?.nuyenExpenseEntries ?? [];
+    
+    // Filter out entries with zero amounts
+    final karmaEntries = allKarmaEntries.where((entry) => entry.amount != 0).toList();
+    final nuyenEntries = allNuyenEntries.where((entry) => entry.amount != 0).toList();
     
     return SingleChildScrollView(
       padding: const EdgeInsets.all(8.0),
@@ -2864,20 +2873,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           
           const SizedBox(height: 24),
           
-          // Ledger sections
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Karma section
-              Expanded(
-                child: _buildKarmaLedgerSection(context, karmaEntries),
-              ),
-              const SizedBox(width: 16),
-              // Nuyen section  
-              Expanded(
-                child: _buildNuyenLedgerSection(context, nuyenEntries),
-              ),
-            ],
+          // Ledger sections - responsive layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Use column layout on narrow screens (< 800px)
+              if (constraints.maxWidth < 800) {
+                return Column(
+                  children: [
+                    _buildKarmaLedgerSection(context, karmaEntries),
+                    const SizedBox(height: 16),
+                    _buildNuyenLedgerSection(context, nuyenEntries),
+                  ],
+                );
+              } else {
+                // Use row layout on wider screens
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Karma section
+                    Expanded(
+                      child: _buildKarmaLedgerSection(context, karmaEntries),
+                    ),
+                    const SizedBox(width: 16),
+                    // Nuyen section  
+                    Expanded(
+                      child: _buildNuyenLedgerSection(context, nuyenEntries),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ],
       ),
@@ -2910,66 +2935,133 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           
-          Row(
-            children: [
-              // Karma field
-              Expanded(
-                child: TextField(
-                  controller: karmaController,
-                  keyboardType: const TextInputType.numberWithOptions(signed: true),
-                  decoration: InputDecoration(
-                    labelText: 'Karma',
-                    hintText: 'e.g., -5, +10',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.psychology),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              
-              // Nuyen field
-              Expanded(
-                child: TextField(
-                  controller: nuyenController,
-                  keyboardType: const TextInputType.numberWithOptions(signed: true),
-                  decoration: InputDecoration(
-                    labelText: 'Nuyen',
-                    hintText: 'e.g., -1000, +5000',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.attach_money),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              
-              // Reason field
-              Expanded(
-                flex: 2,
-                child: TextField(
-                  controller: reasonController,
-                  decoration: InputDecoration(
-                    labelText: 'Reason',
-                    hintText: 'Reason for expense/income',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.description),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              
-              // Submit button
-              ElevatedButton.icon(
-                onPressed: () => _submitExpenseEntry(context, karmaController, nuyenController, reasonController),
-                icon: const Icon(Icons.add),
-                label: const Text('Add Entry'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
-            ],
+          // Responsive form layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Use column layout on narrow screens (< 600px)
+              if (constraints.maxWidth < 600) {
+                return Column(
+                  children: [
+                    // Karma field
+                    TextField(
+                      controller: karmaController,
+                      keyboardType: const TextInputType.numberWithOptions(signed: true),
+                      decoration: InputDecoration(
+                        labelText: 'Karma',
+                        hintText: 'e.g., -5, +10',
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.psychology),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Nuyen field
+                    TextField(
+                      controller: nuyenController,
+                      keyboardType: const TextInputType.numberWithOptions(signed: true),
+                      decoration: InputDecoration(
+                        labelText: 'Nuyen',
+                        hintText: 'e.g., -1000, +5000',
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.attach_money),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Reason field
+                    TextField(
+                      controller: reasonController,
+                      decoration: InputDecoration(
+                        labelText: 'Reason',
+                        hintText: 'Reason for expense/income',
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.description),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Submit button - full width on mobile
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _submitExpenseEntry(context, karmaController, nuyenController, reasonController),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Entry'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                // Use row layout on wider screens
+                return Row(
+                  children: [
+                    // Karma field
+                    Expanded(
+                      child: TextField(
+                        controller: karmaController,
+                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        decoration: InputDecoration(
+                          labelText: 'Karma',
+                          hintText: 'e.g., -5, +10',
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.psychology),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    
+                    // Nuyen field
+                    Expanded(
+                      child: TextField(
+                        controller: nuyenController,
+                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        decoration: InputDecoration(
+                          labelText: 'Nuyen',
+                          hintText: 'e.g., -1000, +5000',
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.attach_money),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    
+                    // Reason field
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: reasonController,
+                        decoration: InputDecoration(
+                          labelText: 'Reason',
+                          hintText: 'Reason for expense/income',
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.description),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    
+                    // Submit button
+                    ElevatedButton.icon(
+                      onPressed: () => _submitExpenseEntry(context, karmaController, nuyenController, reasonController),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add Entry'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ],
       ),
@@ -2998,39 +3090,87 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 topRight: Radius.circular(12),
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.psychology,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Karma Ledger',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Text(
-                      'Show Chart',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(width: 8),
-                    Switch(
-                      value: _showKarmaChart,
-                      onChanged: (value) {
-                        debugPrint('Karma chart toggle: $value');
-                        setState(() {
-                          _showKarmaChart = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Use column layout on narrow headers (< 300px)
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Karma Ledger',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text(
+                            'Show Chart',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(width: 8),
+                          Switch(
+                            value: _showKarmaChart,
+                            onChanged: (value) {
+                              debugPrint('Karma chart toggle: $value');
+                              setState(() {
+                                _showKarmaChart = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use row layout on wider headers
+                  return Row(
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Karma Ledger',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Text(
+                            'Show Chart',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(width: 8),
+                          Switch(
+                            value: _showKarmaChart,
+                            onChanged: (value) {
+                              debugPrint('Karma chart toggle: $value');
+                              setState(() {
+                                _showKarmaChart = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
           
@@ -3069,39 +3209,87 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 topRight: Radius.circular(12),
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.attach_money,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Nuyen Ledger',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Text(
-                      'Show Chart',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(width: 8),
-                    Switch(
-                      value: _showNuyenChart,
-                      onChanged: (value) {
-                        debugPrint('Nuyen chart toggle: $value');
-                        setState(() {
-                          _showNuyenChart = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Use column layout on narrow headers (< 300px)
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.currency_yen,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Nuyen Ledger',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text(
+                            'Show Chart',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(width: 8),
+                          Switch(
+                            value: _showNuyenChart,
+                            onChanged: (value) {
+                              debugPrint('Nuyen chart toggle: $value');
+                              setState(() {
+                                _showNuyenChart = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                } else {
+                  // Use row layout on wider headers
+                  return Row(
+                    children: [
+                      Icon(
+                        Icons.currency_yen,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Nuyen Ledger',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Text(
+                            'Show Chart',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(width: 8),
+                          Switch(
+                            value: _showNuyenChart,
+                            onChanged: (value) {
+                              debugPrint('Nuyen chart toggle: $value');
+                              setState(() {
+                                _showNuyenChart = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
           
@@ -3119,7 +3307,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildKarmaTable(BuildContext context, List<ExpenseEntry> karmaEntries) {
-    if (karmaEntries.isEmpty) {
+    // Filter out zero amounts for display
+    final filteredEntries = karmaEntries.where((entry) => entry.amount != 0).toList();
+    
+    if (filteredEntries.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -3160,7 +3351,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           child: Row(
             children: [
               const Expanded(flex: 2, child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Expanded(flex: 1, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(flex: 2, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
               const Expanded(flex: 3, child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
@@ -3170,9 +3361,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         // Table content
         Expanded(
           child: ListView.builder(
-            itemCount: karmaEntries.length,
+            itemCount: filteredEntries.length,
             itemBuilder: (context, index) {
-              final entry = karmaEntries[index];
+              final entry = filteredEntries[index];
               return _buildKarmaEntryRow(context, entry, index);
             },
           ),
@@ -3182,7 +3373,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildNuyenTable(BuildContext context, List<ExpenseEntry> nuyenEntries) {
-    if (nuyenEntries.isEmpty) {
+    // Filter out zero amounts for display
+    final filteredEntries = nuyenEntries.where((entry) => entry.amount != 0).toList();
+    
+    if (filteredEntries.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -3223,7 +3417,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           child: Row(
             children: [
               const Expanded(flex: 2, child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Expanded(flex: 1, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(flex: 2, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
               const Expanded(flex: 3, child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
@@ -3233,9 +3427,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         // Table content
         Expanded(
           child: ListView.builder(
-            itemCount: nuyenEntries.length,
+            itemCount: filteredEntries.length,
             itemBuilder: (context, index) {
-              final entry = nuyenEntries[index];
+              final entry = filteredEntries[index];
               return _buildNuyenEntryRow(context, entry, index);
             },
           ),
@@ -3245,8 +3439,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildKarmaEntryRow(BuildContext context, ExpenseEntry entry, int index) {
-    final date = entry.date;
-    final amount = entry.amount.toString();
+    // Format date with locale-aware formatting
+    final dateFormat = DateFormat.yMd();
+    final formattedDate = dateFormat.format(entry.date);
+    
+    // Format karma amounts with locale-aware number formatting
+    final numberFormat = NumberFormat.decimalPattern();
+    final amount = entry.amount is double && entry.amount != (entry.amount as double).round()
+        ? numberFormat.format(entry.amount) // Show with appropriate decimals
+        : numberFormat.format(entry.amount.round()); // Show as integer
     final reason = entry.reason;
 
     return Container(
@@ -3260,8 +3461,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text(date.toIso8601String(), style: Theme.of(context).textTheme.bodySmall)),
-          Expanded(flex: 1, child: Text(amount, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 2, child: Text(formattedDate, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 2, child: Text(amount, style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis, softWrap: false)),
           Expanded(flex: 3, child: Text(reason, style: Theme.of(context).textTheme.bodySmall)),
         ],
       ),
@@ -3269,8 +3470,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildNuyenEntryRow(BuildContext context, ExpenseEntry entry, int index) {
-    final date = entry.date;
-    final amount = entry.amount.toString();
+    // Format date with locale-aware formatting
+    final dateFormat = DateFormat.yMd();
+    final formattedDate = dateFormat.format(entry.date);
+    
+    // Format nuyen amounts with locale-aware currency formatting
+    final currencyFormat = NumberFormat.currency(symbol: '¥', decimalDigits: 2);
+    final amount = currencyFormat.format(entry.amount);
     final reason = entry.reason;
 
     return Container(
@@ -3284,8 +3490,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text(date.toIso8601String(), style: Theme.of(context).textTheme.bodySmall)),
-          Expanded(flex: 1, child: Text(amount, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 2, child: Text(formattedDate, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(flex: 2, child: Text(amount, style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis, softWrap: false)),
           Expanded(flex: 3, child: Text(reason, style: Theme.of(context).textTheme.bodySmall)),
         ],
       ),
@@ -3293,197 +3499,71 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildKarmaChart(BuildContext context, List<ExpenseEntry> karmaEntries) {
-    if (karmaEntries.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.show_chart,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No Karma Data',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Add karma entries to see the chart',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
-              ),
-            ),
-          ],
+    final numberFormat = NumberFormat.decimalPattern();
+    
+    return _buildExpenseChart(
+      context,
+      karmaEntries,
+      title: 'Karma',
+      titleColor: Theme.of(context).colorScheme.secondary,
+      primaryColor: Theme.of(context).colorScheme.primary,
+      secondaryColor: Theme.of(context).colorScheme.primaryContainer,
+      formatAmount: (amount) => numberFormat.format(amount),
+      formatTooltipAmount: (amount) => '${numberFormat.format(amount.round())} karma',
+      formatLeftAxisLabel: (value) => Text(
+        value.toInt().toString(),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontSize: 10,
         ),
-      );
-    }
-
-    // Calculate running total for karma over time
-    final chartData = <FlSpot>[];
-    int runningTotal = 0;
-    
-    // Sort entries by date
-    final sortedEntries = [...karmaEntries]
-      ..sort((a, b) => a.date.compareTo(b.date));
-    
-    for (int i = 0; i < sortedEntries.length; i++) {
-      runningTotal += sortedEntries[i].amount;
-      chartData.add(FlSpot(i.toDouble(), runningTotal.toDouble()));
-    }
-
-    // Find min/max values for better scaling
-    final maxY = chartData.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
-    final minY = chartData.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
-    final padding = (maxY - minY) * 0.1; // 10% padding
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Karma Over Time',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: true,
-                  drawHorizontalLine: true,
-                  horizontalInterval: (maxY - minY) / 5,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                      strokeWidth: 1,
-                    );
-                  },
-                  getDrawingVerticalLine: (value) {
-                    return FlLine(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                      strokeWidth: 1,
-                    );
-                  },
-                ),
-                titlesData: FlTitlesData(
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 32,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index >= 0 && index < sortedEntries.length) {
-                          final date = sortedEntries[index].date;
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              '${date.month}/${date.day}',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                fontSize: 10,
-                              ),
-                            ),
-                          );
-                        }
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toInt().toString(),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontSize: 10,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                borderData: FlBorderData(
-                  show: true,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                minX: 0,
-                maxX: (chartData.length - 1).toDouble(),
-                minY: minY - padding,
-                maxY: maxY + padding,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: chartData,
-                    isCurved: true,
-                    color: Theme.of(context).colorScheme.primary,
-                    barWidth: 3,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) {
-                        return FlDotCirclePainter(
-                          radius: 4,
-                          color: Theme.of(context).colorScheme.primary,
-                          strokeWidth: 2,
-                          strokeColor: Theme.of(context).colorScheme.surface,
-                        );
-                      },
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    ),
-                  ),
-                ],
-                lineTouchData: LineTouchData(
-                  enabled: true,
-                  touchTooltipData: LineTouchTooltipData(
-                    getTooltipItems: (touchedSpots) {
-                      return touchedSpots.map((spot) {
-                        final index = spot.x.toInt();
-                        if (index >= 0 && index < sortedEntries.length) {
-                          final entry = sortedEntries[index];
-                          return LineTooltipItem(
-                            '${entry.date.month}/${entry.date.day}/${entry.date.year}\n'
-                            'Total: ${spot.y.toInt()} karma\n'
-                            'Entry: ${entry.amount > 0 ? '+' : ''}${entry.amount}\n'
-                            '${entry.reason}',
-                            TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 12,
-                            ),
-                          );
-                        }
-                        return null;
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
 
   Widget _buildNuyenChart(BuildContext context, List<ExpenseEntry> nuyenEntries) {
-    if (nuyenEntries.isEmpty) {
+    final currencyFormat = NumberFormat.currency(symbol: '¥', decimalDigits: 2);
+    
+    return _buildExpenseChart(
+      context,
+      nuyenEntries,
+      title: 'Nuyen',
+      titleColor: Theme.of(context).colorScheme.secondary,
+      primaryColor: Colors.green,
+      secondaryColor: Colors.greenAccent,
+      formatAmount: (amount) => currencyFormat.format(amount),
+      formatTooltipAmount: (amount) => currencyFormat.format(amount),
+      formatLeftAxisLabel: (value) {
+        // Format large numbers with K suffix for nuyen
+        final intValue = value.toInt();
+        String displayValue;
+        if (intValue.abs() >= 1000) {
+          displayValue = '${(intValue / 1000).toStringAsFixed(0)}K';
+        } else {
+          displayValue = intValue.toString();
+        }
+        return Text(
+          '¥$displayValue',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 10,
+          ),
+        );
+      },
+    );
+  }
+  Widget _buildExpenseChart(BuildContext context, List<ExpenseEntry> entries, {
+    required String title,
+    required Color titleColor,
+    required Color primaryColor,
+    required Color secondaryColor,
+    required String Function(num) formatAmount,
+    required String Function(num) formatTooltipAmount,
+    required Widget Function(num) formatLeftAxisLabel,
+  }) {
+    // Filter out zero amounts for chart display
+    final filteredEntries = entries.where((entry) => entry.amount != 0).toList();
+
+    if (filteredEntries.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -3491,18 +3571,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Icon(
               Icons.show_chart,
               size: 64,
-              color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+              color: primaryColor.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
-              'No Nuyen Data',
+              'No $title Data',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.secondary,
+                color: primaryColor,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Add nuyen entries to see the chart',
+              'Add ${title.toLowerCase()} entries to see the chart',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
               ),
@@ -3512,17 +3592,51 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
     }
 
-    // Calculate running total for nuyen over time
-    final chartData = <FlSpot>[];
-    int runningTotal = 0;
-    
-    // Sort entries by date
-    final sortedEntries = [...nuyenEntries]
+    // Sort all filtered entries chronologically first
+    final sortedEntries = List<ExpenseEntry>.from(filteredEntries)
       ..sort((a, b) => a.date.compareTo(b.date));
     
-    for (int i = 0; i < sortedEntries.length; i++) {
-      runningTotal += sortedEntries[i].amount;
-      chartData.add(FlSpot(i.toDouble(), runningTotal.toDouble()));
+    // Find the date range (first entry to last entry)
+    final firstDate = DateTime(sortedEntries.first.date.year, sortedEntries.first.date.month, sortedEntries.first.date.day);
+    final lastDate = DateTime(sortedEntries.last.date.year, sortedEntries.last.date.month, sortedEntries.last.date.day);
+    
+    // Generate all calendar days in the range (continuous timeline)
+    final allDays = <DateTime>[];
+    var currentDate = firstDate;
+    while (currentDate.isBefore(lastDate.add(const Duration(days: 1)))) {
+      allDays.add(currentDate);
+      currentDate = currentDate.add(const Duration(days: 1));
+    }
+    
+    // Group entries by calendar day
+    final Map<DateTime, List<ExpenseEntry>> entriesByDay = {};
+    for (final entry in sortedEntries) {
+      final dayKey = DateTime(entry.date.year, entry.date.month, entry.date.day);
+      entriesByDay.putIfAbsent(dayKey, () => []).add(entry);
+    }
+    
+    // Create chart data with individual entries stacked for same dates
+    final chartData = <FlSpot>[];
+    final entryToSpotMapping = <ExpenseEntry, FlSpot>{}; // Track which entry corresponds to which spot
+    num runningTotal = 0;
+    
+    for (int dayIndex = 0; dayIndex < allDays.length; dayIndex++) {
+      final day = allDays[dayIndex];
+      final entriesForDay = entriesByDay[day];
+      
+      if (entriesForDay != null) {
+        // Add each entry for this day as a separate point
+        for (int entryIndex = 0; entryIndex < entriesForDay.length; entryIndex++) {
+          final entry = entriesForDay[entryIndex];
+          runningTotal += entry.amount;
+          
+          // Use day index as x-coordinate, add small offset for stacking entries on same day
+          final xPos = dayIndex.toDouble() + (entryIndex * 0.05); // Smaller offset for better visual
+          final spot = FlSpot(xPos, runningTotal.toDouble());
+          chartData.add(spot);
+          entryToSpotMapping[entry] = spot;
+        }
+      }
     }
 
     // Find min/max values for better scaling
@@ -3536,10 +3650,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Nuyen Over Time',
+            '$title Over Time',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.secondary,
+              color: titleColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -3571,8 +3685,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       reservedSize: 32,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index >= 0 && index < sortedEntries.length) {
-                          final date = sortedEntries[index].date;
+                        if (index >= 0 && index < allDays.length) {
+                          final date = allDays[index];
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
@@ -3593,21 +3707,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       showTitles: true,
                       reservedSize: 60,
                       getTitlesWidget: (value, meta) {
-                        // Format large numbers with K suffix
-                        final intValue = value.toInt();
-                        String displayValue;
-                        if (intValue.abs() >= 1000) {
-                          displayValue = '${(intValue / 1000).toStringAsFixed(0)}K';
-                        } else {
-                          displayValue = intValue.toString();
-                        }
-                        return Text(
-                          '¥$displayValue',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontSize: 10,
-                          ),
-                        );
+                        return formatLeftAxisLabel(value);
                       },
                     ),
                   ),
@@ -3622,21 +3722,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ),
                 ),
                 minX: 0,
-                maxX: (chartData.length - 1).toDouble(),
+                maxX: allDays.isEmpty ? 0 : (allDays.length - 1).toDouble() + 0.5, // Account for stacking offset
                 minY: minY - padding,
                 maxY: maxY + padding,
                 lineBarsData: [
                   LineChartBarData(
                     spots: chartData,
-                    isCurved: true,
-                    color: Theme.of(context).colorScheme.secondary,
+                    isCurved: false,
+                    color: primaryColor,
                     barWidth: 3,
                     dotData: FlDotData(
                       show: true,
                       getDotPainter: (spot, percent, barData, index) {
                         return FlDotCirclePainter(
                           radius: 4,
-                          color: Theme.of(context).colorScheme.secondary,
+                          color: primaryColor,
                           strokeWidth: 2,
                           strokeColor: Theme.of(context).colorScheme.surface,
                         );
@@ -3644,7 +3744,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                      color: primaryColor.withOpacity(0.1),
                     ),
                   ),
                 ],
@@ -3653,20 +3753,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
-                        final index = spot.x.toInt();
-                        if (index >= 0 && index < sortedEntries.length) {
-                          final entry = sortedEntries[index];
-                          // Format the amount with commas for readability
-                          final totalFormatted = spot.y.toInt().toString().replaceAllMapped(
-                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]},');
-                          final entryFormatted = entry.amount.toString().replaceAllMapped(
-                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]},');
+                        // Find the entry that corresponds to this spot
+                        final entry = entryToSpotMapping.entries
+                            .where((e) => e.value.x == spot.x && e.value.y == spot.y)
+                            .firstOrNull?.key;
+                        
+                        if (entry != null) {
+                          final date = entry.date;
+                          final runningTotalFormatted = formatTooltipAmount(spot.y);
+                          final entryAmountFormatted = formatAmount(entry.amount);
+                          
+                          // Build tooltip with entry details
+                          String tooltip = '${date.month}/${date.day}/${date.year}\n'
+                              'Running Total: $runningTotalFormatted\n'
+                              'This Entry: ${entry.amount > 0 ? '+' : ''}$entryAmountFormatted\n'
+                              '${entry.reason}';
                           
                           return LineTooltipItem(
-                            '${entry.date.month}/${entry.date.day}/${entry.date.year}\n'
-                            'Total: ¥$totalFormatted\n'
-                            'Entry: ${entry.amount > 0 ? '+' : ''}¥$entryFormatted\n'
-                            '${entry.reason}',
+                            tooltip,
                             TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
@@ -3686,8 +3790,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
+
   void _submitExpenseEntry(BuildContext context, TextEditingController karmaController, 
-      TextEditingController nuyenController, TextEditingController reasonController) {
+      TextEditingController nuyenController, TextEditingController reasonController) async {
     
     final karmaText = karmaController.text.trim();
     final nuyenText = nuyenController.text.trim();
@@ -3715,11 +3820,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
     
     // Parse amounts
-    int? karmaAmount;
-    int? nuyenAmount;
+    num? karmaAmount;
+    num? nuyenAmount;
     
     if (karmaText.isNotEmpty) {
-      karmaAmount = int.tryParse(karmaText);
+      karmaAmount = num.tryParse(karmaText);
       if (karmaAmount == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -3732,7 +3837,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
     
     if (nuyenText.isNotEmpty) {
-      nuyenAmount = int.tryParse(nuyenText);
+      nuyenAmount = num.tryParse(nuyenText);
       if (nuyenAmount == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -3745,17 +3850,119 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
     
     // TODO: Implement actual expense entry creation and XML modification
-    // For now, just show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Entry added: K${karmaAmount ?? 0}, ¥${nuyenAmount ?? 0} - $reason'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    
-    // Clear the form
-    karmaController.clear();
-    nuyenController.clear();
-    reasonController.clear();
+    try {
+      // Add expense entries to the XML service
+      if (karmaAmount != null && karmaAmount != 0) {
+        _xmlService.addExpenseEntry(
+          type: ExpenseType.karma,
+          amount: karmaAmount,
+          reason: reason,
+          date: DateTime.now(),
+        );
+      }
+      
+      if (nuyenAmount != null && nuyenAmount != 0) {
+        _xmlService.addExpenseEntry(
+          type: ExpenseType.nuyen,
+          amount: nuyenAmount,
+          reason: reason,
+          date: DateTime.now(),
+        );
+      }
+
+      // Try to save or export the modified XML
+      await _saveOrExportModifiedXml(context);
+
+      // Update the current character with new expense entries by re-parsing
+      await _refreshCharacterData();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Entry added: K${karmaAmount ?? 0}, ¥${nuyenAmount ?? 0} - $reason'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      
+      // Clear the form
+      karmaController.clear();
+      nuyenController.clear();
+      reasonController.clear();
+      
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding entry: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  /// Save the modified XML or offer export options
+  Future<void> _saveOrExportModifiedXml(BuildContext context) async {
+    try {
+      // Check if we can save directly to the original file
+      if (await _xmlService.canSaveToOriginalFile()) {
+        final success = await _xmlService.saveToOriginalFile();
+        if (success) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Character file updated successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        } else {
+          throw Exception('Failed to save to original file');
+        }
+      } else {
+        // Export for sharing since we can't save directly
+        final filename = '${_currentCharacter?.name ?? 'character'}_modified.xml';
+        final exportPath = await _xmlService.exportModifiedXmlForSharing(filename);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Modified character exported to: $exportPath'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving file: $e'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Refresh character data by re-parsing the modified XML
+  Future<void> _refreshCharacterData() async {
+    try {
+      if (_xmlService.hasLoadedDocument) {
+        final modifiedXml = _xmlService.exportModifiedXml();
+        final updatedCharacter = _xmlService.parseAndCacheCharacterXml(modifiedXml);
+        
+        if (updatedCharacter != null) {
+          setState(() {
+            // Update the character in our list
+            final characterIndex = _characters.indexOf(_currentCharacter!);
+            if (characterIndex != -1) {
+              _characters[characterIndex] = updatedCharacter;
+              _currentCharacter = updatedCharacter;
+            }
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error refreshing character data: $e');
+    }
   }
 }

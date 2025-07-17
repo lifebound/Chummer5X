@@ -56,7 +56,7 @@ class MutableXmlService extends EnhancedChumerXmlService {
   /// Add an expense entry to the cached XML document
   void addExpenseEntry({
     required ExpenseType type,
-    required int amount,
+    required num amount,
     required String reason,
     DateTime? date,
   }) {
@@ -95,10 +95,8 @@ class MutableXmlService extends EnhancedChumerXmlService {
 
     // Add all pending expenses
     for (final expense in _pendingExpenses) {
-      final expenseXml = expense.toXml();
-      final expenseDoc = XmlDocument.parse('<root>$expenseXml</root>');
-      final expenseElement = expenseDoc.findElements('root').first.findElements('expense').first;
-      expensesElement.children.add(expenseElement.copy());
+      final expenseXmlElement = expense.toXml();
+      expensesElement.children.add(expenseXmlElement);
     }
 
     // Clear pending expenses after export

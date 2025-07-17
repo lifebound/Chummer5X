@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:chummer5x/services/mutable_xml_service.dart';
 import 'package:chummer5x/models/expense_entry.dart';
+import 'package:xml/xml.dart';
 
 void main() {
   group('ExpenseEntry', () {
@@ -38,23 +39,35 @@ void main() {
       );
 
       final xml = expense.toXml();
+      final xmlString = xml.toXmlString();
       
-      expect(xml, contains('<expense>'), reason: 'XML should contain opening expense tag');
-      expect(xml, contains('<type>Karma</type>'), reason: 'XML should contain the expense type');
-      expect(xml, contains('<amount>3</amount>'), reason: 'XML should contain the expense amount');
-      expect(xml, contains('<reason>Good roleplay</reason>'), reason: 'XML should contain the expense reason');
-      expect(xml, contains('</expense>'), reason: 'XML should contain closing expense tag');
+      expect(xmlString, contains('<expense>'), reason: 'XML should contain opening expense tag');
+      expect(xmlString, contains('<type>Karma</type>'), reason: 'XML should contain the expense type');
+      expect(xmlString, contains('<amount>3</amount>'), reason: 'XML should contain the expense amount');
+      expect(xmlString, contains('<reason>Good roleplay</reason>'), reason: 'XML should contain the expense reason');
+      expect(xmlString, contains('</expense>'), reason: 'XML should contain closing expense tag');
     });
 
     test('should parse from XML element', () {
-      const xmlString = '''
-        <expense>
-          <type>Nuyen</type>
-          <amount>500</amount>
-          <reason>Equipment sale</reason>
-          <date>2024-01-15</date>
-        </expense>
-      ''';
+      // const xmlString = '''
+      //   <expense>
+      //     <type>Nuyen</type>
+      //     <amount>500</amount>
+      //     <reason>Equipment sale</reason>
+      //     <date>2024-01-15</date>
+      //   </expense>
+      // ''';
+
+      XmlElement xmlString = XmlElement(
+        XmlName('expense'),
+        [],
+        [
+          XmlElement(XmlName('type'), [], [XmlText('Nuyen')]),
+          XmlElement(XmlName('amount'), [], [XmlText('500')]),
+          XmlElement(XmlName('reason'), [], [XmlText('Equipment sale')]),
+          XmlElement(XmlName('date'), [], [XmlText('2024-01-15')]),
+        ],
+      );
 
       final expense = ExpenseEntry.fromXml(xmlString);
 

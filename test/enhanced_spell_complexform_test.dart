@@ -95,7 +95,7 @@ void main() {
           </character>'''
         ;
         final xmlElement = XmlDocument.parse(xmlData).rootElement;
-        final spell = EnhancedChumerXmlService.parseSpells(xmlElement).first;
+        final spell = EnhancedChummerXmlService.parseSpells(xmlElement).first;
 
         expect(spell.name, equals('Increase Reflexes'));
         expect(spell.range, equals('T'));
@@ -354,7 +354,7 @@ void main() {
         </character>''';
 
         final xmlElement = XmlDocument.parse(xmlData).rootElement;
-        final powers = EnhancedChumerXmlService.parseAdeptPowers(xmlElement);
+        final powers = EnhancedChummerXmlService.parseAdeptPowers(xmlElement);
         final cloak = powers.firstWhere((p) => p.name == 'Cloak');
         expect(cloak.name, equals('Cloak'));
         expect(cloak.rating, equals('2'));

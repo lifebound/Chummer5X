@@ -31,7 +31,7 @@ void main() {
   </attributes>
 </character>''';
 
-      final character = EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+      final character = EnhancedChummerXmlService.parseCharacterXml(xmlContent);
       
       expect(character?.name, equals('Test Character'));
       expect(character?.attributes.length, equals(3)); // Should include Body, Agility, and Essence default attributes
@@ -71,7 +71,7 @@ void main() {
   </attributes>
 </character>''';
 
-      final character = EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+      final character = EnhancedChummerXmlService.parseCharacterXml(xmlContent);
       
       expect(character?.name, equals('Minimal Character'));
       expect(character?.attributes.length, equals(2)); // Should still have Body and Essence default attributes

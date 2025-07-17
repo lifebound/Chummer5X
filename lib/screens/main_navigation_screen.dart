@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:chummer5x/services/enhanced_chumer_xml_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -407,14 +410,57 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void _loadCharacterFile() async {
     try {
       
-      final result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result;
+    
+      result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['xml', 'chum5'],
-        withData: true,
+        allowedExtensions: ['chum5', 'xml'],
+        allowMultiple: false,
+        withData: true
       );
 
       if (result != null && result.files.single.bytes != null) {
-        final Uint8List bytes = result.files.single.bytes!;
+      // On web, filePath might be null or a temporary blob URL.
+      // We primarily care about the bytes and fileName here.
+      // final filePath = result.files.single.path; // Keep this if you need path for non-web, but be aware it's null on web
+      final fileName = result.files.single.name;
+      final Uint8List bytes = result.files.single.bytes!;
+
+      // --- Platform-specific extension validation ---
+      // This part now correctly uses kIsWeb
+      if (!kIsWeb) { // Only run this block if NOT on web
+        // For mobile and desktop, we can validate the extension based on fileName
+        final extension = fileName.toLowerCase().split('.').last;
+        if (extension != 'chum5' && extension != 'xml') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select a .chum5 or .xml file.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+      }
+      // On web, the `allowedExtensions` in `pickFiles` already handles this client-side
+      // to a good extent. If you need stricter server-side validation, you'd do it
+      // after the file is processed. If you need a fallback client-side validation
+      // for web beyond what `allowedExtensions` provides, you can do:
+      else { // This is for kIsWeb == true
+         final extension = fileName.toLowerCase().split('.').last;
+         if (extension != 'chum5' && extension != 'xml') {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select a .chum5 or .xml file.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+      }
         
         final String xmlContent = utf8.decode(bytes);
         String cleanXmlContent = xmlContent;
@@ -3931,7 +3977,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }
       } else {
         // Export for sharing since we can't save directly
-        final filename = '${_currentCharacter?.name ?? 'character'}_modified.xml';
+        final filename = '${_currentCharacter?.name ?? 'character'}_modified.chum5';
         final exportPath = await _xmlService.exportModifiedXmlForSharing(filename);
         if (mounted) {
           if (exportPath != null) {
@@ -3968,8 +4014,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     try {
       if (_xmlService.hasLoadedDocument) {
         final modifiedXml = _xmlService.exportModifiedXml();
-        final updatedCharacter = _xmlService.parseAndCacheCharacterXml(modifiedXml);
-        
+        final updatedCharacter = EnhancedChummerXmlService.parseCharacterXml(modifiedXml);
+
         if (updatedCharacter != null) {
           setState(() {
             // Update the character in our list

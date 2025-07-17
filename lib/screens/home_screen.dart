@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final filePath = await FileService.pickChumerFile();
       if (filePath != null) {
-        final character = await EnhancedChumerXmlService.parseCharacterFile(filePath);
+        final character = await EnhancedChummerXmlService.parseCharacterFile(filePath);
         if (character != null) {
           setState(() {
             _currentCharacter = character;

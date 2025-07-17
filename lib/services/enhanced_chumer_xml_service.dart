@@ -23,7 +23,7 @@ import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
 
 
-class EnhancedChumerXmlService {
+class EnhancedChummerXmlService {
   /// Parse a Chummer XML file and return a comprehensive ShadowrunCharacter
   static Future<ShadowrunCharacter?> parseCharacterFile(String filePath) async {
     try {

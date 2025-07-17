@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart';
@@ -6,7 +7,7 @@ import 'enhanced_chumer_xml_service.dart';
 import '../utils/platform_file_handler.dart';
 import 'package:chummer5x/models/expense_entry.dart';
 
-class MutableXmlService extends EnhancedChumerXmlService {
+class MutableXmlService extends EnhancedChummerXmlService {
   XmlDocument? _cachedDocument;
   String? _originalFilePath;
   final List<ExpenseEntry> _pendingExpenses = [];
@@ -22,14 +23,26 @@ class MutableXmlService extends EnhancedChumerXmlService {
       if (!await file.exists()) {
         throw Exception('File not found: $filePath');
       }
-
-      final xmlContent = await file.readAsString();
+      final fileContent = await file.readAsBytes();
+      final bytes = fileContent;
+      if (bytes.isEmpty) {
+        throw Exception('File is empty: $filePath');
+      }
+      final String xmlContent = utf8.decode(bytes);
+        String cleanXmlContent = xmlContent;
+        if (cleanXmlContent.startsWith('\uFEFF')) {
+          cleanXmlContent = cleanXmlContent.substring(1);
+          debugPrint('Explicit BOM \\uFEFF stripped after UTF-8 decode.');
+        } else {
+          debugPrint('No \\uFEFF BOM found at the beginning of content after UTF-8 decode.');
+        }
+      
       _cachedDocument = XmlDocument.parse(xmlContent);
       _originalFilePath = filePath;
       _pendingExpenses.clear();
 
       // Parse character normally
-      return EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+      return EnhancedChummerXmlService.parseCharacterXml(xmlContent);
     } catch (e) {
       debugPrint('Error parsing and caching character file: $e');
       _cachedDocument = null;
@@ -45,7 +58,7 @@ class MutableXmlService extends EnhancedChumerXmlService {
       _originalFilePath = null; // No file path for direct XML content
       _pendingExpenses.clear();
 
-      return EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+      return EnhancedChummerXmlService.parseCharacterXml(xmlContent);
     } catch (e) {
       debugPrint('Error parsing and caching XML content: $e');
       _cachedDocument = null;
@@ -86,7 +99,9 @@ class MutableXmlService extends EnhancedChumerXmlService {
     // Find or create the expenses element
     final characterElement = clonedDoc.findElements('character').first;
     XmlElement? expensesElement = characterElement.findElements('expenses').firstOrNull;
-    
+
+    debugPrint(expensesElement == null ? 'No expenses element found, creating new one.' : 'Expenses element found with ${expensesElement.children.length} entries, adding new ones.');
+
     if (expensesElement == null) {
       // Create expenses element if it doesn't exist
       expensesElement = XmlElement(XmlName('expenses'));
@@ -101,6 +116,10 @@ class MutableXmlService extends EnhancedChumerXmlService {
 
     // Clear pending expenses after export
     _pendingExpenses.clear();
+
+
+    final expenseCount = clonedDoc.findAllElements('expense').length;
+    debugPrint('Exporting modified XML with ${expensesElement.children.length} expense entries. cloned doc has a number of expense entries: $expenseCount');
 
     return clonedDoc.toXmlString(pretty: true);
   }
@@ -125,6 +144,7 @@ class MutableXmlService extends EnhancedChumerXmlService {
   /// Export modified XML using platform-appropriate method
   Future<String?> exportModifiedXmlForSharing(String filename) async {
     final modifiedXml = exportModifiedXml();
+    _cachedDocument = XmlDocument.parse(modifiedXml); // Ensure cached document is updated
     final fileHandler = PlatformFileHandler.create();
     return await fileHandler.exportXmlForSharing(modifiedXml, filename);
   }

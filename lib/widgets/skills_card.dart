@@ -6,10 +6,11 @@ import 'package:chummer5x/utils/skill_group_map.dart';
 import 'package:chummer5x/utils/responsive_layout.dart';
 
 enum SkillOrganization {
-  alphabetical('Alphabetical'),
-  byAttribute('By Attribute'),
-  byCategory('By Category'),
-  bySkillGroup('By Skill Group');
+  none('No Grouping'),
+  alphabetical('Group Alphabetical'),
+  byAttribute('Group By Attribute'),
+  byCategory('Group By Category'),
+  bySkillGroup('Group By Skill Group');
 
   const SkillOrganization(this.displayName);
   final String displayName;
@@ -24,6 +25,16 @@ enum SkillFilter {
   final String displayName;
 }
 
+enum SkillSort {
+  name('Sort by Name'),
+  attribute('Sort by Attribute'),
+  baseSkill('Sort by Base Skill'),
+  totalSkill('Sort by Total Rating');
+
+  const SkillSort(this.displayName);
+  final String displayName;
+}
+
 class SkillsCard extends StatefulWidget {
   final ShadowrunCharacter character;
 
@@ -34,8 +45,10 @@ class SkillsCard extends StatefulWidget {
 }
 
 class _SkillsCardState extends State<SkillsCard> {
-  SkillOrganization _organization = SkillOrganization.alphabetical;
+  SkillOrganization _organization = SkillOrganization.none;
   SkillFilter _filter = SkillFilter.showAll;
+  SkillSort _sort = SkillSort.name;
+  bool _sortReversed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +82,10 @@ class _SkillsCardState extends State<SkillsCard> {
       );
     }
 
-    // Apply filters and organization
+    // Apply filters, sorting, and organization
     final filteredSkills = _filterSkills(skills);
-    final skillGroups = _organizeSkills(filteredSkills);
+    final sortedSkills = _sortSkills(filteredSkills);
+    final skillGroups = _organizeSkills(sortedSkills);
     
     return Card(
       child: Padding(
@@ -97,7 +111,8 @@ class _SkillsCardState extends State<SkillsCard> {
         return skills.where((skill) {
           final baseRating = int.tryParse(skill.base ?? '0') ?? 0;
           final karmaRating = int.tryParse(skill.karma ?? '0') ?? 0;
-          final skillRating = baseRating + karmaRating + skill.skillGroupTotal;
+          final priorityBonus = skill.isPrioritySkill ? 2 : 0;
+          final skillRating = baseRating + karmaRating + skill.skillGroupTotal + priorityBonus;
           return skillRating > 0;
         }).toList();
       
@@ -114,9 +129,78 @@ class _SkillsCardState extends State<SkillsCard> {
         }).toList();
       
       case SkillFilter.showAll:
-      default:
         return skills;
     }
+  }
+
+  List<Skill> _sortSkills(List<Skill> skills) {
+    final sortedList = List<Skill>.from(skills);
+    
+    switch (_sort) {
+      case SkillSort.name:
+        sortedList.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      
+      case SkillSort.attribute:
+        sortedList.sort((a, b) {
+          final attrA = getSkillAttribute(a.name) ?? '';
+          final attrB = getSkillAttribute(b.name) ?? '';
+          final result = attrA.compareTo(attrB);
+          // Secondary sort by name if attributes are the same
+          return result != 0 ? result : a.name.compareTo(b.name);
+        });
+        break;
+      
+      case SkillSort.baseSkill:
+        sortedList.sort((a, b) {
+          final baseA = int.tryParse(a.base ?? '0') ?? 0;
+          final baseB = int.tryParse(b.base ?? '0') ?? 0;
+          final karmaA = int.tryParse(a.karma ?? '0') ?? 0;
+          final karmaB = int.tryParse(b.karma ?? '0') ?? 0;
+          final skillRatingA = baseA + karmaA + a.skillGroupTotal;
+          final skillRatingB = baseB + karmaB + b.skillGroupTotal;
+          final result = skillRatingA.compareTo(skillRatingB);
+          // Secondary sort by name if ratings are the same
+          return result != 0 ? result : a.name.compareTo(b.name);
+        });
+        break;
+      
+      case SkillSort.totalSkill:
+        sortedList.sort((a, b) {
+          final baseA = int.tryParse(a.base ?? '0') ?? 0;
+          final baseB = int.tryParse(b.base ?? '0') ?? 0;
+          final karmaA = int.tryParse(a.karma ?? '0') ?? 0;
+          final karmaB = int.tryParse(b.karma ?? '0') ?? 0;
+          final skillRatingA = baseA + karmaA + a.skillGroupTotal;
+          final skillRatingB = baseB + karmaB + b.skillGroupTotal;
+          
+          final totalA = calculateTotalSkillRating(
+            a.name, 
+            skillRatingA, 
+            widget.character.attributes, 
+            isPrioritySkill: a.isPrioritySkill,
+            conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
+          );
+          final totalB = calculateTotalSkillRating(
+            b.name, 
+            skillRatingB, 
+            widget.character.attributes, 
+            isPrioritySkill: b.isPrioritySkill,
+            conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
+          );
+          
+          final result = totalA.compareTo(totalB);
+          // Secondary sort by name if totals are the same
+          return result != 0 ? result : a.name.compareTo(b.name);
+        });
+        break;
+    }
+    
+    if (_sortReversed) {
+      return sortedList.reversed.toList();
+    }
+    
+    return sortedList;
   }
 
   Map<String, List<Skill>> _organizeSkills(List<Skill> skills) {
@@ -125,6 +209,10 @@ class _SkillsCardState extends State<SkillsCard> {
     for (final skill in skills) {
       String key;
       switch (_organization) {
+        case SkillOrganization.none:
+          key = 'Skills'; // Single group for all skills
+          break;
+          
         case SkillOrganization.byAttribute:
           final attributeName = getSkillAttribute(skill.name);
           key = attributeName ?? 'Unknown Attribute';
@@ -137,20 +225,18 @@ class _SkillsCardState extends State<SkillsCard> {
         case SkillOrganization.bySkillGroup:
           key = skill.skillGroupName.isNotEmpty ? skill.skillGroupName : 'No Skill Group';
           break;
-        
+          
         case SkillOrganization.alphabetical:
-        default:
-          key = 'A'; // All skills under alphabetical go here for now
+          // Group by first letter of skill name
+          key = skill.name.isNotEmpty ? skill.name[0].toUpperCase() : 'Other';
           break;
       }
       
       groups.putIfAbsent(key, () => []).add(skill);
     }
     
-    // Sort each group by skill name
-    for (final group in groups.values) {
-      group.sort((a, b) => a.name.compareTo(b.name));
-    }
+    // Don't re-sort each group since we already sorted the entire list
+    // The organization maintains the overall sort order
     
     return groups;
   }
@@ -165,6 +251,96 @@ class _SkillsCardState extends State<SkillsCard> {
   }
 
   Widget _buildFilterControls(BuildContext context) {
+    final screenSize = ResponsiveLayout.getScreenSize(context);
+    
+    if (screenSize == ScreenSize.phone) {
+      // Vertical layout for phone
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButton<SkillOrganization>(
+                  value: _organization,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _organization = value;
+                      });
+                    }
+                  },
+                  items: SkillOrganization.values.map((org) {
+                    return DropdownMenuItem<SkillOrganization>(
+                      value: org,
+                      child: Text(org.displayName),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: DropdownButton<SkillFilter>(
+                  value: _filter,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _filter = value;
+                      });
+                    }
+                  },
+                  items: SkillFilter.values.map((filter) {
+                    return DropdownMenuItem<SkillFilter>(
+                      value: filter,
+                      child: Text(filter.displayName),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButton<SkillSort>(
+                  value: _sort,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _sort = value;
+                      });
+                    }
+                  },
+                  items: SkillSort.values.map((sort) {
+                    return DropdownMenuItem<SkillSort>(
+                      value: sort,
+                      child: Text(sort.displayName),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _sortReversed = !_sortReversed;
+                  });
+                },
+                icon: Icon(
+                  _sortReversed ? Icons.arrow_upward : Icons.arrow_downward,
+                  color: _sortReversed 
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                tooltip: _sortReversed ? 'Sort Descending' : 'Sort Ascending',
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+    
+    // Horizontal layout for larger screens
     return Row(
       children: [
         Expanded(
@@ -203,6 +379,40 @@ class _SkillsCardState extends State<SkillsCard> {
               );
             }).toList(),
           ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: DropdownButton<SkillSort>(
+            value: _sort,
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _sort = value;
+                });
+              }
+            },
+            items: SkillSort.values.map((sort) {
+              return DropdownMenuItem<SkillSort>(
+                value: sort,
+                child: Text(sort.displayName),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _sortReversed = !_sortReversed;
+            });
+          },
+          icon: Icon(
+            _sortReversed ? Icons.arrow_upward : Icons.arrow_downward,
+            color: _sortReversed 
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          tooltip: _sortReversed ? 'Sort Descending' : 'Sort Ascending',
         ),
       ],
     );
@@ -434,7 +644,7 @@ class _SkillsCardState extends State<SkillsCard> {
       
       parts.add('${attributeValue.round() - 1}'); // Attribute - 1
       if (skill.isPrioritySkill) {
-        parts.add('+2'); // Priority bonus
+        parts.add('2'); // Priority bonus
       }
       
       return Text(
@@ -447,17 +657,19 @@ class _SkillsCardState extends State<SkillsCard> {
     
     // Normal skill calculation (skill + attribute + priority)
     final parts = <String>[];
-    parts.add('$skillRating'); // Skill points      // Add attribute bonus
-      final attributeValue = widget.character.attributes
-          .where((attr) => attr.name.toUpperCase() == attributeName)
-          .firstOrNull?.totalValue ?? 0;
+    parts.add('$skillRating'); // Skill points
+    
+    // Add attribute bonus
+    final attributeValue = widget.character.attributes
+        .where((attr) => attr.name.toUpperCase() == attributeName)
+        .firstOrNull?.totalValue ?? 0;
     if (attributeValue > 0) {
       parts.add('${attributeValue.round()}');
     }
     
     // Add priority bonus if applicable
     if (skill.isPrioritySkill) {
-      parts.add('+2');
+      parts.add('2');
     }
     
     return Text(

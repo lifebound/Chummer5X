@@ -1,5 +1,4 @@
 import 'package:chummer5x/models/critter_base.dart';
-import 'dart:math';
 
 class Sprite extends Critter {
   Sprite({

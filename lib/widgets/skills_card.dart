@@ -509,12 +509,12 @@ class _SkillsCardState extends State<SkillsCard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: skill.isPrioritySkill 
-            ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
-            : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+            : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: skill.isPrioritySkill ? 2 : 1,
         ),
       ),
@@ -731,7 +731,7 @@ class _SkillsCardState extends State<SkillsCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(

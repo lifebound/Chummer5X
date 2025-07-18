@@ -1,6 +1,5 @@
 // Supporting classes for the enhanced model
 import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:math';
 import 'package:chummer5x/models/attributes.dart';
 import 'package:chummer5x/models/qualities.dart';

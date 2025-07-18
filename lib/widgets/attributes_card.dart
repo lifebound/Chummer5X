@@ -111,7 +111,7 @@ class AttributesCard extends StatelessWidget {
           onTap: () => _showAttributeDetails(context, attribute),
           child: Container(
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               border: Border.all(color: color, width: 2),
               borderRadius: BorderRadius.circular(12),
             ),

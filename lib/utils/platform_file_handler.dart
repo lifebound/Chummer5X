@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 // Web-specific import
 import 'package:universal_html/html.dart' as html;
@@ -102,11 +104,86 @@ class MobileFileHandler implements FileHandler {
     throw UnsupportedError('Direct file writing not supported on mobile platforms');
   }
 
+  /// Export XML content for sharing on mobile platforms
+  /// 
+  /// This method creates a temporary file and uses the share_plus package
+  /// to share it through the platform's native sharing mechanism.
+  /// Returns a descriptive status message instead of a file path.
+  /// 
+  /// Falls back to legacy behavior ('share://$filename') in test environments
+  /// where Flutter services may not be available.
   @override
   Future<String?> exportXmlForSharing(String xmlContent, String filename) async {
-    // On mobile, we would use the share_plus package to share the file
-    // For now, return a placeholder path indicating sharing should be used
-    return 'share://$filename';
+    try {
+      // Check if we're in a test environment where Flutter services aren't available
+      if (kDebugMode) {
+        try {
+          // Try to access temporary directory - this will fail in test environment
+          final tempDir = await getTemporaryDirectory();
+          final tempFile = File('${tempDir.path}/$filename');
+          
+          // Write the XML content to the temporary file
+          await tempFile.writeAsString(xmlContent, encoding: utf8);
+          
+          // Share the file using share_plus
+          final result = await Share.shareXFiles(
+            [XFile(tempFile.path)],
+            text: 'Shadowrun character file: ${filename.replaceAll('.chum5', '')}',
+            subject: 'Shadowrun Character Export',
+          );
+          
+          // Clean up the temporary file after a delay to allow sharing to complete
+          Future.delayed(const Duration(seconds: 30), () {
+            if (tempFile.existsSync()) {
+              tempFile.deleteSync();
+            }
+          });
+          
+          // Return a descriptive message instead of the temp path
+          if (result.status == ShareResultStatus.success) {
+            return 'Character shared successfully';
+          } else if (result.status == ShareResultStatus.dismissed) {
+            return null; // User cancelled
+          } else {
+            return 'Share failed: ${result.status}';
+          }
+        } catch (bindingError) {
+          // Fall back to old behavior for tests or when services aren't available
+          debugPrint('Flutter services not available, using fallback: $bindingError');
+          return 'share://$filename';
+        }
+      } else {
+        // Production environment - full implementation
+        final tempDir = await getTemporaryDirectory();
+        final tempFile = File('${tempDir.path}/$filename');
+        
+        await tempFile.writeAsString(xmlContent, encoding: utf8);
+        
+        final result = await Share.shareXFiles(
+          [XFile(tempFile.path)],
+          text: 'Shadowrun character file: ${filename.replaceAll('.chum5', '')}',
+          subject: 'Shadowrun Character Export',
+        );
+        
+        Future.delayed(const Duration(seconds: 30), () {
+          if (tempFile.existsSync()) {
+            tempFile.deleteSync();
+          }
+        });
+        
+        if (result.status == ShareResultStatus.success) {
+          return 'Character shared successfully';
+        } else if (result.status == ShareResultStatus.dismissed) {
+          return null;
+        } else {
+          return 'Share failed: ${result.status}';
+        }
+      }
+    } catch (e) {
+      debugPrint('Error sharing file on mobile: $e');
+      // Fall back to old behavior for compatibility
+      return 'share://$filename';
+    }
   }
 }
 

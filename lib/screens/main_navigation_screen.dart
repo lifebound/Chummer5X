@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:chummer5x/services/enhanced_chumer_xml_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -53,7 +51,7 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  List<ShadowrunCharacter> _characters = [];
+  final List<ShadowrunCharacter> _characters = [];
   ShadowrunCharacter? _currentCharacter;
   NavigationSection _currentSection = NavigationSection.overview;
   
@@ -137,7 +135,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         color: Theme.of(context)
                             .colorScheme
                             .onPrimary
-                            .withOpacity(0.8),
+                            .withValues(alpha: 0.8),
                         fontSize: 14,
                         fontStyle: FontStyle.italic,
                       ),
@@ -163,7 +161,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       color: Theme.of(context)
                           .colorScheme
                           .onPrimary
-                          .withOpacity(0.8),
+                          .withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -526,7 +524,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       selected: isSelected,
       selectedTileColor:
-          Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+          Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
       onTap: () {
         setState(() {
           _currentSection = section;
@@ -634,7 +632,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   else
                     ...positiveQualities
                         .map((quality) => _buildQualityCard(context, quality))
-                        .toList(),
+                        ,
                 ],
               ),
             ),
@@ -670,7 +668,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   else
                     ...negativeQualities
                         .map((quality) => _buildQualityCard(context, quality))
-                        .toList(),
+                        ,
                 ],
               ),
             ),
@@ -726,7 +724,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
               )
             else
-              ...items.map((e) => itemBuilder(context, e)).toList(),
+              ...items.map((e) => itemBuilder(context, e)),
           ],
         ),
       ),
@@ -787,10 +785,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -907,7 +905,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -944,7 +942,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -981,7 +979,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -1029,10 +1027,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1051,7 +1049,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: categoryColor.withOpacity(0.2),
+                  color: categoryColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -1093,7 +1091,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -1274,7 +1272,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           else
             ...sortedGrades
                 .map((grade) => _buildInitiationGradeItem(context, grade))
-                .toList(),
+                ,
         ],
       ),
     );
@@ -1325,7 +1323,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           else
             ...sortedGrades
                 .map((grade) => _buildSubmersionGradeItem(context, grade))
-                .toList(),
+                ,
         ],
       ),
     );
@@ -1337,10 +1335,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1372,7 +1370,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: _buildMetamagicItem(context, metamagic),
                     ))
-                .toList(),
+                ,
           ],
         ],
       ),
@@ -1386,10 +1384,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1420,7 +1418,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: _buildMetamagicItem(context, metamagic),
                     ))
-                .toList(),
+                ,
           ],
         ],
       ),
@@ -1432,9 +1430,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         label,
@@ -1452,10 +1450,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -1482,7 +1480,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .onPrimaryContainer
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
             ),
           ],
@@ -1583,14 +1581,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isNearDeath
               ? Colors.red.shade800
               : isInOverflow
                   ? Colors.red.shade600
-                  : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: isNearDeath ? 2 : 1,
         ),
       ),
@@ -1611,7 +1609,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(status).withOpacity(0.2),
+                  color: _getStatusColor(status).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -1703,7 +1701,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         : Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1726,7 +1724,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         : Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                   ),
                 ),
               ],
@@ -1903,7 +1901,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             else
               ...critters
                   .map((critter) => itemBuilder(context, critter))
-                  .toList(),
+                  ,
           ],
         ),
       ),
@@ -1952,10 +1950,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1981,7 +1979,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               fontStyle: FontStyle.italic,
                               fontSize: 12,
-                              color: typeColor.withOpacity(0.3),
+                              color: typeColor.withValues(alpha: 0.3),
                             ),
                       ),
                   ],
@@ -1990,7 +1988,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: typeColor.withOpacity(0.2),
+                  color: typeColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -2078,7 +2076,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 color: Theme.of(context)
                     .colorScheme
                     .primaryContainer
-                    .withOpacity(0.3),
+                    .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
@@ -2306,7 +2304,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -2340,10 +2338,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -2375,7 +2373,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
         color:
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -2411,13 +2409,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isDefaulting
-            ? Theme.of(context).colorScheme.errorContainer.withOpacity(0.3)
-            : Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.7),
+            ? Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3)
+            : Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isDefaulting
-              ? Theme.of(context).colorScheme.error.withOpacity(0.5)
-              : Theme.of(context).colorScheme.tertiary.withOpacity(0.5),
+              ? Theme.of(context).colorScheme.error.withValues(alpha: 0.5)
+              : Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
@@ -2438,8 +2436,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
             decoration: BoxDecoration(
               color: isDefaulting
-                  ? Theme.of(context).colorScheme.error.withOpacity(0.2)
-                  : Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
+                  ? Theme.of(context).colorScheme.error.withValues(alpha: 0.2)
+                  : Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(
@@ -2563,7 +2561,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               color: Theme.of(context)
                   .colorScheme
                   .onSurfaceVariant
-                  .withOpacity(0.5),
+                  .withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -2579,7 +2577,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurfaceVariant
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
               textAlign: TextAlign.center,
             ),
@@ -2638,11 +2636,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.05),
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -2675,7 +2673,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               color: Theme.of(context)
                   .colorScheme
                   .onSurfaceVariant
-                  .withOpacity(0.5),
+                  .withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -2691,7 +2689,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurfaceVariant
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
               textAlign: TextAlign.center,
             ),
@@ -2794,7 +2792,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSecondaryContainer
-                                  .withOpacity(0.7),
+                                  .withValues(alpha: 0.7),
                             ),
                       ),
                     ],
@@ -2808,7 +2806,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 const SizedBox(height: 24),
               ],
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -2825,11 +2823,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -2884,7 +2882,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurfaceVariant
-                        .withOpacity(0.6),
+                        .withValues(alpha: 0.6),
                     fontStyle: FontStyle.italic,
                   ),
             ),
@@ -2975,10 +2973,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -3124,14 +3122,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
-
+  
   Widget _buildKarmaLedgerSection(BuildContext context, List<ExpenseEntry> karmaEntries) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -3141,7 +3139,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -3250,7 +3248,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -3260,7 +3258,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -3375,7 +3373,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Icon(
               Icons.psychology_outlined,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
@@ -3388,7 +3386,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               'Add your first karma entry above',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -3402,7 +3400,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
@@ -3441,7 +3439,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Icon(
               Icons.attach_money_outlined,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
@@ -3454,7 +3452,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               'Add your first nuyen entry above',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -3468,7 +3466,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
@@ -3513,7 +3511,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       decoration: BoxDecoration(
         color: index.isEven 
             ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -3542,7 +3540,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       decoration: BoxDecoration(
         color: index.isEven 
             ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -3628,7 +3626,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Icon(
               Icons.show_chart,
               size: 64,
-              color: primaryColor.withOpacity(0.5),
+              color: primaryColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -3641,7 +3639,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               'Add ${title.toLowerCase()} entries to see the chart',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -3724,13 +3722,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   horizontalInterval: (maxY - minY) / 5,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                       strokeWidth: 1,
                     );
                   },
                   getDrawingVerticalLine: (value) {
                     return FlLine(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                       strokeWidth: 1,
                     );
                   },
@@ -3774,7 +3772,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 borderData: FlBorderData(
                   show: true,
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -3801,7 +3799,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -3940,6 +3938,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       
     } catch (e) {
       // Show error message
+      if(!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding entry: $e'),
@@ -3970,13 +3969,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       } else {
         // Export for sharing since we can't save directly
         final filename = '${_currentCharacter?.name ?? 'character'}_modified.chum5';
-        final exportPath = await _xmlService.exportModifiedXmlForSharing(filename);
+        final exportResult = await _xmlService.exportModifiedXmlForSharing(filename);
         if (mounted) {
-          if (exportPath != null) {
+          if (exportResult != null) {
+            // Check if this is a file path or a status message
+            final isFilePath = exportResult.contains('/') || exportResult.contains('\\');
+            final message = isFilePath 
+              ? 'Modified character exported to: $exportResult'
+              : exportResult;
+            
+            final backgroundColor = exportResult.toLowerCase().contains('error') 
+              ? Colors.red 
+              : Colors.blue;
+              
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Modified character exported to: $exportPath'),
-                backgroundColor: Colors.blue,
+                content: Text(message),
+                backgroundColor: backgroundColor,
               ),
             );
           } else {

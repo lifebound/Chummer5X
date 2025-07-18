@@ -749,7 +749,7 @@ class EnhancedChummerXmlService {
           continue;
         }
         final name = _getElementText(enchantmentElement, 'name');
-        final descriptor = _getElementText(enchantmentElement, 'descriptors') ?? '';
+        //final descriptor = _getElementText(enchantmentElement, 'descriptors') ?? '';
         final trueName = '$category: $name';
         final source = _getElementText(enchantmentElement, 'source') ?? '';
         final page = _getElementText(enchantmentElement, 'page') ?? '';
@@ -870,7 +870,7 @@ class EnhancedChummerXmlService {
     return entries;
   }
 
-  /// Parse mugshot from XML - extracts first mugshot from <mugshots> element
+  /// Parse mugshot from XML - extracts first mugshot from \<mugshots\> element
   static Mugshot? _parseMugshot(XmlElement characterElement) {
     try {
       final mugshotsElement = characterElement.findElements('mugshots').firstOrNull;

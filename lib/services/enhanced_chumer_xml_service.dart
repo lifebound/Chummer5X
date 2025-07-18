@@ -21,6 +21,7 @@ import 'package:chummer5x/models/skills.dart';
 import 'package:chummer5x/models/qualities.dart';
 import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/models/mugshot.dart';
 
 
 class EnhancedChummerXmlService {
@@ -47,7 +48,15 @@ class EnhancedChummerXmlService {
       final characterElement = document.findAllElements('character').first;
       
       // Basic character information
-      final name = _getElementText(characterElement, 'alias') ?? _getElementText(characterElement, 'name');
+      //name is usually name, but if its null or empty, use alias
+
+      String name = _getElementText(characterElement, 'name') ?? _getElementText(characterElement, 'alias') ?? 'Unknown';
+      if(name.isEmpty) {
+        name = _getElementText(characterElement, 'alias') ?? 'Unknown';
+      }
+
+
+      final alias = _getElementText(characterElement, 'alias') ?? name;
       final metatype = _getElementText(characterElement, 'metatype');
       final ethnicity = _getElementText(characterElement, 'ethnicity');
       final age = _getElementText(characterElement, 'age');
@@ -116,9 +125,12 @@ class EnhancedChummerXmlService {
       final karmaExpenseEntries = allExpenseEntries.where((entry) => entry.type == ExpenseType.karma).toList();
       final nuyenExpenseEntries = allExpenseEntries.where((entry) => entry.type == ExpenseType.nuyen).toList();
       
+      // Parse mugshot
+      final mugshot = _parseMugshot(characterElement);
+      
       return ShadowrunCharacter(
         name: name,
-        alias: name, // In Chummer, alias is often the main name
+        alias: alias, // In Chummer, alias is often the main name
         metatype: metatype,
         ethnicity: ethnicity,
         age: age,
@@ -154,6 +166,7 @@ class EnhancedChummerXmlService {
         submersionGrades: submersionGrades,
         karmaExpenseEntries: karmaExpenseEntries,
         nuyenExpenseEntries: nuyenExpenseEntries,
+        mugshot: mugshot,
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');
@@ -855,5 +868,34 @@ class EnhancedChummerXmlService {
       }
     }
     return entries;
+  }
+
+  /// Parse mugshot from XML - extracts first mugshot from <mugshots> element
+  static Mugshot? _parseMugshot(XmlElement characterElement) {
+    try {
+      final mugshotsElement = characterElement.findElements('mugshots').firstOrNull;
+      if (mugshotsElement == null) {
+        return null;
+      }
+
+      final mugshotElements = mugshotsElement.findElements('mugshot');
+      if (mugshotElements.isEmpty) {
+        return null;
+      }
+
+      // Get the first mugshot element
+      final firstMugshot = mugshotElements.first;
+      final base64Data = firstMugshot.innerText.trim();
+      
+      if (base64Data.isEmpty) {
+        return null;
+      }
+
+      // Create mugshot from base64 data - format detection happens automatically
+      return Mugshot.fromBase64(base64Data);
+    } catch (e) {
+      debugPrint('Error parsing mugshot: $e');
+      return null;
+    }
   }
 }

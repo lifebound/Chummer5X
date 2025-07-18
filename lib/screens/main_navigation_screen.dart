@@ -26,7 +26,6 @@ import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
-import 'dart:typed_data';
 
 enum NavigationSection {
   overview,
@@ -69,7 +68,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentCharacter?.name ?? 'Chummer5X'),
+        title: Text(_currentCharacter?.alias ?? 'Chummer5X'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       drawer: _buildNavigationDrawer(context),
@@ -116,19 +115,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (_currentCharacter != null) ...[
-                  CircleAvatar(
+                  _buildCharacterAvatar(
+                    character: _currentCharacter,
                     radius: 30,
                     backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                    child: Text(
-                      (_currentCharacter!.name?.isNotEmpty == true)
-                          ? _currentCharacter!.name![0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
+                    foregroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -334,12 +325,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
             // Character list
             ..._characters.map((character) => ListTile(
-                  leading: CircleAvatar(
-                    child: Text(
-                      (character.name?.isNotEmpty == true)
-                          ? character.name![0].toUpperCase()
-                          : '?',
-                    ),
+                  leading: _buildCharacterAvatar(
+                    character: character,
+                    radius: 20,
                   ),
                   title: Text(character.name ?? 'Unknown'),
                   subtitle: character.alias?.isNotEmpty == true
@@ -426,7 +414,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     
       result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['chum5', 'xml'],
+        allowedExtensions: ['bin','chum5', 'xml'],
         allowMultiple: false,
         withData: true
       );
@@ -4034,5 +4022,40 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     } catch (e) {
       debugPrint('Error refreshing character data: $e');
     }
+  }
+
+  /// Build character avatar with mugshot support and fallback to letter avatar
+  Widget _buildCharacterAvatar({
+    required ShadowrunCharacter? character,
+    required double radius,
+    Color? backgroundColor,
+    Color? foregroundColor,
+  }) {
+    // If character has a mugshot, display it as a circular avatar
+    if (character?.mugshot != null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundImage: MemoryImage(character!.mugshot!.imageData),
+        backgroundColor: backgroundColor,
+        onBackgroundImageError: (exception, stackTrace) {
+          // If image fails to load, fall back to letter avatar
+          debugPrint('Failed to load mugshot image in navigation: $exception');
+        },
+      );
+    }
+
+    // Fallback to letter avatar when no mugshot is available
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: backgroundColor,
+      child: Text(
+        (character?.name?.isNotEmpty == true) ? character!.name![0].toUpperCase() : '?',
+        style: TextStyle(
+          fontSize: radius * 0.8, // Scale font size to avatar size
+          fontWeight: FontWeight.bold,
+          color: foregroundColor,
+        ),
+      ),
+    );
   }
 }

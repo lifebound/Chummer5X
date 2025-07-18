@@ -19,6 +19,7 @@ import 'package:chummer5x/models/submersion.dart';
 import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/expense_entry.dart';
+import 'package:chummer5x/models/mugshot.dart';
 
 
 
@@ -71,6 +72,9 @@ class ShadowrunCharacter {
   final Calendar? calendar;
   final GameNotes? gameNotes;
   
+  // Character mugshot
+  final Mugshot? mugshot;
+  
   // Attribute enabled flags
   final bool magEnabled;
   final bool resEnabled;
@@ -111,6 +115,7 @@ class ShadowrunCharacter {
     this.nuyenExpenseEntries = const [],
     this.calendar,
     this.gameNotes,
+    this.mugshot,
     this.magEnabled = false,
     this.resEnabled = false,
     this.depEnabled = false,
@@ -391,6 +396,7 @@ class ShadowrunCharacter {
     bool? isAdept,
     bool? isMagician,
     bool? isTechnomancer,
+    Mugshot? mugshot,
 
   }) {
     return ShadowrunCharacter(
@@ -426,6 +432,7 @@ class ShadowrunCharacter {
       isAdept: isAdept ?? this.isAdept,
       isMagician: isMagician ?? this.isMagician,
       isTechnomancer: isTechnomancer ?? this.isTechnomancer,
+      mugshot: mugshot ?? this.mugshot,
     );
   }
 

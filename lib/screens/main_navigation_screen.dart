@@ -10,6 +10,7 @@ import '../utils/skill_attribute_map.dart';
 import '../widgets/character_info_card.dart';
 import '../widgets/attributes_card.dart';
 import '../widgets/skills_card.dart';
+import '../widgets/profile_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:chummer5x/models/spells.dart';
 import 'package:chummer5x/models/complex_forms.dart';
@@ -68,6 +69,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       appBar: AppBar(
         title: Text(_currentCharacter?.alias ?? 'Chummer5X'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          if (_currentCharacter != null) ...[
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: GestureDetector(
+                onTap: () {
+                  // Get the position of the avatar for desktop modal positioning
+                  final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+                  final position = renderBox?.localToGlobal(Offset.zero);
+                  ProfileMenu.show(
+                    context,
+                    _currentCharacter!,
+                    position: position,
+                  );
+                },
+                child: _buildCharacterAvatar(
+                  character: _currentCharacter,
+                  radius: 20, // Smaller size for app bar
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
       drawer: _buildNavigationDrawer(context),
       body: _currentCharacter != null

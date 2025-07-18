@@ -17,7 +17,7 @@ class CharacterInfoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                _buildCharacterAvatar(context),
+                //_buildCharacterAvatar(context),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(

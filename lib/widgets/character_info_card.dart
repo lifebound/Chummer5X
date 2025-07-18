@@ -130,33 +130,33 @@ class CharacterInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCharacterAvatar(BuildContext context) {
-    // If character has a mugshot, display it as a circular avatar
-    if (character.mugshot != null) {
-      return CircleAvatar(
-        radius: 30,
-        backgroundImage: MemoryImage(character.mugshot!.imageData),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        onBackgroundImageError: (exception, stackTrace) {
-          // If image fails to load, fall back to letter avatar
-          debugPrint('Failed to load mugshot image: $exception');
-        },
-        child: null, // No child when showing image
-      );
-    }
+  // Widget _buildCharacterAvatar(BuildContext context) {
+  //   // If character has a mugshot, display it as a circular avatar
+  //   if (character.mugshot != null) {
+  //     return CircleAvatar(
+  //       radius: 30,
+  //       backgroundImage: MemoryImage(character.mugshot!.imageData),
+  //       backgroundColor: Theme.of(context).colorScheme.primary,
+  //       onBackgroundImageError: (exception, stackTrace) {
+  //         // If image fails to load, fall back to letter avatar
+  //         debugPrint('Failed to load mugshot image: $exception');
+  //       },
+  //       child: null, // No child when showing image
+  //     );
+  //   }
 
-    // Fallback to letter avatar when no mugshot is available
-    return CircleAvatar(
-      radius: 30,
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      child: Text(
-        (character.name?.isNotEmpty == true) ? character.name![0].toUpperCase() : '?',
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-      ),
-    );
-  }
+  //   // Fallback to letter avatar when no mugshot is available
+  //   return CircleAvatar(
+  //     radius: 30,
+  //     backgroundColor: Theme.of(context).colorScheme.primary,
+  //     child: Text(
+  //       (character.name?.isNotEmpty == true) ? character.name![0].toUpperCase() : '?',
+  //       style: TextStyle(
+  //         fontSize: 24,
+  //         fontWeight: FontWeight.bold,
+  //         color: Theme.of(context).colorScheme.onPrimary,
+  //       ),
+  //     ),
+  //   );
+  // }
 }

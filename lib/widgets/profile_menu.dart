@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import '../models/shadowrun_character.dart';
 
 class ProfileMenu extends StatelessWidget {
   final ShadowrunCharacter character;
+  final List<ShadowrunCharacter> allCharacters;
   final VoidCallback? onClose;
+  final VoidCallback? onLoadCharacter;
+  final Function(ShadowrunCharacter)? onSwitchCharacter;
 
   const ProfileMenu({
     super.key,
     required this.character,
+    this.allCharacters = const [],
     this.onClose,
+    this.onLoadCharacter,
+    this.onSwitchCharacter,
   });
 
   @override
@@ -92,34 +97,48 @@ class ProfileMenu extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 16),
           
-          // // Menu options (placeholder for now)
-          // _buildMenuItem(
-          //   context,
-          //   icon: Icons.settings,
-          //   title: 'Character Settings',
-          //   onTap: () {
-          //     // TODO: Implement character settings
-          //     onClose?.call();
-          //   },
-          // ),
-          // _buildMenuItem(
-          //   context,
-          //   icon: Icons.info_outline,
-          //   title: 'Character Info',
-          //   onTap: () {
-          //     // TODO: Implement character info view
-          //     onClose?.call();
-          //   },
-          // ),
-          _buildMenuItem(
-            context,
-            icon: Icons.switch_account,
-            title: 'Switch Character',
-            onTap: () {
-              // TODO: Implement character switching
-              onClose?.call();
-            },
-          ),
+          // Menu options based on character count
+          if (allCharacters.length <= 1) ...[
+            // Single character or no other characters - show "Load Character" option
+            _buildMenuItem(
+              context,
+              icon: Icons.folder_open,
+              title: 'Load Character',
+              onTap: () {
+                onLoadCharacter?.call();
+                onClose?.call();
+              },
+            ),
+          ] else ...[
+            // Multiple characters - show character switching options
+            Text(
+              'Switch Character',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            // List other characters (excluding current one)
+            ...allCharacters
+                .where((char) => char != character)
+                .take(3) // Show max 3 characters to avoid overflow
+                .map((char) => _buildCharacterMenuItem(context, char)),
+            
+            // Show "Load Another" option
+            const SizedBox(height: 8),
+            _buildMenuItem(
+              context,
+              icon: Icons.add,
+              title: 'Load Another Character',
+              onTap: () {
+                onLoadCharacter?.call();
+                onClose?.call();
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -142,6 +161,31 @@ class ProfileMenu extends StatelessWidget {
           initials,
           style: TextStyle(
             fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildSmallCharacterAvatar(BuildContext context, ShadowrunCharacter char, {double radius = 16}) {
+    if (char.mugshot != null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundImage: MemoryImage(char.mugshot!.imageData),
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      );
+    } else {
+      // Generate avatar from name initials
+      final initials = _getInitials(char.name ?? 'Unknown');
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Text(
+          initials,
+          style: TextStyle(
+            fontSize: radius * 0.6, // Scale font size with radius
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.onPrimary,
           ),
@@ -182,6 +226,51 @@ class ProfileMenu extends StatelessWidget {
     );
   }
 
+  Widget _buildCharacterMenuItem(BuildContext context, ShadowrunCharacter char) {
+    return InkWell(
+      onTap: () {
+        onSwitchCharacter?.call(char);
+        onClose?.call();
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        child: Row(
+          children: [
+            _buildSmallCharacterAvatar(context, char, radius: 16),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    char.name ?? 'Unknown',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (char.alias?.isNotEmpty == true)
+                    Text(
+                      '"${char.alias}"',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _getInitials(String name) {
     final words = name.trim().split(' ');
     if (words.isEmpty) return '?';
@@ -193,6 +282,9 @@ class ProfileMenu extends StatelessWidget {
   static void show(
     BuildContext context,
     ShadowrunCharacter character, {
+    List<ShadowrunCharacter> allCharacters = const [],
+    VoidCallback? onLoadCharacter,
+    Function(ShadowrunCharacter)? onSwitchCharacter,
     Offset? position,
   }) {
     // Check screen size to determine UI pattern
@@ -203,16 +295,19 @@ class ProfileMenu extends StatelessWidget {
     // Use desktop UI for larger screens (desktop/tablet)
     if (isMobileSize) {
       // Mobile-sized screen: Show page route with slide transition
-      _showMobilePage(context, character);
+      _showMobilePage(context, character, allCharacters, onLoadCharacter, onSwitchCharacter);
     } else {
       // Desktop/tablet-sized screen: Show modal overlay
-      _showDesktopModal(context, character, position);
+      _showDesktopModal(context, character, allCharacters, onLoadCharacter, onSwitchCharacter, position);
     }
   }
 
   static void _showDesktopModal(
     BuildContext context,
     ShadowrunCharacter character,
+    List<ShadowrunCharacter> allCharacters,
+    VoidCallback? onLoadCharacter,
+    Function(ShadowrunCharacter)? onSwitchCharacter,
     Offset? position,
   ) {
     showDialog(
@@ -231,6 +326,9 @@ class ProfileMenu extends StatelessWidget {
                   onTap: () {}, // Prevent dismissal when tapping the menu
                   child: ProfileMenu(
                     character: character,
+                    allCharacters: allCharacters,
+                    onLoadCharacter: onLoadCharacter,
+                    onSwitchCharacter: onSwitchCharacter,
                     onClose: () => Navigator.of(context).pop(),
                   ),
                 ),
@@ -245,11 +343,19 @@ class ProfileMenu extends StatelessWidget {
   static void _showMobilePage(
     BuildContext context,
     ShadowrunCharacter character,
+    List<ShadowrunCharacter> allCharacters,
+    VoidCallback? onLoadCharacter,
+    Function(ShadowrunCharacter)? onSwitchCharacter,
   ) {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            _MobileProfilePage(character: character),
+            _MobileProfilePage(
+              character: character,
+              allCharacters: allCharacters,
+              onLoadCharacter: onLoadCharacter,
+              onSwitchCharacter: onSwitchCharacter,
+            ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           const end = Offset.zero;
@@ -272,8 +378,16 @@ class ProfileMenu extends StatelessWidget {
 
 class _MobileProfilePage extends StatelessWidget {
   final ShadowrunCharacter character;
+  final List<ShadowrunCharacter> allCharacters;
+  final VoidCallback? onLoadCharacter;
+  final Function(ShadowrunCharacter)? onSwitchCharacter;
 
-  const _MobileProfilePage({required this.character});
+  const _MobileProfilePage({
+    required this.character,
+    this.allCharacters = const [],
+    this.onLoadCharacter,
+    this.onSwitchCharacter,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -330,39 +444,52 @@ class _MobileProfilePage extends StatelessWidget {
             
             const SizedBox(height: 32),
             
-            // Menu options
+            // Menu options based on character count
             Card(
               child: Column(
                 children: [
-                  // _buildMobileMenuItem(
-                  //   context,
-                  //   icon: Icons.settings,
-                  //   title: 'Character Settings',
-                  //   onTap: () {
-                  //     // TODO: Implement character settings
-                  //     Navigator.of(context).pop();
-                  //   },
-                  // ),
-                  // const Divider(height: 1),
-                  // _buildMobileMenuItem(
-                  //   context,
-                  //   icon: Icons.info_outline,
-                  //   title: 'Character Info',
-                  //   onTap: () {
-                  //     // TODO: Implement character info view
-                  //     Navigator.of(context).pop();
-                  //   },
-                  // ),
-                  // const Divider(height: 1),
-                  _buildMobileMenuItem(
-                    context,
-                    icon: Icons.switch_account,
-                    title: 'Switch Character',
-                    onTap: () {
-                      // TODO: Implement character switching
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                  if (allCharacters.length <= 1) ...[
+                    // Single character or no other characters - show "Load Character" option
+                    _buildMobileMenuItem(
+                      context,
+                      icon: Icons.folder_open,
+                      title: 'Load Character',
+                      onTap: () {
+                        onLoadCharacter?.call();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ] else ...[
+                    // Multiple characters - show character switching options
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Switch Character',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    
+                    // List other characters (excluding current one)
+                    ...allCharacters
+                        .where((char) => char != character)
+                        .take(5) // Show more characters on mobile
+                        .map((char) => _buildMobileCharacterMenuItem(context, char)),
+                    
+                    // Show "Load Another" option
+                    _buildMobileMenuItem(
+                      context,
+                      icon: Icons.add,
+                      title: 'Load Another Character',
+                      onTap: () {
+                        onLoadCharacter?.call();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -409,6 +536,46 @@ class _MobileProfilePage extends StatelessWidget {
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
     );
+  }
+
+  Widget _buildMobileCharacterMenuItem(BuildContext context, ShadowrunCharacter char) {
+    return ListTile(
+      leading: _buildSmallCharacterAvatar(context, char, radius: 20),
+      title: Text(char.name ?? 'Unknown'),
+      subtitle: char.alias?.isNotEmpty == true
+          ? Text('"${char.alias}"')
+          : null,
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () {
+        onSwitchCharacter?.call(char);
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
+  Widget _buildSmallCharacterAvatar(BuildContext context, ShadowrunCharacter char, {double radius = 16}) {
+    if (char.mugshot != null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundImage: MemoryImage(char.mugshot!.imageData),
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      );
+    } else {
+      // Generate avatar from name initials
+      final initials = _getInitials(char.name ?? 'Unknown');
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Text(
+          initials,
+          style: TextStyle(
+            fontSize: radius * 0.6, // Scale font size with radius
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+      );
+    }
   }
 
   String _getInitials(String name) {

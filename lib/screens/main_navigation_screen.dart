@@ -81,6 +81,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ProfileMenu.show(
                     context,
                     _currentCharacter!,
+                    allCharacters: _characters,
+                    onLoadCharacter: _loadCharacterFile,
+                    onSwitchCharacter: (character) {
+                      setState(() {
+                        _currentCharacter = character;
+                        _currentSection = NavigationSection.overview;
+                      });
+                    },
                     position: position,
                   );
                 },
@@ -194,15 +202,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ),
 
-          // Character Management Section
-          ListTile(
-            leading: const Icon(Icons.add),
-            title: const Text('Load Character'),
-            onTap: () {
-              Navigator.of(context).pop();
-              _loadCharacterFile();
-            },
-          ),
+          // // Character Management Section
+          // ListTile(
+          //   leading: const Icon(Icons.add),
+          //   title: const Text('Load Character'),
+          //   onTap: () {
+          //     Navigator.of(context).pop();
+          //     _loadCharacterFile();
+          //   },
+          // ),
 
           // Save Character (only show if character is loaded and has modifications)
           if (_currentCharacter != null && _xmlService.hasLoadedDocument) ...[
@@ -330,42 +338,42 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
 
-          // Character List (if multiple characters loaded)
-          if (_characters.length > 1) ...[
-            const Divider(),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Characters',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
+          // // Character List (if multiple characters loaded)
+          // if (_characters.length > 1) ...[
+          //   const Divider(),
+          //   const Padding(
+          //     padding: EdgeInsets.all(16.0),
+          //     child: Text(
+          //       'Characters',
+          //       style: TextStyle(
+          //         fontSize: 14,
+          //         fontWeight: FontWeight.bold,
+          //         color: Colors.grey,
+          //       ),
+          //     ),
+          //   ),
 
-            // Character list
-            ..._characters.map((character) => ListTile(
-                  leading: _buildCharacterAvatar(
-                    character: character,
-                    radius: 20,
-                  ),
-                  title: Text(character.name ?? 'Unknown'),
-                  subtitle: character.alias?.isNotEmpty == true
-                      ? Text('"${character.alias}"')
-                      : null,
-                  selected: _currentCharacter == character,
-                  onTap: () {
-                    setState(() {
-                      _currentCharacter = character;
-                      _currentSection =
-                          NavigationSection.overview; // Reset to overview
-                    });
-                    Navigator.of(context).pop();
-                  },
-                )),
-          ],
+          //   // Character list
+          //   ..._characters.map((character) => ListTile(
+          //         leading: _buildCharacterAvatar(
+          //           character: character,
+          //           radius: 20,
+          //         ),
+          //         title: Text(character.name ?? 'Unknown'),
+          //         subtitle: character.alias?.isNotEmpty == true
+          //             ? Text('"${character.alias}"')
+          //             : null,
+          //         selected: _currentCharacter == character,
+          //         onTap: () {
+          //           setState(() {
+          //             _currentCharacter = character;
+          //             _currentSection =
+          //                 NavigationSection.overview; // Reset to overview
+          //           });
+          //           Navigator.of(context).pop();
+          //         },
+          //       )),
+          // ],
         ],
       ),
     );

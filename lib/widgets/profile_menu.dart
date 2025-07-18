@@ -195,14 +195,18 @@ class ProfileMenu extends StatelessWidget {
     ShadowrunCharacter character, {
     Offset? position,
   }) {
-    if (kIsWeb || Theme.of(context).platform == TargetPlatform.windows ||
-        Theme.of(context).platform == TargetPlatform.macOS ||
-        Theme.of(context).platform == TargetPlatform.linux) {
-      // Desktop/Web: Show modal overlay
-      _showDesktopModal(context, character, position);
-    } else {
-      // Mobile: Show page route with slide transition
+    // Check screen size to determine UI pattern
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobileSize = screenWidth < 768; // Common mobile breakpoint
+    
+    // Use mobile UI for mobile-sized screens regardless of platform
+    // Use desktop UI for larger screens (desktop/tablet)
+    if (isMobileSize) {
+      // Mobile-sized screen: Show page route with slide transition
       _showMobilePage(context, character);
+    } else {
+      // Desktop/tablet-sized screen: Show modal overlay
+      _showDesktopModal(context, character, position);
     }
   }
 

@@ -1525,42 +1525,92 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Condition Monitors',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
+            // Use a flexible layout that can wrap on small screens
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // If screen is too narrow, stack vertically
+                if (constraints.maxWidth < 300) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Condition Monitors',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                       ),
-                ),
-                // CM Penalty indicator
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: cmPenalty < 0
-                        ? Colors.red.shade100
-                        : Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: cmPenalty < 0
-                          ? Colors.red.shade400
-                          : Colors.green.shade400,
-                    ),
-                  ),
-                  child: Text(
-                    'CM Penalty: ${cmPenalty >= 0 ? '+' : ''}$cmPenalty',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: cmPenalty < 0
-                          ? Colors.red.shade700
-                          : Colors.green.shade700,
-                    ),
-                  ),
-                ),
-              ],
+                      const SizedBox(height: 8),
+                      // CM Penalty indicator
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: cmPenalty < 0
+                              ? Colors.red.shade100
+                              : Colors.green.shade100,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: cmPenalty < 0
+                                ? Colors.red.shade400
+                                : Colors.green.shade400,
+                          ),
+                        ),
+                        child: Text(
+                          'CM Penalty: ${cmPenalty >= 0 ? '+' : ''}$cmPenalty',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: cmPenalty < 0
+                                ? Colors.red.shade700
+                                : Colors.green.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Wide enough for horizontal layout
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'Condition Monitors',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                      ),
+                      // CM Penalty indicator
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: cmPenalty < 0
+                              ? Colors.red.shade100
+                              : Colors.green.shade100,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: cmPenalty < 0
+                                ? Colors.red.shade400
+                                : Colors.green.shade400,
+                          ),
+                        ),
+                        child: Text(
+                          'CM Penalty: ${cmPenalty >= 0 ? '+' : ''}$cmPenalty',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: cmPenalty < 0
+                                ? Colors.red.shade700
+                                : Colors.green.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
             const SizedBox(height: 16),
             Row(

@@ -252,9 +252,11 @@ class _SkillsCardState extends State<SkillsCard> {
 
   Widget _buildFilterControls(BuildContext context) {
     final screenSize = ResponsiveLayout.getScreenSize(context);
+    final screenWidth = MediaQuery.of(context).size.width;
     
-    if (screenSize == ScreenSize.phone) {
-      // Vertical layout for phone
+    // Use vertical layout for phones or narrow screens
+    if (screenSize == ScreenSize.phone || screenWidth < 600) {
+      // Vertical layout for phone and narrow screens
       return Column(
         children: [
           Row(
@@ -262,6 +264,7 @@ class _SkillsCardState extends State<SkillsCard> {
               Expanded(
                 child: DropdownButton<SkillOrganization>(
                   value: _organization,
+                  isExpanded: true, // Ensures dropdown fills available width
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
@@ -272,7 +275,10 @@ class _SkillsCardState extends State<SkillsCard> {
                   items: SkillOrganization.values.map((org) {
                     return DropdownMenuItem<SkillOrganization>(
                       value: org,
-                      child: Text(org.displayName),
+                      child: Text(
+                        org.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     );
                   }).toList(),
                 ),
@@ -281,6 +287,7 @@ class _SkillsCardState extends State<SkillsCard> {
               Expanded(
                 child: DropdownButton<SkillFilter>(
                   value: _filter,
+                  isExpanded: true, // Ensures dropdown fills available width
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
@@ -291,7 +298,10 @@ class _SkillsCardState extends State<SkillsCard> {
                   items: SkillFilter.values.map((filter) {
                     return DropdownMenuItem<SkillFilter>(
                       value: filter,
-                      child: Text(filter.displayName),
+                      child: Text(
+                        filter.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     );
                   }).toList(),
                 ),
@@ -304,6 +314,7 @@ class _SkillsCardState extends State<SkillsCard> {
               Expanded(
                 child: DropdownButton<SkillSort>(
                   value: _sort,
+                  isExpanded: true, // Ensures dropdown fills available width
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
@@ -314,7 +325,10 @@ class _SkillsCardState extends State<SkillsCard> {
                   items: SkillSort.values.map((sort) {
                     return DropdownMenuItem<SkillSort>(
                       value: sort,
-                      child: Text(sort.displayName),
+                      child: Text(
+                        sort.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     );
                   }).toList(),
                 ),
@@ -344,8 +358,10 @@ class _SkillsCardState extends State<SkillsCard> {
     return Row(
       children: [
         Expanded(
+          flex: 2, // Give more space to organization dropdown
           child: DropdownButton<SkillOrganization>(
             value: _organization,
+            isExpanded: true, // Ensures dropdown fills available width
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -356,15 +372,20 @@ class _SkillsCardState extends State<SkillsCard> {
             items: SkillOrganization.values.map((org) {
               return DropdownMenuItem<SkillOrganization>(
                 value: org,
-                child: Text(org.displayName),
+                child: Text(
+                  org.displayName,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 8), // Reduced spacing
         Expanded(
+          flex: 2, // Give more space to filter dropdown
           child: DropdownButton<SkillFilter>(
             value: _filter,
+            isExpanded: true, // Ensures dropdown fills available width
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -375,15 +396,20 @@ class _SkillsCardState extends State<SkillsCard> {
             items: SkillFilter.values.map((filter) {
               return DropdownMenuItem<SkillFilter>(
                 value: filter,
-                child: Text(filter.displayName),
+                child: Text(
+                  filter.displayName,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 8), // Reduced spacing
         Expanded(
+          flex: 1, // Less space for sort dropdown
           child: DropdownButton<SkillSort>(
             value: _sort,
+            isExpanded: true, // Ensures dropdown fills available width
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -394,12 +420,15 @@ class _SkillsCardState extends State<SkillsCard> {
             items: SkillSort.values.map((sort) {
               return DropdownMenuItem<SkillSort>(
                 value: sort,
-                child: Text(sort.displayName),
+                child: Text(
+                  sort.displayName,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4), // Minimal spacing before icon
         IconButton(
           onPressed: () {
             setState(() {
@@ -448,44 +477,32 @@ class _SkillsCardState extends State<SkillsCard> {
       ScreenSize.fourK => 4,
     };
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        childAspectRatio: _getAspectRatio(skills, crossAxisCount),
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: skills.length,
-      itemBuilder: (context, index) => _buildSkillItem(context, skills[index]),
-    );
-  }
-
-  double _getAspectRatio(List<Skill> skills, int crossAxisCount) {
-    // Calculate the maximum number of specializations in any skill
-    final maxSpecializations = skills.fold(0, (max, skill) => 
-      skill.specializations.length > max ? skill.specializations.length : max);
-    
-    // Base aspect ratio
-    double baseRatio = crossAxisCount == 1 ? 4.0 : 3.5;
-    
-    // Adjust for specializations
-    if (maxSpecializations > 0) {
-      if (crossAxisCount == 1) {
-        // On phone, we use compact display, so less height adjustment needed
-        baseRatio = 3.5;
-      } else {
-        // On larger screens, reduce aspect ratio for each specialization
-        final adjustment = maxSpecializations * 0.4;
-        baseRatio = baseRatio - adjustment;
-        
-        // Ensure minimum aspect ratio
-        baseRatio = baseRatio < 2.0 ? 2.0 : baseRatio;
-      }
+    // Use a flexible layout that can handle variable heights
+    if (crossAxisCount == 1) {
+      // On phone, use a simple column for better control
+      return Column(
+        children: skills.map((skill) => Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: _buildSkillItem(context, skill),
+        )).toList(),
+      );
+    } else {
+      // For larger screens, use a staggered grid-like layout
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final itemWidth = (constraints.maxWidth - (8.0 * (crossAxisCount - 1))) / crossAxisCount;
+          
+          return Wrap(
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: skills.map((skill) => SizedBox(
+              width: itemWidth,
+              child: _buildSkillItem(context, skill),
+            )).toList(),
+          );
+        },
+      );
     }
-    
-    return baseRatio;
   }
 
   Widget _buildSkillItem(BuildContext context, Skill skill) {
@@ -518,7 +535,7 @@ class _SkillsCardState extends State<SkillsCard> {
           width: skill.isPrioritySkill ? 2 : 1,
         ),
       ),
-      child: SingleChildScrollView(
+      child: IntrinsicHeight( // Allow card to expand to fit content
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -541,7 +558,7 @@ class _SkillsCardState extends State<SkillsCard> {
                                   ? Theme.of(context).colorScheme.primary
                                   : Theme.of(context).colorScheme.onSurface,
                               ),
-                              maxLines: 1,
+                              maxLines: 2, // Allow skill name to wrap to 2 lines if needed
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),

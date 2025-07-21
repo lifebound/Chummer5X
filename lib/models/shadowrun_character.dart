@@ -8,7 +8,7 @@ import 'package:chummer5x/models/limits.dart';
 import 'package:chummer5x/models/spells.dart';
 import 'package:chummer5x/models/adept_powers.dart';
 import 'package:chummer5x/models/complex_forms.dart';
-import 'package:chummer5x/models/gear.dart';
+import 'package:chummer5x/models/items/gear.dart';
 import 'package:chummer5x/models/condition_monitor.dart';
 //import 'package:chummer5x/models/critter_base.dart';
 import 'package:chummer5x/models/spirit.dart';

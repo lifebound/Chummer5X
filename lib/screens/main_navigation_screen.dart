@@ -109,10 +109,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildCharacterContent(BuildContext context) {
-    // For Notes section, use minimal constraints to maximize space usage
-    if (_currentSection == NavigationSection.notes) {
+    // For Notes and Gear sections, use minimal constraints to maximize space usage
+    if (_currentSection == NavigationSection.notes || _currentSection == NavigationSection.gear) {
       return Padding(
-        padding: const EdgeInsets.all(8.0), // Minimal padding for Notes
+        padding: const EdgeInsets.all(8.0), // Minimal padding for tabbed sections
         child: _buildCurrentView(context),
       );
     }
@@ -1153,20 +1153,58 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildGearView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return DefaultTabController(
+      length: 5, // 5 gear categories
+      child: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Gear',
-              style: Theme.of(context).textTheme.headlineSmall,
+            Container(
+              constraints: const BoxConstraints(maxWidth: 800), // Center tabs with max width
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TabBar(
+                isScrollable: false, // Don't scroll since we have fewer tabs now
+                tabs: const [
+                  Tab(
+                    icon: Icon(Icons.inventory),
+                    text: 'Gear',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.shield),
+                    text: 'Clothing & Armor',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.gps_fixed),
+                    text: 'Weapons',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.medication),
+                    text: 'Drugs',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.home),
+                    text: 'Lifestyles',
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Gear section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
+            Expanded(
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 1200), // Center content with max width
+                  child: TabBarView(
+                    children: [
+                      _buildGearTabContent(context),
+                      _buildClothingArmorTabContent(context),
+                      _buildWeaponsTabContent(context),
+                      _buildDrugsTabContent(context),
+                      _buildLifestylesTabContent(context),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -4145,6 +4183,167 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           fontSize: radius * 0.8, // Scale font size to avatar size
           fontWeight: FontWeight.bold,
           color: foregroundColor,
+        ),
+      ),
+    );
+  }
+
+  // Gear Tab Content Methods
+  Widget _buildGearTabContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'General Gear',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _buildPlaceholderContent(context, 'General Gear', 'inventory'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClothingArmorTabContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Clothing & Armor',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _buildPlaceholderContent(context, 'Clothing & Armor', 'shield'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeaponsTabContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Weapons',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _buildPlaceholderContent(context, 'Weapons', 'gps_fixed'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrugsTabContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Drugs & Toxins',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _buildPlaceholderContent(context, 'Drugs & Toxins', 'medication'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLifestylesTabContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Lifestyles',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _buildPlaceholderContent(context, 'Lifestyles', 'home'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderContent(BuildContext context, String category, String iconName) {
+    IconData icon;
+    switch (iconName) {
+      case 'inventory':
+        icon = Icons.inventory;
+        break;
+      case 'shield':
+        icon = Icons.shield;
+        break;
+      case 'gps_fixed':
+        icon = Icons.gps_fixed;
+        break;
+      case 'medication':
+        icon = Icons.medication;
+        break;
+      case 'home':
+        icon = Icons.home;
+        break;
+      default:
+        icon = Icons.help_outline;
+    }
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              category,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'This section will display $category items when the gear parsing is implemented.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Coming Soon!',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );

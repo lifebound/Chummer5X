@@ -240,12 +240,9 @@ class SkillsScreen extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (item.category != null)
-                        Text('Category: ${item.category}'),
-                      if (item.rating != null)
-                        Text('Rating: ${item.rating}'),
-                      if (item.quantity != null)
-                        Text('Quantity: ${item.quantity}'),
+                      Text('Category: ${item.category}'),
+                      Text('Rating: ${item.rating}'),
+                      Text('Quantity: ${item.qty}'),
                     ],
                   ),
                   trailing: item.equipped 

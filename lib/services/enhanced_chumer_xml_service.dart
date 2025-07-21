@@ -11,7 +11,10 @@ import 'package:chummer5x/models/spells.dart';
 import 'package:chummer5x/models/spirit.dart';
 import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/complex_forms.dart';
-import 'package:chummer5x/models/gear.dart';
+import 'package:chummer5x/models/items/gear.dart';
+import 'package:chummer5x/models/items/weapon.dart';
+import 'package:chummer5x/models/items/armor.dart';
+import 'package:chummer5x/models/items/vehicle.dart';
 import 'package:chummer5x/models/adept_powers.dart';
 import 'package:chummer5x/models/initiation.dart';
 import 'package:chummer5x/models/submersion.dart';
@@ -556,8 +559,8 @@ class EnhancedChummerXmlService {
     final gearsElement = characterElement.findElements('gears').firstOrNull;
     if (gearsElement != null) {
       for (final gearElement in gearsElement.findElements('gear')) {
-        final gear = _parseGearItem(gearElement);
-        if (gear != null) allGear.add(gear);
+        final gear = Gear.fromXml(gearElement);
+        allGear.add(gear);
       }
     }
     
@@ -565,8 +568,8 @@ class EnhancedChummerXmlService {
     final weaponsElement = characterElement.findElements('weapons').firstOrNull;
     if (weaponsElement != null) {
       for (final weaponElement in weaponsElement.findElements('weapon')) {
-        final gear = _parseGearItem(weaponElement);
-        if (gear != null) allGear.add(gear);
+        final gear = Armor.fromXml(weaponElement);
+
       }
     }
     
@@ -574,37 +577,13 @@ class EnhancedChummerXmlService {
     final armorsElement = characterElement.findElements('armors').firstOrNull;
     if (armorsElement != null) {
       for (final armorElement in armorsElement.findElements('armor')) {
-        final gear = _parseGearItem(armorElement);
-        if (gear != null) allGear.add(gear);
+        final gear = Armor.fromXml(armorElement);
       }
     }
     
     return allGear;
   }
   
-  static Gear? _parseGearItem(XmlElement gearElement) {
-    final name = _getElementText(gearElement, 'name');
-    final category = _getElementText(gearElement, 'category');
-    final rating = _getElementText(gearElement, 'rating');
-    final equipped = _getElementText(gearElement, 'equipped') == 'True';
-    final quantity = _getElementText(gearElement, 'quantity');
-    final source = _getElementText(gearElement, 'source') ?? '';
-    final guid = _getElementText(gearElement, 'guid');
-    
-    if (name != null) {
-      return Gear(
-        guid: guid,
-        name: name,
-        category: category,
-        rating: rating,
-        equipped: equipped,
-        quantity: quantity,
-        source: source,
-      );
-    }
-    
-    return null;
-  }
   
   static ConditionMonitor _parseConditionMonitor(XmlElement characterElement, Map<String, dynamic> calculatedValues) {
     // Create a map with all the root-level character data

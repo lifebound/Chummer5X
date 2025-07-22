@@ -585,19 +585,7 @@ class EnhancedChummerXmlService {
         final gear = Gear.fromXml(gearElement);
         allGear.add(gear);
       }
-    }
-    
-    // Parse weapons as gear
-    final weaponsElement = characterElement.findElements('weapons').firstOrNull;
-    if (weaponsElement != null) {
-      for (final weaponElement in weaponsElement.findElements('weapon')) {
-        final gear = Armor.fromXml(weaponElement);
-
-      }
-    }
-    
-    
-    
+    }   
     return allGear;
   }
 

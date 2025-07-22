@@ -42,11 +42,11 @@ class TestShadowrunItem extends ShadowrunItem {
 
   factory TestShadowrunItem.fromXml(XmlElement xmlElement) {
     return TestShadowrunItem(
-      name: xmlElement.getElement('name')?.text ?? 'Test Item',
-      category: xmlElement.getElement('category')?.text ?? 'Test Category',
-      source: xmlElement.getElement('source')?.text ?? 'Test Source',
-      page: xmlElement.getElement('page')?.text ?? '0',
-      avail: xmlElement.getElement('avail')?.text ?? '0',
+      name: xmlElement.getElement('name')?.innerText ?? 'Test Item',
+      category: xmlElement.getElement('category')?.innerText ?? 'Test Category',
+      source: xmlElement.getElement('source')?.innerText ?? 'Test Source',
+      page: xmlElement.getElement('page')?.innerText ?? '0',
+      avail: xmlElement.getElement('avail')?.innerText ?? '0',
     );
   }
 }

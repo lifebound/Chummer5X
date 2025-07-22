@@ -71,56 +71,56 @@ class Armor extends ShadowrunItem {
   });
 
   factory Armor.fromXml(XmlElement xmlElement) {
-    int armorRating = int.tryParse(xmlElement.getElement('armor')?.text ?? '0') ?? 0;
+    int armorRating = int.tryParse(xmlElement.getElement('armor')?.innerText ?? '0') ?? 0;
     
-    final nameText = xmlElement.getElement('name')?.text;
-    final categoryText = xmlElement.getElement('category')?.text;
-    final sourceText = xmlElement.getElement('source')?.text;
-    final pageText = xmlElement.getElement('page')?.text;
+    final nameText = xmlElement.getElement('name')?.innerText;
+    final categoryText = xmlElement.getElement('category')?.innerText;
+    final sourceText = xmlElement.getElement('source')?.innerText;
+    final pageText = xmlElement.getElement('page')?.innerText;
     
     final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
     final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultArmorLocationGuid;
 
 
     return Armor(
-      sourceId: xmlElement.getElement('sourceid')?.text,
+      sourceId: xmlElement.getElement('sourceid')?.innerText,
       locationGuid: locationGuid,
       name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Armor',
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
-      armorValue: xmlElement.getElement('armor')?.text ?? '0',
-      armorOverride: xmlElement.getElement('armoroverride')?.text,
-      armorCapacity: xmlElement.getElement('armorcapacity')?.text ?? '0',
+      armorValue: xmlElement.getElement('armor')?.innerText ?? '0',
+      armorOverride: xmlElement.getElement('armoroverride')?.innerText,
+      armorCapacity: xmlElement.getElement('armorcapacity')?.innerText ?? '0',
       avail: parseAvail(xmlElement.getElement('avail'), armorRating),
-      cost: int.tryParse(xmlElement.getElement('cost')?.text ?? '0') ?? 0,
-      weight: xmlElement.getElement('weight')?.text,
+      cost: int.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
+      weight: xmlElement.getElement('weight')?.innerText,
       source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
       page: pageText?.isNotEmpty == true ? pageText! : '0',
-      armorName: xmlElement.getElement('armorname')?.text,
-      equipped: xmlElement.getElement('equipped')?.text == 'True',
-      active: xmlElement.getElement('active')?.text == 'True',
-      homeNode: xmlElement.getElement('homenode')?.text == 'True',
-      deviceRating: xmlElement.getElement('devicerating')?.text,
-      programLimit: xmlElement.getElement('programlimit')?.text,
-      overclocked: xmlElement.getElement('overclocked')?.text,
-      attack: xmlElement.getElement('attack')?.text,
-      sleaze: xmlElement.getElement('sleaze')?.text,
-      dataProcessing: xmlElement.getElement('dataprocessing')?.text,
-      firewall: xmlElement.getElement('firewall')?.text,
-      wirelessOn: xmlElement.getElement('wirelesson')?.text == 'True',
-      canFormPersona: xmlElement.getElement('canformpersona')?.text == 'True',
-      extra: xmlElement.getElement('extra')?.text,
-      damage: int.tryParse(xmlElement.getElement('damage')?.text ?? '0') ?? 0,
+      armorName: xmlElement.getElement('armorname')?.innerText,
+      equipped: xmlElement.getElement('equipped')?.innerText == 'True',
+      active: xmlElement.getElement('active')?.innerText == 'True',
+      homeNode: xmlElement.getElement('homenode')?.innerText == 'True',
+      deviceRating: xmlElement.getElement('devicerating')?.innerText,
+      programLimit: xmlElement.getElement('programlimit')?.innerText,
+      overclocked: xmlElement.getElement('overclocked')?.innerText,
+      attack: xmlElement.getElement('attack')?.innerText,
+      sleaze: xmlElement.getElement('sleaze')?.innerText,
+      dataProcessing: xmlElement.getElement('dataprocessing')?.innerText,
+      firewall: xmlElement.getElement('firewall')?.innerText,
+      wirelessOn: xmlElement.getElement('wirelesson')?.innerText == 'True',
+      canFormPersona: xmlElement.getElement('canformpersona')?.innerText == 'True',
+      extra: xmlElement.getElement('extra')?.innerText,
+      damage: int.tryParse(xmlElement.getElement('damage')?.innerText ?? '0') ?? 0,
       rating: armorRating,
-      maxRating: int.tryParse(xmlElement.getElement('maxrating')?.text ?? '0') ?? 0,
-      ratingLabel: xmlElement.getElement('ratinglabel')?.text ?? 'String_Rating',
-      stolen: xmlElement.getElement('stolen')?.text == 'True',
-      encumbrance: xmlElement.getElement('emcumbrance')?.text == 'True',
+      maxRating: int.tryParse(xmlElement.getElement('maxrating')?.innerText ?? '0') ?? 0,
+      ratingLabel: xmlElement.getElement('ratinglabel')?.innerText ?? 'String_Rating',
+      stolen: xmlElement.getElement('stolen')?.innerText == 'True',
+      encumbrance: xmlElement.getElement('emcumbrance')?.innerText == 'True',
       armorMods: xmlElement.findElements('armormods').expand((e) => e.findElements('armormod')).map((modXml) => ArmorMod.fromXml(modXml)).toList(),
-      location: xmlElement.getElement('location')?.text,
-      notes: xmlElement.getElement('notes')?.text,
-      notesColor: xmlElement.getElement('notesColor')?.text,
-      discountedCost: xmlElement.getElement('discountedcost')?.text == 'True',
-      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.text ?? '0') ?? 0,
+      location: xmlElement.getElement('location')?.innerText,
+      notes: xmlElement.getElement('notes')?.innerText,
+      notesColor: xmlElement.getElement('notesColor')?.innerText,
+      discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
+      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
     );
   }
 }

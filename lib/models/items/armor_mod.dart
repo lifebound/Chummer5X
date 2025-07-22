@@ -55,36 +55,36 @@ class ArmorMod {
   });
 
   factory ArmorMod.fromXml(XmlElement xmlElement) {
-    final nameText = xmlElement.getElement('name')?.text;
-    final categoryText = xmlElement.getElement('category')?.text;
-    final sourceText = xmlElement.getElement('source')?.text;
-    final pageText = xmlElement.getElement('page')?.text;
+    final nameText = xmlElement.getElement('name')?.innerText;
+    final categoryText = xmlElement.getElement('category')?.innerText;
+    final sourceText = xmlElement.getElement('source')?.innerText;
+    final pageText = xmlElement.getElement('page')?.innerText;
     
     return ArmorMod(
-      sourceId: xmlElement.getElement('sourceid')?.text,
-      guid: xmlElement.getElement('guid')?.text,
+      sourceId: xmlElement.getElement('sourceid')?.innerText,
+      guid: xmlElement.getElement('guid')?.innerText,
       name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Armor Mod',
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
-      armor: int.tryParse(xmlElement.getElement('armor')?.text ?? '0') ?? 0,
-      armorCapacity: xmlElement.getElement('armorcapacity')?.text ?? '0',
-      gearCapacity: xmlElement.getElement('gearcapacity')?.text,
-      maxRating: int.tryParse(xmlElement.getElement('maxrating')?.text ?? '0') ?? 0,
-      rating: int.tryParse(xmlElement.getElement('rating')?.text ?? '0') ?? 0,
-      ratingLabel: xmlElement.getElement('ratinglabel')?.text ?? 'String_Rating',
-      avail: xmlElement.getElement('avail')?.text,
-      cost: xmlElement.getElement('cost')?.text ?? '0',
-      weight: xmlElement.getElement('weight')?.text,
+      armor: int.tryParse(xmlElement.getElement('armor')?.innerText ?? '0') ?? 0,
+      armorCapacity: xmlElement.getElement('armorcapacity')?.innerText ?? '0',
+      gearCapacity: xmlElement.getElement('gearcapacity')?.innerText,
+      maxRating: int.tryParse(xmlElement.getElement('maxrating')?.innerText ?? '0') ?? 0,
+      rating: int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0,
+      ratingLabel: xmlElement.getElement('ratinglabel')?.innerText ?? 'String_Rating',
+      avail: xmlElement.getElement('avail')?.innerText,
+      cost: xmlElement.getElement('cost')?.innerText ?? '0',
+      weight: xmlElement.getElement('weight')?.innerText,
       source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
       page: pageText?.isNotEmpty == true ? pageText! : '0',
-      included: xmlElement.getElement('included')?.text == 'True',
-      equipped: xmlElement.getElement('equipped')?.text == 'True',
-      extra: xmlElement.getElement('extra')?.text,
-      stolen: xmlElement.getElement('stolen')?.text == 'True',
-      notes: xmlElement.getElement('notes')?.text,
-      notesColor: xmlElement.getElement('notesColor')?.text,
-      discountedCost: xmlElement.getElement('discountedcost')?.text == 'True',
-      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.text ?? '0') ?? 0,
-      wirelessOn: xmlElement.getElement('wirelesson')?.text == 'True',
+      included: xmlElement.getElement('included')?.innerText == 'True',
+      equipped: xmlElement.getElement('equipped')?.innerText == 'True',
+      extra: xmlElement.getElement('extra')?.innerText,
+      stolen: xmlElement.getElement('stolen')?.innerText == 'True',
+      notes: xmlElement.getElement('notes')?.innerText,
+      notesColor: xmlElement.getElement('notesColor')?.innerText,
+      discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
+      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
+      wirelessOn: xmlElement.getElement('wirelesson')?.innerText == 'True',
     );
   }
 }

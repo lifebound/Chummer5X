@@ -186,7 +186,7 @@ void main() {
       expect(vehicle.matrixCmFilled, 2);
     });
 
-    group('fromXmlElement', () {
+    group('fromXml', () {
       test('should parse minimal XML correctly', () {
         // Arrange
         final xmlString = '''
@@ -234,7 +234,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicle = Vehicle.fromXmlElement(xmlElement);
+        final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
         expect(vehicle.sourceId, 'test-source');
@@ -291,7 +291,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicle = Vehicle.fromXmlElement(xmlElement);
+        final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
         expect(vehicle.name, '');
@@ -357,7 +357,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicle = Vehicle.fromXmlElement(xmlElement);
+        final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
         expect(vehicle.dealerConnection, true);
@@ -408,7 +408,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicle = Vehicle.fromXmlElement(xmlElement);
+        final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
         expect(vehicle.sortOrder, 0);
@@ -427,7 +427,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicle = Vehicle.fromXmlElement(xmlElement);
+        final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
         expect(vehicle.name, '');

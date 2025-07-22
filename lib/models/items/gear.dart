@@ -10,8 +10,6 @@ class Gear extends ShadowrunItem {
   final String? maxRating;
   final int rating;
   final double qty;
-  @override
-  final String avail;
   final int cost;
   final String? weight;
   final String? extra;
@@ -39,7 +37,7 @@ class Gear extends ShadowrunItem {
     this.maxRating,
     this.rating = 0,
     this.qty = 1.0,
-    this.avail = '0',
+    super.avail = '0',
     this.cost = 0,
     this.weight,
     this.extra,
@@ -55,18 +53,18 @@ class Gear extends ShadowrunItem {
     super.discountedCost,
     super.sortOrder,
   }) : super(
-          avail: avail,
+      
         );
 
   factory Gear.fromXml(XmlElement xmlElement) {
-    int gearRating = int.tryParse(xmlElement.getElement('rating')?.text ?? '0') ?? 0;
+    int gearRating = int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0;
     
     // Handle name selection priority: extra > name > default
-    final extraText = xmlElement.getElement('extra')?.text;
-    final nameText = xmlElement.getElement('name')?.text;
-    final categoryText = xmlElement.getElement('category')?.text;
-    final sourceText = xmlElement.getElement('source')?.text;
-    final pageText = xmlElement.getElement('page')?.text;
+    final extraText = xmlElement.getElement('extra')?.innerText;
+    final nameText = xmlElement.getElement('name')?.innerText;
+    final categoryText = xmlElement.getElement('category')?.innerText;
+    final sourceText = xmlElement.getElement('source')?.innerText;
+    final pageText = xmlElement.getElement('page')?.innerText;
     
     final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
     final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultGearLocationGuid;
@@ -83,36 +81,36 @@ class Gear extends ShadowrunItem {
     }
     
     return Gear(
-      sourceId: xmlElement.getElement('sourceid')?.text,
+      sourceId: xmlElement.getElement('sourceid')?.innerText,
       locationGuid: locationGuid,
       name: finalName,
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
       page: pageText?.isNotEmpty == true ? pageText! : '0',
-      equipped: xmlElement.getElement('equipped')?.text == 'True',
-      wirelessOn: xmlElement.getElement('wirelesson')?.text == 'True',
-      stolen: xmlElement.getElement('stolen')?.text == 'True',
-      capacity: xmlElement.getElement('capacity')?.text,
-      armorCapacity: xmlElement.getElement('armorcapacity')?.text,
-      minRating: xmlElement.getElement('minrating')?.text,
-      maxRating: xmlElement.getElement('maxrating')?.text,
+      equipped: xmlElement.getElement('equipped')?.innerText == 'True',
+      wirelessOn: xmlElement.getElement('wirelesson')?.innerText == 'True',
+      stolen: xmlElement.getElement('stolen')?.innerText == 'True',
+      capacity: xmlElement.getElement('capacity')?.innerText,
+      armorCapacity: xmlElement.getElement('armorcapacity')?.innerText,
+      minRating: xmlElement.getElement('minrating')?.innerText,
+      maxRating: xmlElement.getElement('maxrating')?.innerText,
       rating: gearRating,
-      qty: double.tryParse(xmlElement.getElement('qty')?.text ?? '1.0') ?? 1.0,
+      qty: double.tryParse(xmlElement.getElement('qty')?.innerText ?? '1.0') ?? 1.0,
       avail: parseAvail(xmlElement.getElement('avail'), gearRating),
-      cost: int.tryParse(xmlElement.getElement('cost')?.text ?? '0') ?? 0,
-      weight: xmlElement.getElement('weight')?.text,
-      extra: xmlElement.getElement('extra')?.text,
-      bonded: xmlElement.getElement('bonded')?.text == 'True',
-      gearName: xmlElement.getElement('gearname')?.text,
-      forcedValue: xmlElement.getElement('forcedvalue')?.text,
-      parentId: xmlElement.getElement('parentid')?.text,
-      allowRename: xmlElement.getElement('allowrename')?.text == 'True',
+      cost: int.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
+      weight: xmlElement.getElement('weight')?.innerText,
+      extra: xmlElement.getElement('extra')?.innerText,
+      bonded: xmlElement.getElement('bonded')?.innerText == 'True',
+      gearName: xmlElement.getElement('gearname')?.innerText,
+      forcedValue: xmlElement.getElement('forcedvalue')?.innerText,
+      parentId: xmlElement.getElement('parentid')?.innerText,
+      allowRename: xmlElement.getElement('allowrename')?.innerText == 'True',
       children: xmlElement.findElements('children').expand((e) => e.findElements('gear')).map((childXml) => Gear.fromXml(childXml)).toList(),
-      location: xmlElement.getElement('location')?.text,
-      notes: xmlElement.getElement('notes')?.text,
-      notesColor: xmlElement.getElement('notesColor')?.text,
-      discountedCost: xmlElement.getElement('discountedcost')?.text == 'True',
-      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.text ?? '0') ?? 0,
+      location: xmlElement.getElement('location')?.innerText,
+      notes: xmlElement.getElement('notes')?.innerText,
+      notesColor: xmlElement.getElement('notesColor')?.innerText,
+      discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
+      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
     );
   }
 }

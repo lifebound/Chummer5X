@@ -137,87 +137,87 @@ class Weapon extends ShadowrunItem {
   });
 
   factory Weapon.fromXml(XmlElement xmlElement) {
-    int weaponRating = int.tryParse(xmlElement.getElement('rating')?.text ?? '0') ?? 0;
+    int weaponRating = int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0;
     
-    final nameText = xmlElement.getElement('name')?.text;
-    final categoryText = xmlElement.getElement('category')?.text;
-    final typeText = xmlElement.getElement('type')?.text;
-    final sourceText = xmlElement.getElement('source')?.text;
-    final pageText = xmlElement.getElement('page')?.text;
-    final modeText = xmlElement.getElement('mode')?.text;
-    final ammoText = xmlElement.getElement('ammo')?.text;
-    final firingModeText = xmlElement.getElement('firingmode')?.text;
-    final accuracyText = xmlElement.getElement('accuracy')?.text;
+    final nameText = xmlElement.getElement('name')?.innerText;
+    final categoryText = xmlElement.getElement('category')?.innerText;
+    final typeText = xmlElement.getElement('type')?.innerText;
+    final sourceText = xmlElement.getElement('source')?.innerText;
+    final pageText = xmlElement.getElement('page')?.innerText;
+    final modeText = xmlElement.getElement('mode')?.innerText;
+    final ammoText = xmlElement.getElement('ammo')?.innerText;
+    final firingModeText = xmlElement.getElement('firingmode')?.innerText;
+    final accuracyText = xmlElement.getElement('accuracy')?.innerText;
     
 
     final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
     final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultWeaponLocationGuid;
 
     return Weapon(
-      sourceId: xmlElement.getElement('sourceid')?.text,
+      sourceId: xmlElement.getElement('sourceid')?.innerText,
       locationGuid: locationGuid,
       name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Weapon',
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       type: typeText?.isNotEmpty == true ? typeText! : 'Unknown',
-      spec: xmlElement.getElement('spec')?.text,
-      spec2: xmlElement.getElement('spec2')?.text,
-      reach: int.tryParse(xmlElement.getElement('reach')?.text ?? '0') ?? 0,
-      damage: xmlElement.getElement('damage')?.text ?? '0',
-      ap: xmlElement.getElement('ap')?.text ?? '-',
+      spec: xmlElement.getElement('spec')?.innerText,
+      spec2: xmlElement.getElement('spec2')?.innerText,
+      reach: int.tryParse(xmlElement.getElement('reach')?.innerText ?? '0') ?? 0,
+      damage: xmlElement.getElement('damage')?.innerText ?? '0',
+      ap: xmlElement.getElement('ap')?.innerText ?? '-',
       mode: modeText?.isNotEmpty == true ? modeText! : 'Unknown',
-      rc: int.tryParse(xmlElement.getElement('rc')?.text ?? '0') ?? 0,
+      rc: int.tryParse(xmlElement.getElement('rc')?.innerText ?? '0') ?? 0,
       ammo: ammoText?.isNotEmpty == true ? ammoText! : 'Unknown',
-      cyberware: xmlElement.getElement('cyberware')?.text == 'True',
-      ammoCategory: xmlElement.getElement('ammocategory')?.text,
-      ammoSlots: int.tryParse(xmlElement.getElement('ammoslots')?.text ?? '1') ?? 1,
-      sizeCategory: xmlElement.getElement('sizecategory')?.text,
+      cyberware: xmlElement.getElement('cyberware')?.innerText == 'True',
+      ammoCategory: xmlElement.getElement('ammocategory')?.innerText,
+      ammoSlots: int.tryParse(xmlElement.getElement('ammoslots')?.innerText ?? '1') ?? 1,
+      sizeCategory: xmlElement.getElement('sizecategory')?.innerText,
       firingMode: firingModeText?.isNotEmpty == true ? firingModeText! : 'Unknown',
-      minRating: xmlElement.getElement('minrating')?.text,
-      maxRating: xmlElement.getElement('maxrating')?.text,
+      minRating: xmlElement.getElement('minrating')?.innerText,
+      maxRating: xmlElement.getElement('maxrating')?.innerText,
       rating: weaponRating,
       accuracy: accuracyText?.isNotEmpty == true ? accuracyText! : '0',
-      activeAmmoSlot: int.tryParse(xmlElement.getElement('activeammoslot')?.text ?? '1') ?? 1,
-      conceal: xmlElement.getElement('conceal')?.text ?? '0',
+      activeAmmoSlot: int.tryParse(xmlElement.getElement('activeammoslot')?.innerText ?? '1') ?? 1,
+      conceal: xmlElement.getElement('conceal')?.innerText ?? '0',
       avail: parseAvail(xmlElement.getElement('avail'), weaponRating),
-      cost: int.tryParse(xmlElement.getElement('cost')?.text ?? '0') ?? 0,
-      weight: xmlElement.getElement('weight')?.text,
-      useSkill: xmlElement.getElement('useskill')?.text,
-      useSkillSpec: xmlElement.getElement('useskillspec')?.text,
-      range: xmlElement.getElement('range')?.text,
-      alternateRange: xmlElement.getElement('alternaterange')?.text,
-      rangeMultiply: int.tryParse(xmlElement.getElement('rangemultiply')?.text ?? '1') ?? 1,
-      singleShot: int.tryParse(xmlElement.getElement('singleshot')?.text ?? '1') ?? 1,
-      shortBurst: int.tryParse(xmlElement.getElement('shortburst')?.text ?? '3') ?? 3,
-      longBurst: int.tryParse(xmlElement.getElement('longburst')?.text ?? '6') ?? 6,
-      fullBurst: int.tryParse(xmlElement.getElement('fullburst')?.text ?? '10') ?? 10,
-      suppressive: int.tryParse(xmlElement.getElement('suppressive')?.text ?? '20') ?? 20,
-      allowSingleShot: xmlElement.getElement('allowsingleshot')?.text == 'True' || xmlElement.getElement('allowsingleshot') == null,
-      allowShortBurst: xmlElement.getElement('allowshortburst')?.text == 'True' || xmlElement.getElement('allowshortburst') == null,
-      allowLongBurst: xmlElement.getElement('allowlongburst')?.text == 'True' || xmlElement.getElement('allowlongburst') == null,
-      allowFullBurst: xmlElement.getElement('allowfullburst')?.text == 'True' || xmlElement.getElement('allowfullburst') == null,
-      allowSuppressive: xmlElement.getElement('allowsuppressive')?.text == 'True' || xmlElement.getElement('allowsuppressive') == null,
+      cost: int.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
+      weight: xmlElement.getElement('weight')?.innerText,
+      useSkill: xmlElement.getElement('useskill')?.innerText,
+      useSkillSpec: xmlElement.getElement('useskillspec')?.innerText,
+      range: xmlElement.getElement('range')?.innerText,
+      alternateRange: xmlElement.getElement('alternaterange')?.innerText,
+      rangeMultiply: int.tryParse(xmlElement.getElement('rangemultiply')?.innerText ?? '1') ?? 1,
+      singleShot: int.tryParse(xmlElement.getElement('singleshot')?.innerText ?? '1') ?? 1,
+      shortBurst: int.tryParse(xmlElement.getElement('shortburst')?.innerText ?? '3') ?? 3,
+      longBurst: int.tryParse(xmlElement.getElement('longburst')?.innerText ?? '6') ?? 6,
+      fullBurst: int.tryParse(xmlElement.getElement('fullburst')?.innerText ?? '10') ?? 10,
+      suppressive: int.tryParse(xmlElement.getElement('suppressive')?.innerText ?? '20') ?? 20,
+      allowSingleShot: xmlElement.getElement('allowsingleshot')?.innerText == 'True' || xmlElement.getElement('allowsingleshot') == null,
+      allowShortBurst: xmlElement.getElement('allowshortburst')?.innerText == 'True' || xmlElement.getElement('allowshortburst') == null,
+      allowLongBurst: xmlElement.getElement('allowlongburst')?.innerText == 'True' || xmlElement.getElement('allowlongburst') == null,
+      allowFullBurst: xmlElement.getElement('allowfullburst')?.innerText == 'True' || xmlElement.getElement('allowfullburst') == null,
+      allowSuppressive: xmlElement.getElement('allowsuppressive')?.innerText == 'True' || xmlElement.getElement('allowsuppressive') == null,
       source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
       page: pageText?.isNotEmpty == true ? pageText! : '0',
-      parentId: xmlElement.getElement('parentid')?.text,
-      allowAccessory: xmlElement.getElement('allowaccessory')?.text == 'True',
-      weaponName: xmlElement.getElement('weaponname')?.text,
-      included: xmlElement.getElement('included')?.text == 'True',
-      equipped: xmlElement.getElement('equipped')?.text == 'True',
-      active: xmlElement.getElement('active')?.text == 'True',
-      homeNode: xmlElement.getElement('homenode')?.text == 'True',
-      deviceRating: xmlElement.getElement('devicerating')?.text,
-      requireAmmo: xmlElement.getElement('requireammo')?.text == 'True' || xmlElement.getElement('requireammo') == null,
-      mount: xmlElement.getElement('mount')?.text,
-      stolen: xmlElement.getElement('stolen')?.text == 'True',
-      extraMount: xmlElement.getElement('extramount')?.text,
+      parentId: xmlElement.getElement('parentid')?.innerText,
+      allowAccessory: xmlElement.getElement('allowaccessory')?.innerText == 'True',
+      weaponName: xmlElement.getElement('weaponname')?.innerText,
+      included: xmlElement.getElement('included')?.innerText == 'True',
+      equipped: xmlElement.getElement('equipped')?.innerText == 'True',
+      active: xmlElement.getElement('active')?.innerText == 'True',
+      homeNode: xmlElement.getElement('homenode')?.innerText == 'True',
+      deviceRating: xmlElement.getElement('devicerating')?.innerText,
+      requireAmmo: xmlElement.getElement('requireammo')?.innerText == 'True' || xmlElement.getElement('requireammo') == null,
+      mount: xmlElement.getElement('mount')?.innerText,
+      stolen: xmlElement.getElement('stolen')?.innerText == 'True',
+      extraMount: xmlElement.getElement('extramount')?.innerText,
       accessories: xmlElement.findElements('accessories').expand((e) => e.findElements('accessory')).map((accXml) => WeaponAccessory.fromXml(accXml)).toList(),
-      location: xmlElement.getElement('location')?.text,
-      notes: xmlElement.getElement('notes')?.text,
-      notesColor: xmlElement.getElement('notesColor')?.text,
-      discountedCost: xmlElement.getElement('discountedcost')?.text == 'True',
-      wirelessOn: xmlElement.getElement('wirelesson')?.text == 'True',
-      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.text ?? '0') ?? 0,
-      weaponType: xmlElement.getElement('weapontype')?.text,
+      location: xmlElement.getElement('location')?.innerText,
+      notes: xmlElement.getElement('notes')?.innerText,
+      notesColor: xmlElement.getElement('notesColor')?.innerText,
+      discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
+      wirelessOn: xmlElement.getElement('wirelesson')?.innerText == 'True',
+      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
+      weaponType: xmlElement.getElement('weapontype')?.innerText,
     );
   }
 }

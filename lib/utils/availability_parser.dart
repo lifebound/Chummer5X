@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:xml/xml.dart';
 
 String parseAvail(XmlElement? element, int itemRating) {
@@ -28,13 +29,13 @@ String parseAvail(XmlElement? element, int itemRating) {
       return '$calculatedValue$suffix';
     } catch (e) {
       // Fallback if parsing fails for some reason (e.g., non-numeric string despite regex match attempt)
-      print('Warning: Could not parse availability "$rawAvail" with rating $itemRating. Error: $e');
+      debugPrint('Warning: Could not parse availability "$rawAvail" with rating $itemRating. Error: $e');
       return rawAvail; // Return original if calculation fails
     }
   }
 
   // If it doesn't match either expected pattern, return original or default.
-  print('Warning: Unrecognized availability format: "$rawAvail"');
+  debugPrint('Warning: Unrecognized availability format: "$rawAvail"');
   return rawAvail;
 }
 

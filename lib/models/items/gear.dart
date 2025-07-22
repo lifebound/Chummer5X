@@ -1,3 +1,4 @@
+import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
@@ -67,6 +68,11 @@ class Gear extends ShadowrunItem {
     final sourceText = xmlElement.getElement('source')?.text;
     final pageText = xmlElement.getElement('page')?.text;
     
+    final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
+    final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultGearLocationGuid;
+
+
+
     String finalName;
     if (extraText?.isNotEmpty == true) {
       finalName = extraText!;
@@ -78,7 +84,7 @@ class Gear extends ShadowrunItem {
     
     return Gear(
       sourceId: xmlElement.getElement('sourceid')?.text,
-      locationGuid: xmlElement.getElement('guid')?.text,
+      locationGuid: locationGuid,
       name: finalName,
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',

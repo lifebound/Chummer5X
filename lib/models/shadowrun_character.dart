@@ -19,6 +19,7 @@ import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/expense_entry.dart';
 import 'package:chummer5x/models/mugshot.dart';
+import 'package:chummer5x/models/items/location.dart';
 
 
 
@@ -56,7 +57,8 @@ class ShadowrunCharacter {
   
   // Equipment
   final List<Gear> gear;
-  
+  final Map<String, Location> gearLocations; // Added to track gear locations
+
   // Condition Monitor
   final ConditionMonitor conditionMonitor;
   
@@ -123,6 +125,7 @@ class ShadowrunCharacter {
     this.isTechnomancer = false,
     this.initiationGrades = const [],
     this.submersionGrades = const [],
+    this.gearLocations = const {}, // Initialize gear locations
   }) : attributes = _ensureEssenceAttribute(attributes);
   
   // Static helper method to ensure ESS attribute is always present

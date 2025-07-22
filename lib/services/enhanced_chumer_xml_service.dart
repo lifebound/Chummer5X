@@ -25,6 +25,7 @@ import 'package:chummer5x/models/qualities.dart';
 import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/mugshot.dart';
+import 'package:chummer5x/models/items/location.dart';
 
 
 class EnhancedChummerXmlService {
@@ -107,7 +108,8 @@ class EnhancedChummerXmlService {
       
       // Parse gear
       final gear = _parseGear(characterElement);
-      
+      final gearLocations = _parseLocations(characterElement, "gearlocations", defaultGearLocationGuid, 'Gear');
+
       // Parse condition monitor
       final conditionMonitor = _parseConditionMonitor(characterElement, calculatedValues);
       
@@ -170,6 +172,7 @@ class EnhancedChummerXmlService {
         karmaExpenseEntries: karmaExpenseEntries,
         nuyenExpenseEntries: nuyenExpenseEntries,
         mugshot: mugshot,
+        gearLocations: gearLocations
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');
@@ -554,6 +557,7 @@ class EnhancedChummerXmlService {
 
   static List<Gear> _parseGear(XmlElement characterElement) {
     final allGear = <Gear>[];
+
     
     // Parse regular gear
     final gearsElement = characterElement.findElements('gears').firstOrNull;
@@ -583,7 +587,44 @@ class EnhancedChummerXmlService {
     
     return allGear;
   }
-  
+
+  static Map<String, Location> _parseLocations(XmlElement characterElement, String locationType, String defaultLocationGuid, String defaultName) {
+    final locations = <String, Location>{};
+    final locationsElement = characterElement.findElements(locationType).firstOrNull;
+    
+    //create default location if no locations are found
+    if (locationsElement == null || locationsElement.children.isEmpty) {
+      locations[defaultName] = Location(
+        name: 'Selected $defaultName',
+        guid: defaultLocationGuid,
+        notes: '',
+        notesColor: '',
+        sortOrder: 0
+      );
+    }
+    if (locationsElement != null) {
+      for (final locationElement in locationsElement.findElements('location')) {
+        final guid = _getElementText(locationElement, 'guid');
+        final name = _getElementText(locationElement, 'name');
+        final description = _getElementText(locationElement, 'notes');
+        final type = _getElementText(locationElement, 'type');
+        final notesColor = _getElementText(locationElement, 'notesColor');
+        final sortOrder = int.tryParse(_getElementText(locationElement, 'sortorder') ?? '0') ?? 0;
+
+        if (name != null && description != null && type != null) {
+          locations[name] = Location(
+            name: name,
+            guid: guid ?? defaultLocationGuid,
+            notes: description,
+            notesColor: notesColor ?? '',
+            sortOrder: sortOrder,
+          );
+        }
+      }
+    }
+    
+    return locations;
+  }
   
   static ConditionMonitor _parseConditionMonitor(XmlElement characterElement, Map<String, dynamic> calculatedValues) {
     // Create a map with all the root-level character data

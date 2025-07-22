@@ -25,6 +25,7 @@ import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
+import 'package:chummer5x/widgets/gear_location_tree_view.dart';
 
 enum NavigationSection {
   overview,
@@ -4201,7 +4202,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _buildPlaceholderContent(context, 'General Gear', 'inventory'),
+            child: GearLocationTreeView(allLocations: _currentCharacter?.gearLocations ?? {}, allGears: _currentCharacter?.gear ?? []),
           ),
         ],
       ),

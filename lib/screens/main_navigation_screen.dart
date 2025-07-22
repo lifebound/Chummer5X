@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:chummer5x/widgets/armor_location_tree_view.dart';
+import 'package:chummer5x/widgets/weapon_location_tree_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -4221,7 +4223,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _buildPlaceholderContent(context, 'Clothing & Armor', 'shield'),
+            child: ArmorLocationTreeView(allLocations: _currentCharacter?.armorLocations ?? {}, allArmors: _currentCharacter?.armor ?? []),
           ),
         ],
       ),
@@ -4240,7 +4242,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _buildPlaceholderContent(context, 'Weapons', 'gps_fixed'),
+            child: WeaponLocationTreeView(allLocations: _currentCharacter?.weaponLocations ?? {}, allWeapons: _currentCharacter?.weapons ?? []),
           ),
         ],
       ),

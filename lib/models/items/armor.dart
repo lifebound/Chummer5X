@@ -1,3 +1,4 @@
+import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
 import 'package:xml/xml.dart';
@@ -77,9 +78,13 @@ class Armor extends ShadowrunItem {
     final sourceText = xmlElement.getElement('source')?.text;
     final pageText = xmlElement.getElement('page')?.text;
     
+    final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
+    final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultArmorLocationGuid;
+
+
     return Armor(
       sourceId: xmlElement.getElement('sourceid')?.text,
-      locationGuid: xmlElement.getElement('guid')?.text,
+      locationGuid: locationGuid,
       name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Armor',
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       armorValue: xmlElement.getElement('armor')?.text ?? '0',

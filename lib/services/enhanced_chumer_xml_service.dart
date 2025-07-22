@@ -110,6 +110,18 @@ class EnhancedChummerXmlService {
       final gear = _parseGear(characterElement);
       final gearLocations = _parseLocations(characterElement, "gearlocations", defaultGearLocationGuid, 'Gear');
 
+      // parse armor
+      final allArmor = _parseArmor(characterElement);
+      final armorLocations = _parseLocations(characterElement, "armorlocations", defaultArmorLocationGuid, 'Armor');
+
+      //parse vehicles
+      final vehicles = _parseVehicles(characterElement);
+      final vehicleLocations = _parseLocations(characterElement, "vehicleLocations", defaultVehicleLocationGuid, 'Vehicle');
+
+      // parse weapons
+      final allWeapons = _parseWeapons(characterElement);
+      final weaponLocations = _parseLocations(characterElement, "weaponLocations", defaultWeaponLocationGuid, 'Weapon');
+
       // Parse condition monitor
       final conditionMonitor = _parseConditionMonitor(characterElement, calculatedValues);
       
@@ -172,7 +184,14 @@ class EnhancedChummerXmlService {
         karmaExpenseEntries: karmaExpenseEntries,
         nuyenExpenseEntries: nuyenExpenseEntries,
         mugshot: mugshot,
-        gearLocations: gearLocations
+        gearLocations: gearLocations,
+        vehicleLocations: vehicleLocations,
+        weaponLocations: weaponLocations,
+        armorLocations: armorLocations,
+        armor: allArmor,
+        vehicles: vehicles,
+        weapons: allWeapons,
+
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');
@@ -577,16 +596,52 @@ class EnhancedChummerXmlService {
       }
     }
     
+    
+    
+    return allGear;
+  }
+
+  static List<Armor> _parseArmor(XmlElement characterElement) {
+    final allArmor = <Armor>[];
     // Parse armor as gear
     final armorsElement = characterElement.findElements('armors').firstOrNull;
     if (armorsElement != null) {
       for (final armorElement in armorsElement.findElements('armor')) {
         final gear = Armor.fromXml(armorElement);
+        allArmor.add(gear);
+      }
+    }
+    return allArmor;
+  }
+  static List<Vehicle> _parseVehicles(XmlElement characterElement) {
+    final allVehicles = <Vehicle>[];
+    final vehiclesElement = characterElement.findElements('vehicles').firstOrNull;
+    
+    if (vehiclesElement != null) {
+      for (final vehicleElement in vehiclesElement.findElements('vehicle')) {
+        final vehicle = Vehicle.fromXml(vehicleElement);
+        allVehicles.add(vehicle);
       }
     }
     
-    return allGear;
+    return allVehicles;
   }
+
+  static List<Weapon> _parseWeapons(XmlElement characterElement) {
+    final allWeapons = <Weapon>[];
+    final weaponsElement = characterElement.findElements('weapons').firstOrNull;
+    
+    if (weaponsElement != null) {
+      for (final weaponElement in weaponsElement.findElements('weapon')) {
+        final weapon = Weapon.fromXml(weaponElement);
+        allWeapons.add(weapon);
+      }
+    }
+    
+    return allWeapons;
+  }
+
+
 
   static Map<String, Location> _parseLocations(XmlElement characterElement, String locationType, String defaultLocationGuid, String defaultName) {
     final locations = <String, Location>{};

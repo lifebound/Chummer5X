@@ -20,6 +20,9 @@ import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/expense_entry.dart';
 import 'package:chummer5x/models/mugshot.dart';
 import 'package:chummer5x/models/items/location.dart';
+import 'package:chummer5x/models/items/armor.dart';
+import 'package:chummer5x/models/items/vehicle.dart';
+import 'package:chummer5x/models/items/weapon.dart';
 
 
 
@@ -58,6 +61,12 @@ class ShadowrunCharacter {
   // Equipment
   final List<Gear> gear;
   final Map<String, Location> gearLocations; // Added to track gear locations
+  final List<Armor> armor;
+  final Map<String, Location> armorLocations; // Added to track armor locations
+  final List<Vehicle> vehicles;
+  final Map<String, Location> vehicleLocations; // Added to track vehicle locations
+  final List<Weapon> weapons;
+  final Map<String, Location> weaponLocations; // Added to track weapon locations
 
   // Condition Monitor
   final ConditionMonitor conditionMonitor;
@@ -126,6 +135,12 @@ class ShadowrunCharacter {
     this.initiationGrades = const [],
     this.submersionGrades = const [],
     this.gearLocations = const {}, // Initialize gear locations
+    this.armor = const [],
+    this.armorLocations = const {}, // Initialize armor locations
+    this.vehicles = const [],
+    this.vehicleLocations = const {}, // Initialize vehicle locations
+    this.weapons = const [],
+    this.weaponLocations = const {}, // Initialize weapon locations
   }) : attributes = _ensureEssenceAttribute(attributes);
   
   // Static helper method to ensure ESS attribute is always present

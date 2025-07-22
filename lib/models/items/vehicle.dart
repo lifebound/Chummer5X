@@ -1,3 +1,4 @@
+import 'package:chummer5x/models/items/location.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:chummer5x/models/items/gear.dart';
@@ -100,11 +101,16 @@ class Vehicle extends ShadowrunItem {
           matrixCmBonus: 0, // Not present in XML for Vehicle directly
         );
 
-  factory Vehicle.fromXmlElement(XmlElement element) {
+  factory Vehicle.fromXml(XmlElement element) {
     int vehicleRating = int.tryParse(element.getElement('devicerating')?.innerText ?? '0') ?? 0;
+
+    final String rawLocationGuid = element.getElement('location')?.innerText ?? '';
+    final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultVehicleLocationGuid;
+
+    
     return Vehicle(
       sourceId: element.getElement('sourceid')?.innerText ?? '',
-      locationGuid: element.getElement('guid')?.innerText ?? '',
+      locationGuid: locationGuid,
       name: element.getElement('name')?.innerText ?? '',
       category: element.getElement('category')?.innerText ?? '',
       handling: element.getElement('handling')?.innerText ?? '',

@@ -1,3 +1,4 @@
+import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/weapon_accessory.dart';
@@ -148,9 +149,13 @@ class Weapon extends ShadowrunItem {
     final firingModeText = xmlElement.getElement('firingmode')?.text;
     final accuracyText = xmlElement.getElement('accuracy')?.text;
     
+
+    final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
+    final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultWeaponLocationGuid;
+
     return Weapon(
       sourceId: xmlElement.getElement('sourceid')?.text,
-      locationGuid: xmlElement.getElement('guid')?.text,
+      locationGuid: locationGuid,
       name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Weapon',
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       type: typeText?.isNotEmpty == true ? typeText! : 'Unknown',

@@ -236,7 +236,7 @@ class SkillsScreen extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  title: Text(item.name?.toString() ?? 'Unknown Item'),
+                  title: Text(item.name.toString()),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

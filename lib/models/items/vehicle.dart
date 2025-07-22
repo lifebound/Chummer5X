@@ -35,7 +35,7 @@ class Vehicle extends ShadowrunItem {
 
   Vehicle({
     required String super.sourceId,
-    required String super.guid,
+    required String super.locationGuid,
     required super.name,
     required super.category,
     required super.avail,
@@ -103,7 +103,7 @@ class Vehicle extends ShadowrunItem {
     int vehicleRating = int.tryParse(element.getElement('devicerating')?.innerText ?? '0') ?? 0;
     return Vehicle(
       sourceId: element.getElement('sourceid')?.innerText ?? '',
-      guid: element.getElement('guid')?.innerText ?? '',
+      locationGuid: element.getElement('guid')?.innerText ?? '',
       name: element.getElement('name')?.innerText ?? '',
       category: element.getElement('category')?.innerText ?? '',
       handling: element.getElement('handling')?.innerText ?? '',

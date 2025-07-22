@@ -55,7 +55,7 @@ class Weapon extends ShadowrunItem {
 
   Weapon({
     super.sourceId,
-    super.guid,
+    super.locationGuid,
     required super.name,
     required super.category,
     required super.source,
@@ -137,29 +137,40 @@ class Weapon extends ShadowrunItem {
 
   factory Weapon.fromXml(XmlElement xmlElement) {
     int weaponRating = int.tryParse(xmlElement.getElement('rating')?.text ?? '0') ?? 0;
+    
+    final nameText = xmlElement.getElement('name')?.text;
+    final categoryText = xmlElement.getElement('category')?.text;
+    final typeText = xmlElement.getElement('type')?.text;
+    final sourceText = xmlElement.getElement('source')?.text;
+    final pageText = xmlElement.getElement('page')?.text;
+    final modeText = xmlElement.getElement('mode')?.text;
+    final ammoText = xmlElement.getElement('ammo')?.text;
+    final firingModeText = xmlElement.getElement('firingmode')?.text;
+    final accuracyText = xmlElement.getElement('accuracy')?.text;
+    
     return Weapon(
       sourceId: xmlElement.getElement('sourceid')?.text,
-      guid: xmlElement.getElement('guid')?.text,
-      name: xmlElement.getElement('name')?.text ?? 'Unnamed Weapon',
-      category: xmlElement.getElement('category')?.text ?? 'Unknown',
-      type: xmlElement.getElement('type')?.text ?? 'Unknown',
+      locationGuid: xmlElement.getElement('guid')?.text,
+      name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Weapon',
+      category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
+      type: typeText?.isNotEmpty == true ? typeText! : 'Unknown',
       spec: xmlElement.getElement('spec')?.text,
       spec2: xmlElement.getElement('spec2')?.text,
       reach: int.tryParse(xmlElement.getElement('reach')?.text ?? '0') ?? 0,
       damage: xmlElement.getElement('damage')?.text ?? '0',
       ap: xmlElement.getElement('ap')?.text ?? '-',
-      mode: xmlElement.getElement('mode')?.text ?? '0',
+      mode: modeText?.isNotEmpty == true ? modeText! : 'Unknown',
       rc: int.tryParse(xmlElement.getElement('rc')?.text ?? '0') ?? 0,
-      ammo: xmlElement.getElement('ammo')?.text ?? '0',
+      ammo: ammoText?.isNotEmpty == true ? ammoText! : 'Unknown',
       cyberware: xmlElement.getElement('cyberware')?.text == 'True',
       ammoCategory: xmlElement.getElement('ammocategory')?.text,
       ammoSlots: int.tryParse(xmlElement.getElement('ammoslots')?.text ?? '1') ?? 1,
       sizeCategory: xmlElement.getElement('sizecategory')?.text,
-      firingMode: xmlElement.getElement('firingmode')?.text ?? 'Unknown',
+      firingMode: firingModeText?.isNotEmpty == true ? firingModeText! : 'Unknown',
       minRating: xmlElement.getElement('minrating')?.text,
       maxRating: xmlElement.getElement('maxrating')?.text,
       rating: weaponRating,
-      accuracy: xmlElement.getElement('accuracy')?.text ?? 'Physical',
+      accuracy: accuracyText?.isNotEmpty == true ? accuracyText! : '0',
       activeAmmoSlot: int.tryParse(xmlElement.getElement('activeammoslot')?.text ?? '1') ?? 1,
       conceal: xmlElement.getElement('conceal')?.text ?? '0',
       avail: parseAvail(xmlElement.getElement('avail'), weaponRating),
@@ -175,19 +186,22 @@ class Weapon extends ShadowrunItem {
       longBurst: int.tryParse(xmlElement.getElement('longburst')?.text ?? '6') ?? 6,
       fullBurst: int.tryParse(xmlElement.getElement('fullburst')?.text ?? '10') ?? 10,
       suppressive: int.tryParse(xmlElement.getElement('suppressive')?.text ?? '20') ?? 20,
-      allowSingleShot: xmlElement.getElement('allowsingleshot')?.text == 'True',
-      allowShortBurst: xmlElement.getElement('allowshortburst')?.text == 'True',
-      allowLongBurst: xmlElement.getElement('allowlongburst')?.text == 'True',
-      allowFullBurst: xmlElement.getElement('allowfullburst')?.text == 'True',
-      allowSuppressive: xmlElement.getElement('allowsuppressive')?.text == 'True',
-      source: xmlElement.getElement('source')?.text ?? 'Unknown',
-      page: xmlElement.getElement('page')?.text ?? '0',
+      allowSingleShot: xmlElement.getElement('allowsingleshot')?.text == 'True' || xmlElement.getElement('allowsingleshot') == null,
+      allowShortBurst: xmlElement.getElement('allowshortburst')?.text == 'True' || xmlElement.getElement('allowshortburst') == null,
+      allowLongBurst: xmlElement.getElement('allowlongburst')?.text == 'True' || xmlElement.getElement('allowlongburst') == null,
+      allowFullBurst: xmlElement.getElement('allowfullburst')?.text == 'True' || xmlElement.getElement('allowfullburst') == null,
+      allowSuppressive: xmlElement.getElement('allowsuppressive')?.text == 'True' || xmlElement.getElement('allowsuppressive') == null,
+      source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
+      page: pageText?.isNotEmpty == true ? pageText! : '0',
       parentId: xmlElement.getElement('parentid')?.text,
       allowAccessory: xmlElement.getElement('allowaccessory')?.text == 'True',
       weaponName: xmlElement.getElement('weaponname')?.text,
       included: xmlElement.getElement('included')?.text == 'True',
       equipped: xmlElement.getElement('equipped')?.text == 'True',
-      requireAmmo: xmlElement.getElement('requireammo')?.text == 'True',
+      active: xmlElement.getElement('active')?.text == 'True',
+      homeNode: xmlElement.getElement('homenode')?.text == 'True',
+      deviceRating: xmlElement.getElement('devicerating')?.text,
+      requireAmmo: xmlElement.getElement('requireammo')?.text == 'True' || xmlElement.getElement('requireammo') == null,
       mount: xmlElement.getElement('mount')?.text,
       stolen: xmlElement.getElement('stolen')?.text == 'True',
       extraMount: xmlElement.getElement('extramount')?.text,

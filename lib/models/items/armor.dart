@@ -21,7 +21,7 @@ class Armor extends ShadowrunItem {
 
   Armor({
     super.sourceId,
-    super.guid,
+    super.locationGuid,
     required super.name,
     required super.category,
     required super.source,
@@ -71,19 +71,25 @@ class Armor extends ShadowrunItem {
 
   factory Armor.fromXml(XmlElement xmlElement) {
     int armorRating = int.tryParse(xmlElement.getElement('armor')?.text ?? '0') ?? 0;
+    
+    final nameText = xmlElement.getElement('name')?.text;
+    final categoryText = xmlElement.getElement('category')?.text;
+    final sourceText = xmlElement.getElement('source')?.text;
+    final pageText = xmlElement.getElement('page')?.text;
+    
     return Armor(
       sourceId: xmlElement.getElement('sourceid')?.text,
-      guid: xmlElement.getElement('guid')?.text,
-      name: xmlElement.getElement('name')?.text ?? 'Unnamed Armor',
-      category: xmlElement.getElement('category')?.text ?? 'Unknown',
+      locationGuid: xmlElement.getElement('guid')?.text,
+      name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Armor',
+      category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       armorValue: xmlElement.getElement('armor')?.text ?? '0',
       armorOverride: xmlElement.getElement('armoroverride')?.text,
       armorCapacity: xmlElement.getElement('armorcapacity')?.text ?? '0',
       avail: parseAvail(xmlElement.getElement('avail'), armorRating),
       cost: int.tryParse(xmlElement.getElement('cost')?.text ?? '0') ?? 0,
       weight: xmlElement.getElement('weight')?.text,
-      source: xmlElement.getElement('source')?.text ?? 'Unknown',
-      page: xmlElement.getElement('page')?.text ?? '0',
+      source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
+      page: pageText?.isNotEmpty == true ? pageText! : '0',
       armorName: xmlElement.getElement('armorname')?.text,
       equipped: xmlElement.getElement('equipped')?.text == 'True',
       active: xmlElement.getElement('active')?.text == 'True',

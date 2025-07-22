@@ -3,7 +3,7 @@ import 'package:xml/xml.dart'; // Import the xml package
 // Abstract base class for all items
 abstract class ShadowrunItem {
   final String? sourceId;
-  final String? guid;
+  final String? locationGuid;
   final String name;
   final String category;
   final String avail;
@@ -38,7 +38,7 @@ abstract class ShadowrunItem {
 
   ShadowrunItem({
     this.sourceId,
-    this.guid,
+    this.locationGuid,
     required this.name,
     required this.category,
     required this.source,

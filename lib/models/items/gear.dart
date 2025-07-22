@@ -24,7 +24,7 @@ class Gear extends ShadowrunItem {
 
   Gear({
     super.sourceId,
-    super.guid,
+    super.locationGuid,
     required super.name,
     required super.category,
     required super.source,
@@ -59,15 +59,30 @@ class Gear extends ShadowrunItem {
 
   factory Gear.fromXml(XmlElement xmlElement) {
     int gearRating = int.tryParse(xmlElement.getElement('rating')?.text ?? '0') ?? 0;
+    
+    // Handle name selection priority: extra > name > default
+    final extraText = xmlElement.getElement('extra')?.text;
+    final nameText = xmlElement.getElement('name')?.text;
+    final categoryText = xmlElement.getElement('category')?.text;
+    final sourceText = xmlElement.getElement('source')?.text;
+    final pageText = xmlElement.getElement('page')?.text;
+    
+    String finalName;
+    if (extraText?.isNotEmpty == true) {
+      finalName = extraText!;
+    } else if (nameText?.isNotEmpty == true) {
+      finalName = nameText!;
+    } else {
+      finalName = 'Unnamed Gear';
+    }
+    
     return Gear(
       sourceId: xmlElement.getElement('sourceid')?.text,
-      guid: xmlElement.getElement('guid')?.text,
-      name: xmlElement.getElement('extra')?.text ??
-          xmlElement.getElement('name')?.text ??
-          'Unnamed Gear',
-      category: xmlElement.getElement('category')?.text ?? 'Unknown',
-      source: xmlElement.getElement('source')?.text ?? 'Unknown',
-      page: xmlElement.getElement('page')?.text ?? '0',
+      locationGuid: xmlElement.getElement('guid')?.text,
+      name: finalName,
+      category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
+      source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
+      page: pageText?.isNotEmpty == true ? pageText! : '0',
       equipped: xmlElement.getElement('equipped')?.text == 'True',
       wirelessOn: xmlElement.getElement('wirelesson')?.text == 'True',
       stolen: xmlElement.getElement('stolen')?.text == 'True',

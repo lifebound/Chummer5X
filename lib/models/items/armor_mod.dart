@@ -55,11 +55,16 @@ class ArmorMod {
   });
 
   factory ArmorMod.fromXml(XmlElement xmlElement) {
+    final nameText = xmlElement.getElement('name')?.text;
+    final categoryText = xmlElement.getElement('category')?.text;
+    final sourceText = xmlElement.getElement('source')?.text;
+    final pageText = xmlElement.getElement('page')?.text;
+    
     return ArmorMod(
       sourceId: xmlElement.getElement('sourceid')?.text,
       guid: xmlElement.getElement('guid')?.text,
-      name: xmlElement.getElement('name')?.text ?? 'Unnamed Armor Mod',
-      category: xmlElement.getElement('category')?.text ?? 'Unknown',
+      name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Armor Mod',
+      category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
       armor: int.tryParse(xmlElement.getElement('armor')?.text ?? '0') ?? 0,
       armorCapacity: xmlElement.getElement('armorcapacity')?.text ?? '0',
       gearCapacity: xmlElement.getElement('gearcapacity')?.text,
@@ -69,8 +74,8 @@ class ArmorMod {
       avail: xmlElement.getElement('avail')?.text,
       cost: xmlElement.getElement('cost')?.text ?? '0',
       weight: xmlElement.getElement('weight')?.text,
-      source: xmlElement.getElement('source')?.text ?? 'Unknown',
-      page: xmlElement.getElement('page')?.text ?? '0',
+      source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
+      page: pageText?.isNotEmpty == true ? pageText! : '0',
       included: xmlElement.getElement('included')?.text == 'True',
       equipped: xmlElement.getElement('equipped')?.text == 'True',
       extra: xmlElement.getElement('extra')?.text,

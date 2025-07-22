@@ -1,0 +1,298 @@
+.
+├── analysis_options.yaml
+├── android
+│   ├── app
+│   │   ├── build.gradle
+│   │   └── src
+│   ├── build.gradle
+│   ├── chummer5x_android.iml
+│   ├── gradle
+│   │   └── wrapper
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   ├── local.properties
+│   └── settings.gradle
+├── assets
+│   ├── icon
+│   └── images
+│       └── chummer5x.png
+├── build
+│   ├── 5f26809536b1c6a3797b573eb72ac672.cache.dill.track.dill
+│   ├── 6b373ba8e28f935e01c7ffd6d2400688
+│   │   ├── _composite.stamp
+│   │   ├── gen_dart_plugin_registrant.stamp
+│   │   └── gen_localizations.stamp
+│   ├── app
+│   │   ├── generated
+│   │   ├── intermediates
+│   │   ├── kotlin
+│   │   ├── outputs
+│   │   ├── snapshot
+│   │   └── tmp
+│   ├── file_picker
+│   │   ├── generated
+│   │   ├── intermediates
+│   │   ├── kotlin
+│   │   ├── outputs
+│   │   └── tmp
+│   ├── flutter_assets
+│   │   ├── AssetManifest.bin
+│   │   ├── AssetManifest.bin.json
+│   │   ├── AssetManifest.json
+│   │   ├── assets
+│   │   ├── FontManifest.json
+│   │   ├── fonts
+│   │   ├── kernel_blob.bin
+│   │   ├── NativeAssetsManifest.json
+│   │   ├── NOTICES
+│   │   ├── NOTICES.Z
+│   │   ├── packages
+│   │   ├── shaders
+│   │   └── version.json
+│   ├── flutter_plugin_android_lifecycle
+│   │   ├── generated
+│   │   ├── intermediates
+│   │   ├── outputs
+│   │   └── tmp
+│   ├── lib
+│   ├── linux
+│   │   └── x64
+│   ├── native_assets
+│   │   ├── android
+│   │   └── linux
+│   ├── path_provider_android
+│   │   ├── generated
+│   │   ├── intermediates
+│   │   ├── outputs
+│   │   └── tmp
+│   ├── reports
+│   │   └── problems
+│   ├── share_plus
+│   │   ├── generated
+│   │   ├── intermediates
+│   │   ├── kotlin
+│   │   ├── outputs
+│   │   └── tmp
+│   ├── test_cache
+│   │   └── build
+│   └── unit_test_assets
+│       ├── AssetManifest.bin
+│       ├── AssetManifest.json
+│       ├── assets
+│       ├── FontManifest.json
+│       ├── fonts
+│       ├── NativeAssetsManifest.json
+│       ├── NOTICES.Z
+│       ├── packages
+│       └── shaders
+├── chummer5x.iml
+├── coverage
+│   ├── attribute_filtering_test.info
+│   ├── character_qualities_test.info
+│   ├── condition_monitor_test.info
+│   ├── critter_skill_display_test.info
+│   ├── critter_switches_test.info
+│   ├── critter_test.info
+│   ├── enhanced_attribute_parsing_test.info
+│   ├── enhanced_spell_complexform_test.info
+│   ├── html
+│   │   ├── amber.png
+│   │   ├── cmd_line
+│   │   ├── emerald.png
+│   │   ├── gcov.css
+│   │   ├── glass.png
+│   │   ├── index.html
+│   │   ├── index-sort-f.html
+│   │   ├── index-sort-l.html
+│   │   ├── lib
+│   │   ├── ruby.png
+│   │   ├── snow.png
+│   │   └── updown.png
+│   ├── platform_file_handler_test.info
+│   ├── skill_cm_penalty_test.info
+│   ├── skill_defaulting_test.info
+│   ├── total_coverage.info
+│   ├── widget_test.info
+│   └── xml_modification_test.info
+├── debug_weapon.dart
+├── devtools_options.yaml
+├── flutter_launcher_icons.yaml
+├── flutter_tree.txt
+├── generate_coverage.sh
+├── ios
+│   ├── Flutter
+│   │   ├── AppFrameworkInfo.plist
+│   │   ├── Debug.xcconfig
+│   │   ├── ephemeral
+│   │   ├── flutter_export_environment.sh
+│   │   ├── Generated.xcconfig
+│   │   └── Release.xcconfig
+│   ├── Runner
+│   │   ├── AppDelegate.swift
+│   │   ├── Assets.xcassets
+│   │   ├── Base.lproj
+│   │   ├── GeneratedPluginRegistrant.h
+│   │   ├── GeneratedPluginRegistrant.m
+│   │   ├── Info.plist
+│   │   └── Runner-Bridging-Header.h
+│   ├── RunnerTests
+│   │   └── RunnerTests.swift
+│   ├── Runner.xcodeproj
+│   │   ├── project.pbxproj
+│   │   ├── project.xcworkspace
+│   │   └── xcshareddata
+│   └── Runner.xcworkspace
+│       ├── contents.xcworkspacedata
+│       └── xcshareddata
+├── lib
+│   ├── main.dart
+│   ├── models
+│   │   ├── adept_powers.dart
+│   │   ├── attributes.dart
+│   │   ├── calendar.dart
+│   │   ├── complex_forms.dart
+│   │   ├── condition_monitor.dart
+│   │   ├── critter_base.dart
+│   │   ├── critter_factory.dart
+│   │   ├── expense_entry.dart
+│   │   ├── game_notes.dart
+│   │   ├── initiation.dart
+│   │   ├── items
+│   │   ├── limits.dart
+│   │   ├── metamagic.dart
+│   │   ├── mugshot.dart
+│   │   ├── qualities.dart
+│   │   ├── shadowrun_character.dart
+│   │   ├── skills.dart
+│   │   ├── spells.dart
+│   │   ├── spirit.dart
+│   │   ├── sprite.dart
+│   │   └── submersion.dart
+│   ├── screens
+│   │   ├── character_detail_screen.dart
+│   │   ├── character_navigation_screen.dart
+│   │   ├── home_screen.dart
+│   │   ├── main_navigation_screen.dart
+│   │   └── skills_screen.dart
+│   ├── services
+│   │   ├── chumer_xml_service.dart
+│   │   ├── enhanced_chumer_xml_service.dart
+│   │   ├── file_service.dart
+│   │   └── mutable_xml_service.dart
+│   ├── utils
+│   │   ├── availability_parser.dart
+│   │   ├── platform_file_handler.dart
+│   │   ├── responsive_layout.dart
+│   │   ├── skill_attribute_map.dart
+│   │   └── skill_group_map.dart
+│   └── widgets
+│       ├── attributes_card.dart
+│       ├── character_info_card.dart
+│       ├── profile_menu.dart
+│       ├── screen_size_indicator.dart
+│       └── skills_card.dart
+├── linux
+│   ├── CMakeLists.txt
+│   ├── flutter
+│   │   ├── CMakeLists.txt
+│   │   ├── ephemeral
+│   │   ├── generated_plugin_registrant.cc
+│   │   ├── generated_plugin_registrant.h
+│   │   └── generated_plugins.cmake
+│   ├── main.cc
+│   ├── my_application.cc
+│   └── my_application.h
+├── macos
+│   ├── Flutter
+│   │   ├── ephemeral
+│   │   ├── Flutter-Debug.xcconfig
+│   │   ├── Flutter-Release.xcconfig
+│   │   └── GeneratedPluginRegistrant.swift
+│   ├── Runner
+│   │   ├── AppDelegate.swift
+│   │   ├── Assets.xcassets
+│   │   ├── Base.lproj
+│   │   ├── Configs
+│   │   ├── DebugProfile.entitlements
+│   │   ├── Info.plist
+│   │   ├── MainFlutterWindow.swift
+│   │   └── Release.entitlements
+│   ├── RunnerTests
+│   │   └── RunnerTests.swift
+│   ├── Runner.xcodeproj
+│   │   ├── project.pbxproj
+│   │   ├── project.xcworkspace
+│   │   └── xcshareddata
+│   └── Runner.xcworkspace
+│       ├── contents.xcworkspacedata
+│       └── xcshareddata
+├── pubspec.lock
+├── pubspec.yaml
+├── README.md
+├── RESPONSIVE_DESIGN.md
+├── test
+│   ├── armor_mod_test.dart
+│   ├── armor_test.dart
+│   ├── attribute_filtering_test.dart
+│   ├── attribute_test.dart
+│   ├── calendar_test.dart
+│   ├── character_qualities_test.dart
+│   ├── condition_monitor_test.dart
+│   ├── critter_skill_display_test.dart
+│   ├── critter_switches_test.dart
+│   ├── critter_test.dart
+│   ├── dynamic_navigation_test.dart
+│   ├── enhanced_attribute_parsing_test.dart
+│   ├── enhanced_spell_complexform_test.dart
+│   ├── fixtures
+│   ├── game_notes_test.dart
+│   ├── gear_test.dart
+│   ├── mobile_file_sharing_test.dart
+│   ├── mugshot_test.dart
+│   ├── navigation_avatar_test.dart
+│   ├── navigation_integration_test.dart
+│   ├── platform_file_handler_test.dart
+│   ├── shadowrun_item_test.dart
+│   ├── skill_cm_penalty_test.dart
+│   ├── skill_defaulting_test.dart
+│   ├── vehicle_mod_test.dart
+│   ├── vehicle_test.dart
+│   ├── weapon_accessory_test.dart
+│   ├── weapon_mount_option_test.dart
+│   ├── weapon_mount_test.dart
+│   ├── weapon_test.dart
+│   ├── widget_test.dart
+│   └── xml_modification_test.dart
+├── web
+│   ├── favicon.png
+│   ├── icons
+│   │   ├── Icon-192.png
+│   │   ├── Icon-512.png
+│   │   ├── Icon-maskable-192.png
+│   │   └── Icon-maskable-512.png
+│   ├── index.html
+│   └── manifest.json
+└── windows
+    ├── CMakeLists.txt
+    ├── flutter
+    │   ├── CMakeLists.txt
+    │   ├── ephemeral
+    │   ├── generated_plugin_registrant.cc
+    │   ├── generated_plugin_registrant.h
+    │   └── generated_plugins.cmake
+    └── runner
+        ├── CMakeLists.txt
+        ├── flutter_window.cpp
+        ├── flutter_window.h
+        ├── main.cpp
+        ├── resource.h
+        ├── resources
+        ├── runner.exe.manifest
+        ├── Runner.rc
+        ├── utils.cpp
+        ├── utils.h
+        ├── win32_window.cpp
+        └── win32_window.h
+
+107 directories, 189 files

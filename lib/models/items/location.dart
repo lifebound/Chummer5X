@@ -2,6 +2,43 @@
 
 import 'package:xml/xml.dart';
 
+const String defaultGearLocationGuid = '00000000-0000-0000-0000-000000000001';
+const String defaultArmorLocationGuid = '00000000-0000-0000-0000-000000000002';
+const String defaultWeaponLocationGuid = '00000000-0000-0000-0000-000000000003';
+const String defaultVehicleLocationGuid = '00000000-0000-0000-0000-000000000004';
+
+final Location defaultGearLocation = Location(
+  guid: defaultGearLocationGuid,
+  name: 'Selected Gear',
+  notes: 'Default location for unassigned gear.',
+  notesColor: 'LightGray',
+  sortOrder: 0,
+);
+
+final Location defaultArmorLocation = Location(
+  guid: defaultArmorLocationGuid,
+  name: 'Selected Armor',
+  notes: 'Default location for unassigned armor.',
+  notesColor: 'LightGray',
+  sortOrder: 0,
+);
+
+final Location defaultWeaponLocation = Location(
+  guid: defaultWeaponLocationGuid,
+  name: 'Selected Weapon',
+  notes: 'Default location for unassigned weapons.',
+  notesColor: 'LightGray',
+  sortOrder: 0,
+);
+
+final Location defaultVehicleLocation = Location(
+  guid: defaultVehicleLocationGuid,
+  name: 'Selected Vehicle',
+  notes: 'Default location for unassigned vehicles.',
+  notesColor: 'LightGray',
+  sortOrder: 0,
+);
+
 
 class Location {
   final String guid;
@@ -28,6 +65,7 @@ class Location {
     );
   }
 }
+
 class GearLocations {
   final List<Location> locations;
 
@@ -37,6 +75,7 @@ class GearLocations {
     final List<Location> loadedLocations = element.findAllElements('location')
         .map((e) => Location.fromXmlElement(e))
         .toList();
+      loadedLocations.add(defaultGearLocation); // Ensure default location is included
     return GearLocations(locations: loadedLocations);
   }
 }
@@ -49,6 +88,7 @@ class ArmorLocations {
     final List<Location> loadedLocations = element.findAllElements('location')
         .map((e) => Location.fromXmlElement(e))
         .toList();
+    loadedLocations.add(defaultArmorLocation); // Ensure default location is included
     return ArmorLocations(locations: loadedLocations);
   }
 }
@@ -61,6 +101,7 @@ class WeaponLocations {
     final List<Location> loadedLocations = element.findAllElements('location')
         .map((e) => Location.fromXmlElement(e))
         .toList();
+    loadedLocations.add(defaultWeaponLocation); // Ensure default location is included
     return WeaponLocations(locations: loadedLocations);
   }
 }
@@ -73,6 +114,7 @@ class VehicleLocations {
     final List<Location> loadedLocations = element.findAllElements('location')
         .map((e) => Location.fromXmlElement(e))
         .toList();
+    loadedLocations.add(defaultVehicleLocation); // Ensure default location is included
     return VehicleLocations(locations: loadedLocations);
   }
 }

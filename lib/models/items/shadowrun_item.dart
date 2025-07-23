@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:xml/xml.dart'; // Import the xml package
 
 // Abstract base class for all items
@@ -9,8 +11,8 @@ abstract class ShadowrunItem {
   final String avail;
   final String source;
   final String page;
-  final bool equipped;
-  final bool active;
+  bool equipped;
+  bool active;
   final bool homeNode;
   final String? deviceRating;
   final String? programLimit;
@@ -28,7 +30,7 @@ abstract class ShadowrunItem {
   final bool canSwapAttributes;
   final int matrixCmFilled;
   final int matrixCmBonus;
-  final bool wirelessOn;
+  bool wirelessOn;
   final bool? canFormPersona;
   final String? notes;
   final String? notesColor;
@@ -77,5 +79,10 @@ abstract class ShadowrunItem {
   // Factory constructor to create an item from an XmlElement (to be implemented in subclasses)
   factory ShadowrunItem.fromXml(XmlElement xmlElement) {
     throw UnimplementedError('fromXml not implemented for ShadowrunItem');
+  }
+
+  Icon getIcon() {
+    // Default icon, can be overridden in subclasses
+    return const Icon(Icons.inventory_2_outlined);
   }
 }

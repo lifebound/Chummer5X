@@ -27,11 +27,14 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
     extends State<ShadowrunItemLocationTreeView<T>> {
   String _searchQuery = '';
   ShadowrunItem? _selectedItemForDetails;
-  static const breakpoint = 600.0; // Define your breakpoint for "large" vs "small" screen
+  late List<T> _items;
+  static const breakpoint =
+      600.0; // Define your breakpoint for "large" vs "small" screen
 
   @override
   void initState() {
     super.initState();
+    _items = List<T>.from(widget.allItems);
     debugPrint(
         'ShadowrunItemLocationTreeView constructor called with ${widget.allLocations.length} locations and ${widget.allItems.length} items');
   }
@@ -39,10 +42,10 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
   // Helper to group items by their location GUID
   Map<String, List<T>> _groupItemsByLocation() {
     debugPrint(
-        '_groupItemsByLocation: Starting to group ${widget.allItems.length} items');
+        '_groupItemsByLocation: Starting to group ${_items.length} items');
     final Map<String, List<T>> groupedItems = {};
 
-    for (var item in widget.allItems) {
+    for (var item in _items) {
       // Determine the default GUID based on the item type if locationGuid is null
       String locationGuid = item.locationGuid ?? _getDefaultLocationGuid(item);
       debugPrint(
@@ -105,13 +108,15 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
         if (mount.name.toLowerCase().contains(lowerQuery)) return true;
       }
       for (var gear in item.gears) {
-        if (_itemMatchesSearch(gear, query))
-          {return true;} // Recursively check nested gear
+        if (_itemMatchesSearch(gear, query)) {
+          return true;
+        } // Recursively check nested gear
       }
       if (item.weapons != null) {
         for (var weapon in item.weapons!) {
-          if (_itemMatchesSearch(weapon, query))
-            {return true;} // Recursively check nested weapon
+          if (_itemMatchesSearch(weapon, query)) {
+            return true;
+          } // Recursively check nested weapon
         }
       }
     } else if (item is Armor) {
@@ -280,32 +285,41 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
             child: ExpansionTile(
               key: PageStorageKey<String>(
                   'item_${item.sourceId ?? item.name}_$indentLevel'), // Unique key
-              initiallyExpanded:
-                  _searchQuery.isNotEmpty, // Auto-expand when searching or at root level
+              initiallyExpanded: _searchQuery
+                  .isNotEmpty, // Auto-expand when searching or at root level
               leading: _getLeadingIcon(item, itemMatches),
-              title: Row( // Use a Row to place title text and the info icon
-              children: [
-                Expanded(
-                  child: Text(
-                    item.name,
-                    style: TextStyle(
-                      fontWeight: itemMatches ? FontWeight.bold : FontWeight.normal,
-                      color: itemMatches ? Theme.of(context).colorScheme.primary : null,
+              
+              title: Row(
+                // Use a Row to place title text and the info icon
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.name,
+                      style: TextStyle(
+                        fontWeight:
+                            itemMatches ? FontWeight.bold : FontWeight.normal,
+                        color: itemMatches
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                      ),
                     ),
                   ),
-                ),
-                // The info icon for details
-                IconButton(
-                  icon: const Icon(Icons.info_outline),
-                  color: Theme.of(context).colorScheme.onSurfaceVariant, // Or a more neutral color
-                  onPressed: () {
-                    debugPrint('Tapped info icon on expandable item "${item.name}"');
-                    _showItemDetails(item, breakpoint); // Call the detail display method
-                  },
-                  tooltip: 'Show details', // Add a tooltip for desktop users
-                ),
-              ],
-            ),
+                  // The info icon for details
+                  IconButton(
+                    icon: const Icon(Icons.info_outline),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant, // Or a more neutral color
+                    onPressed: () {
+                      debugPrint(
+                          'Tapped info icon on expandable item "${item.name}"');
+                      _showItemDetails(
+                          item, breakpoint); // Call the detail display method
+                    },
+                    tooltip: 'Show details', // Add a tooltip for desktop users
+                  ),
+                ],
+              ),
               subtitle: Text(
                 subtitleText,
                 style: TextStyle(
@@ -318,10 +332,9 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
                 debugPrint(
                     'ShadowrunItemLocationTreeView: Item "${item.name}" ${expanded ? 'expanded' : 'collapsed'}');
               },
-              
+
               children: _buildItemTilesRecursively(context, childrenToDisplay,
                   indentLevel: indentLevel + 1),
-              
             ),
           ),
         );
@@ -351,12 +364,11 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
               onTap: () {
                 debugPrint(
                     'ShadowrunItemLocationTreeView: User tapped on item "${item.name}" (Type: ${item.runtimeType})');
-                
               },
               onLongPress: () {
+                _showItemDetails(item, breakpoint);
                 debugPrint(
                     'ShadowrunItemLocationTreeView: User long-pressed on item "${item.name}" (Type: ${item.runtimeType})');
-                
               },
               trailing: IconButton(
                 icon: const Icon(Icons.info_outline), // Or Icons.more_vert
@@ -378,9 +390,7 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
   Icon _getLeadingIcon(ShadowrunItem item, bool isMatch) {
     Color? color = isMatch ? Theme.of(context).colorScheme.primary : null;
     if (item is Gear) {
-      return item.children != null && item.children!.isNotEmpty
-          ? Icon(Icons.folder_outlined, color: color)
-          : Icon(Icons.inventory_2_outlined, color: color);
+      return item.getIcon(color);
     } else if (item is Armor) {
       return Icon(Icons.shield_outlined, color: color);
     } else if (item is Weapon) {
@@ -400,7 +410,6 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
         _groupItemsByLocation();
     final List<Location> sortedLocations = widget.allLocations.values.toList()
       ..sort((a, b) => a.name.compareTo(b.name)); // Sort locations
-
 
     if (screenWidth > breakpoint) {
       // Large screen layout (two-pane)
@@ -422,7 +431,9 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
             flex: 1, // Adjust flex as needed
             child: _selectedItemForDetails == null
                 ? const Center(child: Text('Select an item for details'))
-                : ItemDetailsPanel(item: _selectedItemForDetails!),
+                : ItemDetailsPanel(
+                    item: _selectedItemForDetails!,
+                    onUpdateGear: _updateGearState),
           ),
         ],
       );
@@ -437,6 +448,26 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
       );
       // The modal popover will be triggered by a gesture
     }
+  }
+
+  void _updateGearState(Gear gear,
+      {bool? equipped, bool? wireless, bool? active}) {
+    setState(() {
+      final index = _items.indexWhere((item) => item.sourceId == gear.sourceId);
+      if (index != -1) {
+        final oldGear = _items[index] as Gear;
+        _items[index] = oldGear.copyWith(
+          equipped: equipped ?? oldGear.equipped,
+          wirelessOn: wireless ?? oldGear.wirelessOn,
+          active: active ?? oldGear.active,
+        ) as T;
+
+        // Also update the selected item if it's the one being changed
+        if (_selectedItemForDetails?.sourceId == gear.sourceId) {
+          _selectedItemForDetails = _items[index];
+        }
+      }
+    });
   }
 
   // Helper methods for your slivers (extract them from the original build method)
@@ -515,8 +546,8 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
             child: ExpansionTile(
               key: PageStorageKey<String>(
                   location.guid), // Important for state preservation
-              initiallyExpanded:
-                  _searchQuery.isNotEmpty || index == 0, // Auto-expand when searching or at root level
+              initiallyExpanded: _searchQuery.isNotEmpty ||
+                  index == 0, // Auto-expand when searching or at root level
               title: Text(
                 location.name,
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -552,7 +583,10 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
       showModalBottomSheet(
         context: context,
         builder: (context) {
-          return ItemDetailsModal(item: item);
+          return ItemDetailsModal(
+            item: item,
+            onUpdateGear: _updateGearState,
+          );
         },
       );
       // Or showDialog for a full-screen dialog
@@ -572,8 +606,11 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
 
 class ItemDetailsPanel extends StatelessWidget {
   final ShadowrunItem item;
+  final Function(Gear, {bool? equipped, bool? wireless, bool? active})
+      onUpdateGear;
 
-  const ItemDetailsPanel({super.key, required this.item});
+  const ItemDetailsPanel(
+      {super.key, required this.item, required this.onUpdateGear});
 
   @override
   Widget build(BuildContext context) {
@@ -611,7 +648,10 @@ class ItemDetailsPanel extends StatelessWidget {
           ),
           const Divider(),
           if (item is Gear)
-            _GearDetailsContent(gear: item as Gear)
+            _GearDetailsContent(
+              gear: item as Gear,
+              onUpdate: onUpdateGear,
+            )
           else
             Text(details),
           // You can add more complex widgets here to display nested lists (mods, children, etc.)
@@ -624,8 +664,11 @@ class ItemDetailsPanel extends StatelessWidget {
 
 class ItemDetailsModal extends StatelessWidget {
   final ShadowrunItem item;
+  final Function(Gear, {bool? equipped, bool? wireless, bool? active})
+      onUpdateGear;
 
-  const ItemDetailsModal({super.key, required this.item});
+  const ItemDetailsModal(
+      {super.key, required this.item, required this.onUpdateGear});
 
   @override
   Widget build(BuildContext context) {
@@ -638,7 +681,6 @@ class ItemDetailsModal extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Essential for showModalBottomSheet
         children: [
           Row(
-
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -661,7 +703,10 @@ class ItemDetailsModal extends StatelessWidget {
           const Divider(),
           // Display details here, using the new shared widget
           if (item is Gear)
-            _GearDetailsContent(gear: item as Gear)
+            _GearDetailsContent(
+              gear: item as Gear,
+              onUpdate: onUpdateGear,
+            )
           else ...[
             // Fallback for other item types
             Text('Category: ${item.category}'),
@@ -678,8 +723,9 @@ class ItemDetailsModal extends StatelessWidget {
 /// A shared widget to display the detailed content for a Gear item.
 class _GearDetailsContent extends StatelessWidget {
   final Gear gear;
+  final Function(Gear, {bool? equipped, bool? wireless, bool? active}) onUpdate;
 
-  const _GearDetailsContent({required this.gear});
+  const _GearDetailsContent({required this.gear, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -693,16 +739,16 @@ class _GearDetailsContent extends StatelessWidget {
         _buildDetailRow(context, 'Quantity', gear.qty.toString()),
         const Divider(height: 24, thickness: 1),
         _buildToggleRow(context, 'Equipped', gear.equipped, (value) {
-          // TODO: Implement state change logic
+          onUpdate(gear, equipped: value);
           debugPrint('Equipped toggled to: $value');
         }),
         _buildToggleRow(context, 'Wireless', gear.wirelessOn, (value) {
-          // TODO: Implement state change logic
+          onUpdate(gear, wireless: value);
           debugPrint('Wireless toggled to: $value');
         }),
         if (gear.category.toLowerCase() == 'commlinks')
-          _buildToggleRow(context, 'Active Commlink', false, (value) {
-            // TODO: Implement state change logic for active commlink
+          _buildToggleRow(context, 'Active Commlink', gear.active, (value) {
+            onUpdate(gear, active: value);
             debugPrint('Active Commlink toggled to: $value');
           }),
       ],
@@ -722,7 +768,8 @@ class _GearDetailsContent extends StatelessWidget {
     );
   }
 
-  Widget _buildToggleRow(BuildContext context, String label, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildToggleRow(BuildContext context, String label, bool value,
+      ValueChanged<bool> onChanged) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

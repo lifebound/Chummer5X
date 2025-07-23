@@ -1,5 +1,6 @@
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
+import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
 
@@ -56,33 +57,101 @@ class Gear extends ShadowrunItem {
     this.allowRename = false,
     this.children,
     this.location,
+    super.active = false, // Default to false if not provided
   });
 
+  Gear copyWith({
+    String? sourceId,
+    String? locationGuid,
+    String? name,
+    String? category,
+    String? source,
+    String? page,
+    bool? equipped,
+    bool? wirelessOn,
+    bool? stolen,
+    String? avail,
+    String? notes,
+    String? notesColor,
+    bool? discountedCost,
+    int? sortOrder,
+    String? capacity,
+    String? armorCapacity,
+    String? minRating,
+    String? maxRating,
+    int? rating,
+    double? qty,
+    int? cost,
+    String? weight,
+    String? extra,
+    bool? bonded,
+    String? forcedValue,
+    String? parentId,
+    bool? allowRename,
+    List<Gear>? children,
+    String? location,
+    bool? active,
+  }) {
+    return Gear(
+      sourceId: sourceId ?? this.sourceId,
+      locationGuid: locationGuid ?? this.locationGuid,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      source: source ?? this.source,
+      page: page ?? this.page,
+      equipped: equipped ?? this.equipped,
+      wirelessOn: wirelessOn ?? this.wirelessOn,
+      stolen: stolen ?? this.stolen,
+      avail: avail ?? this.avail,
+      notes: notes ?? this.notes,
+      notesColor: notesColor ?? this.notesColor,
+      discountedCost: discountedCost ?? this.discountedCost,
+      sortOrder: sortOrder ?? this.sortOrder,
+      capacity: capacity ?? this.capacity,
+      armorCapacity: armorCapacity ?? this.armorCapacity,
+      minRating: minRating ?? this.minRating,
+      maxRating: maxRating ?? this.maxRating,
+      rating: rating ?? this.rating,
+      qty: qty ?? this.qty,
+      cost: cost ?? this.cost,
+      weight: weight ?? this.weight,
+      extra: extra ?? this.extra,
+      bonded: bonded ?? this.bonded,
+      forcedValue: forcedValue ?? this.forcedValue,
+      parentId: parentId ?? this.parentId,
+      allowRename: allowRename ?? this.allowRename,
+      children: children ?? this.children,
+      location: location ?? this.location,
+      active: active ?? this.active,
+    );
+  }
 
   factory Gear.fromXml(XmlElement xmlElement) {
-    int gearRating = int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0;
-    
+    int gearRating =
+        int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0;
+
     // Handle name selection priority: extra > name > default
     final extraText = xmlElement.getElement('extra')?.innerText;
     final nameText = xmlElement.getElement('name')?.innerText;
     final categoryText = xmlElement.getElement('category')?.innerText;
     final sourceText = xmlElement.getElement('source')?.innerText;
     final pageText = xmlElement.getElement('page')?.innerText;
-    
-    final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
-    final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultGearLocationGuid;
 
-
+    final String rawLocationGuid =
+        xmlElement.getElement('location')?.innerText ?? '';
+    final String locationGuid =
+        rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultGearLocationGuid;
 
     String finalName;
+    //finalName is the nameText. if extraText is not empty, append it inside parentheses
     if (extraText?.isNotEmpty == true) {
-      finalName = extraText!;
+      finalName = '$nameText ($extraText)';
     } else if (nameText?.isNotEmpty == true) {
       finalName = nameText!;
     } else {
       finalName = 'Unnamed Gear';
     }
-    
+
     return Gear(
       sourceId: xmlElement.getElement('sourceid')?.innerText,
       locationGuid: locationGuid,
@@ -98,7 +167,8 @@ class Gear extends ShadowrunItem {
       minRating: xmlElement.getElement('minrating')?.innerText,
       maxRating: xmlElement.getElement('maxrating')?.innerText,
       rating: gearRating,
-      qty: double.tryParse(xmlElement.getElement('qty')?.innerText ?? '1.0') ?? 1.0,
+      qty: double.tryParse(xmlElement.getElement('qty')?.innerText ?? '1.0') ??
+          1.0,
       avail: parseAvail(xmlElement.getElement('avail'), gearRating),
       cost: int.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
       weight: xmlElement.getElement('weight')?.innerText,
@@ -107,12 +177,32 @@ class Gear extends ShadowrunItem {
       forcedValue: xmlElement.getElement('forcedvalue')?.innerText,
       parentId: xmlElement.getElement('parentid')?.innerText,
       allowRename: xmlElement.getElement('allowrename')?.innerText == 'True',
-      children: xmlElement.findElements('children').expand((e) => e.findElements('gear')).map((childXml) => Gear.fromXml(childXml)).toList(),
+      children: xmlElement
+          .findElements('children')
+          .expand((e) => e.findElements('gear'))
+          .map((childXml) => Gear.fromXml(childXml))
+          .toList(),
       location: xmlElement.getElement('location')?.innerText,
       notes: xmlElement.getElement('notes')?.innerText,
       notesColor: xmlElement.getElement('notesColor')?.innerText,
-      discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
-      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
+      discountedCost:
+          xmlElement.getElement('discountedcost')?.innerText == 'True',
+      sortOrder:
+          int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ??
+              0,
+      active: xmlElement.getElement('active')?.innerText == 'True',
     );
+  }
+
+  @override
+  Icon getIcon(Color? color) {
+    return switch (category.toLowerCase()) {
+      'tools' => Icon(Icons.handyman_outlined, color: color),
+      'commlinks' => Icon(Icons.smartphone_outlined, color: color),
+      'elecrtronics accessories' => Icon(Icons.mic_external_on_outlined, color: color),
+      'id/credsticks' => Icon(Icons.credit_card_outlined, color: color),
+      'hacking programs' => Icon(Icons.code_outlined, color: color),
+      _ => Icon(Icons.miscellaneous_services_outlined, color: color)
+    };
   }
 }

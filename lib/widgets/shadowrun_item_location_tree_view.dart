@@ -106,12 +106,12 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
       }
       for (var gear in item.gears) {
         if (_itemMatchesSearch(gear, query))
-          return true; // Recursively check nested gear
+          {return true;} // Recursively check nested gear
       }
       if (item.weapons != null) {
         for (var weapon in item.weapons!) {
           if (_itemMatchesSearch(weapon, query))
-            return true; // Recursively check nested weapon
+            {return true;} // Recursively check nested weapon
         }
       }
     } else if (item is Armor) {
@@ -638,7 +638,7 @@ class ItemDetailsModal extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Essential for showModalBottomSheet
         children: [
           Row(
-            
+
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(

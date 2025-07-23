@@ -28,6 +28,10 @@ import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
 import 'package:chummer5x/widgets/gear_location_tree_view.dart';
+import 'package:chummer5x/widgets/shadowrun_item_location_tree_view.dart';
+import 'package:chummer5x/models/items/gear.dart';
+//this package only used during testing, not in production
+//import 'package:chummer5x/widgets/gear_sliver_tree_view.dart';
 
 enum NavigationSection {
   overview,
@@ -4191,7 +4195,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  // Gear Tab Content Methods
+  // // Gear Tab Content Methods
   Widget _buildGearTabContent(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -4204,12 +4208,43 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: GearLocationTreeView(allLocations: _currentCharacter?.gearLocations ?? {}, allGears: _currentCharacter?.gear ?? []),
+            //child: GearLocationTreeView(allLocations: _currentCharacter?.gearLocations ?? {}, allGears: _currentCharacter?.gear ?? []),
+            child: ShadowrunItemLocationTreeView<Gear>(allLocations: _currentCharacter?.gearLocations ?? {}, allItems: _currentCharacter?.gear ?? []),
           ),
         ],
       ),
     );
   }
+
+  // Widget _buildGearTabContent(BuildContext context) {
+  //   return CustomScrollView(
+  //     slivers: [
+  //       // Simple pinned header that doesn't change
+  //       SliverPersistentHeader(
+  //         pinned: true,
+  //         delegate: _StickyHeaderDelegate(
+  //           child: Container(
+  //             color: Theme.of(context).colorScheme.surface,
+  //             padding: const EdgeInsets.all(16.0),
+  //             child: Text(
+  //               'General Gear',
+  //               style: Theme.of(context).textTheme.headlineSmall,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+        
+  //       // TreeSliver content - this will be scrollable with proper padding
+  //       SliverPadding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+  //         sliver: GearSliverTreeView(
+  //           allLocations: _currentCharacter?.gearLocations ?? {}, 
+  //           allGears: _currentCharacter?.gear ?? [],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildClothingArmorTabContent(BuildContext context) {
     return Padding(
@@ -4350,5 +4385,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       ),
     );
+  }
+}
+
+// Custom delegate for sticky header
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _StickyHeaderDelegate({required this.child});
+
+  @override
+  double get minExtent => 60.0;
+  
+  @override
+  double get maxExtent => 60.0;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
   }
 }

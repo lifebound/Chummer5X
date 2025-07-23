@@ -35,6 +35,7 @@ abstract class ShadowrunItem {
   final bool discountedCost;
   final int sortOrder;
   final bool stolen;
+  final int cost;
 
   ShadowrunItem({
     this.sourceId,
@@ -70,6 +71,7 @@ abstract class ShadowrunItem {
     this.sortOrder = 0,
     this.stolen = false,
     required this.avail,
+    required this.cost,
   });
 
   // Factory constructor to create an item from an XmlElement (to be implemented in subclasses)

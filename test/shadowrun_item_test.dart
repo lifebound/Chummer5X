@@ -38,6 +38,7 @@ class TestShadowrunItem extends ShadowrunItem {
     super.sortOrder,
     super.stolen,
     required super.avail,
+    super.cost = 0,
   });
 
   factory TestShadowrunItem.fromXml(XmlElement xmlElement) {

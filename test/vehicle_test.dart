@@ -92,6 +92,7 @@ void main() {
         category: 'Electronics',
         source: 'Core',
         page: '1',
+        avail: '—'
       );
 
       // Act

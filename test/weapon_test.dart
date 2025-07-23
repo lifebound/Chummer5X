@@ -133,7 +133,6 @@ void main() {
         allowSuppressive: true,
         parentId: 'parent-123',
         allowAccessory: true,
-        weaponName: 'My Rifle',
         included: false,
         requireAmmo: true,
         mount: 'External',
@@ -184,7 +183,6 @@ void main() {
       expect(weapon.alternateRange, '75/175/350/550');
       expect(weapon.rangeMultiply, 2);
       expect(weapon.allowAccessory, true);
-      expect(weapon.weaponName, 'My Rifle');
       expect(weapon.parentId, 'parent-123');
       expect(weapon.mount, 'External');
       expect(weapon.extraMount, 'Barrel');
@@ -349,7 +347,6 @@ void main() {
         expect(weapon.alternateRange, '75/175/350/550', reason: 'alternateRange should be parsed correctly');
         expect(weapon.rangeMultiply, 2, reason: 'rangeMultiply should be parsed correctly');
         expect(weapon.allowAccessory, true, reason: 'allowAccessory should be parsed correctly');
-        expect(weapon.weaponName, 'My Weapon', reason: 'weaponName should be parsed correctly');
         expect(weapon.included, true, reason: 'included should be parsed correctly');
         expect(weapon.parentId, 'parent-123', reason: 'parentId should be parsed correctly');
         expect(weapon.mount, 'External', reason: 'mount should be parsed correctly');

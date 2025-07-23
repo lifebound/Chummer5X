@@ -11,6 +11,7 @@ void main() {
         category: 'Electronics',
         source: 'Core',
         page: '438',
+        avail: '—',
       );
 
       // Assert
@@ -38,6 +39,7 @@ void main() {
         category: 'Accessory',
         source: 'Core',
         page: '1',
+        avail: '—',
       );
 
       // Act
@@ -62,7 +64,7 @@ void main() {
         weight: '1.5',
         extra: 'Custom modifications',
         bonded: true,
-        gearName: 'Custom Name',
+
         forcedValue: 'Forced',
         parentId: 'parent-123',
         allowRename: true,
@@ -95,7 +97,6 @@ void main() {
       expect(gear.weight, '1.5');
       expect(gear.extra, 'Custom modifications');
       expect(gear.bonded, true);
-      expect(gear.gearName, 'Custom Name');
       expect(gear.forcedValue, 'Forced');
       expect(gear.parentId, 'parent-123');
       expect(gear.allowRename, true);
@@ -208,7 +209,6 @@ void main() {
         expect(gear.cost, 5000);
         expect(gear.weight, '1.5');
         expect(gear.bonded, true);
-        expect(gear.gearName, 'Custom Name');
         expect(gear.forcedValue, 'Forced');
         expect(gear.parentId, 'parent-123');
         expect(gear.allowRename, true);

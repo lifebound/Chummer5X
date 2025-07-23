@@ -33,7 +33,7 @@ class Vehicle extends ShadowrunItem {
   final List<WeaponMount> weaponMounts;
   final List<Gear> gears;
   final List<Weapon>? weapons; // Assuming this is a list of Weapon objects
-  final int? cost;
+
 
   Vehicle({
     required String super.sourceId,
@@ -93,7 +93,7 @@ class Vehicle extends ShadowrunItem {
     required this.weaponMounts,
     required this.gears,
     this.weapons,
-    this.cost = 0, // Default cost to 0 if not provided
+    super.cost = 0, // Default cost to 0 if not provided
   }) : super(
           equipped: true,
           wirelessOn: false, // Default or parse from XML if present

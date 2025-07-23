@@ -26,7 +26,6 @@ class Weapon extends ShadowrunItem {
   final String accuracy;
   final int activeAmmoSlot;
   final String conceal;
-  final int cost;
   final String? weight;
   final String? useSkill;
   final String? useSkillSpec;
@@ -45,7 +44,6 @@ class Weapon extends ShadowrunItem {
   final bool allowSuppressive;
   final String? parentId;
   final bool allowAccessory;
-  final String? weaponName;
   final bool included;
   final bool requireAmmo;
   final String? mount;
@@ -55,12 +53,22 @@ class Weapon extends ShadowrunItem {
   final String? weaponType;
 
   Weapon({
-    super.sourceId,
-    super.locationGuid,
     required super.name,
     required super.category,
     required super.source,
     required super.page,
+    required super.avail, // This comes directly from ShadowrunItem
+    required this.type,
+    required this.damage,
+    required this.ap,
+    required this.mode,
+    required this.ammo,
+    required this.firingMode,
+    required this.accuracy,
+    
+    super.sourceId,
+    super.cost = 0,
+    super.locationGuid,
     super.equipped,
     super.active,
     super.homeNode,
@@ -80,33 +88,29 @@ class Weapon extends ShadowrunItem {
     super.modFirewall,
     super.modAttributeArray,
     super.canSwapAttributes,
-    super.matrixCmFilled = 0,
-    super.matrixCmBonus,
+    super.matrixCmFilled, // Has default in ShadowrunItem
+    super.matrixCmBonus, // Has default in ShadowrunItem
     super.notes,
     super.notesColor,
     super.discountedCost,
     super.sortOrder,
-    required this.type,
+    super.canFormPersona, // Make sure this is also handled in Weapon constructor if needed
+    
+    // Weapon-specific parameters:
     this.spec,
     this.spec2,
     this.reach = 0,
-    required this.damage,
-    required this.ap,
-    required this.mode,
     this.rc = 0,
-    required this.ammo,
     this.cyberware = false,
     this.ammoCategory,
     this.ammoSlots = 1,
     this.sizeCategory,
-    required this.firingMode,
     this.minRating,
     this.maxRating,
     this.rating = 0,
-    required this.accuracy,
     this.activeAmmoSlot = 1,
     this.conceal = '0',
-    this.cost = 0,
+    
     this.weight,
     this.useSkill,
     this.useSkillSpec,
@@ -125,7 +129,6 @@ class Weapon extends ShadowrunItem {
     this.allowSuppressive = true,
     this.parentId,
     this.allowAccessory = false,
-    this.weaponName,
     this.included = false,
     this.requireAmmo = true,
     this.mount,
@@ -133,7 +136,6 @@ class Weapon extends ShadowrunItem {
     this.accessories,
     this.location,
     this.weaponType,
-    required super.avail
   });
 
   factory Weapon.fromXml(XmlElement xmlElement) {
@@ -200,7 +202,6 @@ class Weapon extends ShadowrunItem {
       page: pageText?.isNotEmpty == true ? pageText! : '0',
       parentId: xmlElement.getElement('parentid')?.innerText,
       allowAccessory: xmlElement.getElement('allowaccessory')?.innerText == 'True',
-      weaponName: xmlElement.getElement('weaponname')?.innerText,
       included: xmlElement.getElement('included')?.innerText == 'True',
       equipped: xmlElement.getElement('equipped')?.innerText == 'True',
       active: xmlElement.getElement('active')?.innerText == 'True',

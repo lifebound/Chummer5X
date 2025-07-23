@@ -4,21 +4,20 @@ import 'package:xml/xml.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
 
 class Gear extends ShadowrunItem {
+  // ... Gear-specific final fields remain as they are.
   final String? capacity;
   final String? armorCapacity;
   final String? minRating;
   final String? maxRating;
   final int rating;
   final double qty;
-  final int cost;
   final String? weight;
   final String? extra;
   final bool bonded;
-  final String? gearName;
   final String? forcedValue;
   final String? parentId;
   final bool allowRename;
-  final List<Gear>? children; // Gear can contain other gears
+  final List<Gear>? children;
   final String? location;
 
   Gear({
@@ -31,30 +30,34 @@ class Gear extends ShadowrunItem {
     super.equipped,
     super.wirelessOn,
     super.stolen,
+    // Note: avail is required in ShadowrunItem, but you had a default '0' for it in Gear.
+    // If '0' is truly the default for Gear if not provided, it should be handled:
+    // 1. Make avail optional in ShadowrunItem if it can truly be defaulted.
+    // 2. Or ensure it's always provided by the factory or passed explicitly.
+    // Assuming for now it's always provided by fromXml or explicitly set:
+    required super.avail, // This comes directly from ShadowrunItem
+    super.notes,
+    super.notesColor,
+    super.discountedCost,
+    super.sortOrder,
+    // Gear-specific parameters:
     this.capacity,
     this.armorCapacity,
     this.minRating,
     this.maxRating,
     this.rating = 0,
     this.qty = 1.0,
-    super.avail = '0',
-    this.cost = 0,
+    super.cost = 0,
     this.weight,
     this.extra,
     this.bonded = false,
-    this.gearName,
     this.forcedValue,
     this.parentId,
     this.allowRename = false,
     this.children,
     this.location,
-    super.notes,
-    super.notesColor,
-    super.discountedCost,
-    super.sortOrder,
-  }) : super(
-      
-        );
+  });
+
 
   factory Gear.fromXml(XmlElement xmlElement) {
     int gearRating = int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0;
@@ -101,7 +104,6 @@ class Gear extends ShadowrunItem {
       weight: xmlElement.getElement('weight')?.innerText,
       extra: xmlElement.getElement('extra')?.innerText,
       bonded: xmlElement.getElement('bonded')?.innerText == 'True',
-      gearName: xmlElement.getElement('gearname')?.innerText,
       forcedValue: xmlElement.getElement('forcedvalue')?.innerText,
       parentId: xmlElement.getElement('parentid')?.innerText,
       allowRename: xmlElement.getElement('allowrename')?.innerText == 'True',

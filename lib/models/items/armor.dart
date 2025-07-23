@@ -8,7 +8,6 @@ class Armor extends ShadowrunItem {
   final String armorValue;
   final String? armorOverride;
   final String armorCapacity;
-  final int cost;
   final String? weight;
   final String? armorName;
   final String? extra;
@@ -19,7 +18,6 @@ class Armor extends ShadowrunItem {
   final bool encumbrance; // 'emcumbrance' in XML, assuming it means encumbrance
   final List<ArmorMod>? armorMods;
   final String? location;
-
   Armor({
     super.sourceId,
     super.locationGuid,
@@ -53,10 +51,12 @@ class Armor extends ShadowrunItem {
     super.notesColor,
     super.discountedCost,
     super.sortOrder,
+    required super.avail, // This comes directly from ShadowrunItem
+    // Armor-specific parameters:
     required this.armorValue,
     this.armorOverride,
     required this.armorCapacity,
-    this.cost = 0,
+    super.cost = 0,
     this.weight,
     this.armorName,
     this.extra,
@@ -67,7 +67,7 @@ class Armor extends ShadowrunItem {
     this.encumbrance = false,
     this.armorMods,
     this.location,
-    super.avail = '0',
+    
   });
 
   factory Armor.fromXml(XmlElement xmlElement) {

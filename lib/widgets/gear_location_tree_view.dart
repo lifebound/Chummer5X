@@ -100,7 +100,6 @@ class _GearLocationTreeViewState extends State<GearLocationTreeView> {
           weight: gear.weight,
           extra: gear.extra,
           bonded: gear.bonded,
-          gearName: gear.gearName,
           forcedValue: gear.forcedValue,
           parentId: gear.parentId,
           allowRename: gear.allowRename,
@@ -193,6 +192,13 @@ class _GearLocationTreeViewState extends State<GearLocationTreeView> {
                 // Handle tap on a specific gear item, e.g., show details
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Tapped on ${gear.name}')),
+                );
+              },
+              onLongPress: () {
+                debugPrint('GearLocationTreeView: User long-pressed on gear "${gear.name}"');
+                // Handle long press, e.g., show context menu
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Long pressed on ${gear.name}')),
                 );
               },
             ),
@@ -289,7 +295,7 @@ class _GearLocationTreeViewState extends State<GearLocationTreeView> {
                 margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: ExpansionTile(
                   key: PageStorageKey<String>(location.guid), // Important for state preservation
-                  initiallyExpanded: _searchQuery.isNotEmpty, // Auto-expand when searching
+                  initiallyExpanded: _searchQuery.isNotEmpty || index == 0, // Auto-expand when searching or if initially showing the default location
                   title: Text(
                     location.name,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -316,4 +322,5 @@ class _GearLocationTreeViewState extends State<GearLocationTreeView> {
     // Note: This debugPrint won't execute because we return above, but it shows the structure
     // debugPrint('GearLocationTreeView.build: Widget building completed');
   }
+  
 }

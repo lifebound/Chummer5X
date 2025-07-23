@@ -14,6 +14,7 @@ void main() {
         page: '436',
         armorValue: '12',
         armorCapacity: '6',
+        avail: '—',
       );
 
       // Assert

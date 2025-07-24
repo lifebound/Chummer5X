@@ -27,7 +27,6 @@ import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
-import 'package:chummer5x/widgets/gear_location_tree_view.dart';
 import 'package:chummer5x/widgets/shadowrun_item_location_tree_view.dart';
 import 'package:chummer5x/models/items/gear.dart';
 //this package only used during testing, not in production
@@ -4385,28 +4384,5 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       ),
     );
-  }
-}
-
-// Custom delegate for sticky header
-class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-
-  _StickyHeaderDelegate({required this.child});
-
-  @override
-  double get minExtent => 60.0;
-  
-  @override
-  double get maxExtent => 60.0;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return child;
-  }
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:xml/xml.dart'; // Import the xml package
 
 // Abstract base class for all items
@@ -81,7 +80,7 @@ abstract class ShadowrunItem {
     throw UnimplementedError('fromXml not implemented for ShadowrunItem');
   }
 
-  Icon getIcon() {
+  Icon getIcon(Color? color) {
     // Default icon, can be overridden in subclasses
     return const Icon(Icons.inventory_2_outlined);
   }

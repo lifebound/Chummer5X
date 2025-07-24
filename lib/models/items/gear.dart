@@ -202,6 +202,18 @@ class Gear extends ShadowrunItem {
       'elecrtronics accessories' => Icon(Icons.mic_external_on_outlined, color: color),
       'id/credsticks' => Icon(Icons.credit_card_outlined, color: color),
       'hacking programs' => Icon(Icons.code_outlined, color: color),
+      'ammunition' => Icon(Icons.bolt_outlined, color: color),
+      'autosoft' => Icon(Icons.book_outlined, color: color),
+      'chemicals' => Icon(Icons.science_outlined, color: color),
+      'cyberdecks' => Icon(Icons.laptop_outlined, color: color),
+      'btls' => Icon(Icons.video_collection_outlined, color: color),
+      'drugs' => Icon(Icons.local_pharmacy_outlined, color: color),
+      'explosives' => Icon(Icons.stream_outlined, color: color),
+      'food' => Icon(Icons.fastfood_outlined, color: color),
+      'currency' => Icon(Icons.currency_yen_outlined, color: color),
+      'paydata' => Icon(Icons.cases_outlined, color: color),
+      'skillsofts' => Icon(Icons.school_outlined, color: color),
+      'survival gear' => Icon(Icons.flashlight_on_rounded, color: color),
       _ => Icon(Icons.miscellaneous_services_outlined, color: color)
     };
   }

@@ -1,7 +1,9 @@
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
+import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:chummer5x/models/items/armor_mod.dart';
 
 class Armor extends ShadowrunItem {
@@ -122,5 +124,16 @@ class Armor extends ShadowrunItem {
       discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
       sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
     );
+  }
+  @override
+  Icon getIcon(Color? color) {
+    return switch (category.toLowerCase()) {
+      'armor' => Icon(Icons.shield, color: color),
+      'cloaks' => Icon(Icons.checkroom, color: color),
+      'clothing' => Icon(Symbols.apparel, color: color),
+      'specialty armor' => Icon(Symbols.exclamation, color: color),
+      'high-fashion armor clothing' => Icon(Symbols.shield_person, color: color),
+      _ => Icon(Icons.miscellaneous_services_outlined, color: color)
+    };
   }
 }

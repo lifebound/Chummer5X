@@ -29,7 +29,7 @@ void main() {
       expect(armorMod.discountedCost, false);
       expect(armorMod.sortOrder, 0);
       expect(armorMod.wirelessOn, false);
-      expect(armorMod.cost, '0');
+      expect(armorMod.cost, 0);
       expect(armorMod.ratingLabel, 'String_Rating');
     });
 
@@ -37,7 +37,6 @@ void main() {
       // Arrange & Act
       final armorMod = ArmorMod(
         sourceId: 'test-source',
-        guid: 'test-guid',
         name: 'Advanced Mod',
         category: 'Armor Enhancement',
         armor: 2,
@@ -47,7 +46,7 @@ void main() {
         rating: 3,
         ratingLabel: 'Custom Rating',
         avail: '12F',
-        cost: '5000',
+        cost: 5000,
         weight: '2',
         source: 'Run & Gun',
         page: '456',
@@ -64,7 +63,6 @@ void main() {
 
       // Assert
       expect(armorMod.sourceId, 'test-source');
-      expect(armorMod.guid, 'test-guid');
       expect(armorMod.name, 'Advanced Mod');
       expect(armorMod.category, 'Armor Enhancement');
       expect(armorMod.armor, 2);
@@ -74,7 +72,7 @@ void main() {
       expect(armorMod.rating, 3);
       expect(armorMod.ratingLabel, 'Custom Rating');
       expect(armorMod.avail, '12F');
-      expect(armorMod.cost, '5000');
+      expect(armorMod.cost, 5000);
       expect(armorMod.weight, '2');
       expect(armorMod.source, 'Run & Gun');
       expect(armorMod.page, '456');
@@ -119,7 +117,7 @@ void main() {
         expect(armorMod.stolen, false);
         expect(armorMod.discountedCost, false);
         expect(armorMod.wirelessOn, false);
-        expect(armorMod.cost, '0');
+        expect(armorMod.cost, 0);
         expect(armorMod.ratingLabel, 'String_Rating');
       });
 
@@ -160,7 +158,6 @@ void main() {
 
         // Assert
         expect(armorMod.sourceId, 'test-source');
-        expect(armorMod.guid, 'test-guid');
         expect(armorMod.name, 'Advanced Mod');
         expect(armorMod.category, 'Armor Enhancement');
         expect(armorMod.armor, 2);
@@ -170,7 +167,7 @@ void main() {
         expect(armorMod.rating, 3);
         expect(armorMod.ratingLabel, 'Custom Rating');
         expect(armorMod.avail, '12F');
-        expect(armorMod.cost, '5000');
+        expect(armorMod.cost, 5000);
         expect(armorMod.weight, '2');
         expect(armorMod.source, 'Run & Gun');
         expect(armorMod.page, '456');
@@ -278,7 +275,7 @@ void main() {
         expect(armorMod.source, 'Unknown');
         expect(armorMod.page, '0');
         expect(armorMod.armorCapacity, '0');
-        expect(armorMod.cost, '0');
+        expect(armorMod.cost, 0);
         expect(armorMod.ratingLabel, 'String_Rating');
       });
     });

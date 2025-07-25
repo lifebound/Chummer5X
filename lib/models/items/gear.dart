@@ -217,4 +217,34 @@ class Gear extends ShadowrunItem {
       _ => Icon(Icons.miscellaneous_services_outlined, color: color)
     };
   }
+
+  @override
+  bool matchesSearch(String query) {
+    if (query.isEmpty) return true;
+    
+    // Check base fields first (name, category)
+    if (super.matchesSearch(query)) return true;
+    
+    // Check if any child matches recursively
+    return children?.any((child) => child.matchesSearch(query)) ?? false;
+  }
+
+  /// For filtering that preserves the gear hierarchy
+  @override
+  Gear? filterWithHierarchy(String query) {
+    if (query.isEmpty) return this;
+    
+    final filteredChildren = children
+        ?.map((child) => child.filterWithHierarchy(query))
+        .where((child) => child != null)
+        .cast<Gear>()
+        .toList();
+    
+    // Include this item if it matches OR if it has matching children
+    if (matchesSearch(query) || (filteredChildren?.isNotEmpty ?? false)) {
+      return copyWith(children: filteredChildren);
+    }
+    
+    return null;
+  }
 }

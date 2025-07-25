@@ -87,4 +87,123 @@ class WeaponMount {
       stolen: element.getElement('stolen')?.innerText == 'True',
     );
   }
+
+  bool matchesSearch(String query) {
+    if (query.isEmpty) return true;
+    
+    final String lowerQuery = query.toLowerCase();
+    
+    // Check basic fields
+    if (name.toLowerCase().contains(lowerQuery) ||
+        category.toLowerCase().contains(lowerQuery) ||
+        (extra?.toLowerCase().contains(lowerQuery) ?? false)) {
+      return true;
+    }
+    
+    // Check nested weapons
+    if (weapons?.any((weapon) => weapon.matchesSearch(query)) ?? false) {
+      return true;
+    }
+    
+    // Check nested mods
+    if (mods.any((mod) => mod.matchesSearch(query))) {
+      return true;
+    }
+    
+    // Check weapon mount options
+    return weaponMountOptions.any((option) => 
+        option.name.toLowerCase().contains(lowerQuery)
+    );
+  }
+
+  WeaponMount copyWith({
+    String? sourceId,
+    String? guid,
+    String? name,
+    String? category,
+    String? limit,
+    String? slots,
+    String? avail,
+    String? cost,
+    bool? freeCost,
+    String? markup,
+    String? extra,
+    String? source,
+    String? page,
+    bool? included,
+    bool? equipped,
+    String? weaponMountCategories,
+    String? weaponCapacity,
+    List<Weapon>? weapons,
+    List<WeaponMountOption>? weaponMountOptions,
+    List<VehicleMod>? mods,
+    String? notes,
+    String? notesColor,
+    bool? discountedCost,
+    String? sortOrder,
+    bool? stolen,
+  }) {
+    return WeaponMount(
+      sourceId: sourceId ?? this.sourceId,
+      guid: guid ?? this.guid,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      limit: limit ?? this.limit,
+      slots: slots ?? this.slots,
+      avail: avail ?? this.avail,
+      cost: cost ?? this.cost,
+      freeCost: freeCost ?? this.freeCost,
+      markup: markup ?? this.markup,
+      extra: extra ?? this.extra,
+      source: source ?? this.source,
+      page: page ?? this.page,
+      included: included ?? this.included,
+      equipped: equipped ?? this.equipped,
+      weaponMountCategories: weaponMountCategories ?? this.weaponMountCategories,
+      weaponCapacity: weaponCapacity ?? this.weaponCapacity,
+      weapons: weapons ?? this.weapons,
+      weaponMountOptions: weaponMountOptions ?? this.weaponMountOptions,
+      mods: mods ?? this.mods,
+      notes: notes ?? this.notes,
+      notesColor: notesColor ?? this.notesColor,
+      discountedCost: discountedCost ?? this.discountedCost,
+      sortOrder: sortOrder ?? this.sortOrder,
+      stolen: stolen ?? this.stolen,
+    );
+  }
+
+  WeaponMount? filterWithHierarchy(String query) {
+    if (query.isEmpty) return this;
+    
+    // Filter nested collections
+    final filteredWeapons = weapons
+        ?.map((weapon) => weapon.filterWithHierarchy(query))
+        .where((weapon) => weapon != null)
+        .cast<Weapon>()
+        .toList();
+    
+    final filteredMods = mods
+        .map((mod) => mod.filterWithHierarchy(query))
+        .where((mod) => mod != null)
+        .cast<VehicleMod>()
+        .toList();
+    
+    final filteredOptions = weaponMountOptions
+        .where((option) => option.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    
+    // Include this mount if it matches OR if it has any matching nested items
+    if (matchesSearch(query) || 
+        (filteredWeapons?.isNotEmpty ?? false) || 
+        filteredMods.isNotEmpty || 
+        filteredOptions.isNotEmpty) {
+      return copyWith(
+        weapons: filteredWeapons,
+        mods: filteredMods,
+        weaponMountOptions: filteredOptions,
+      );
+    }
+    
+    return null;
+  }
 }

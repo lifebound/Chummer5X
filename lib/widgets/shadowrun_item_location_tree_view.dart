@@ -1,4 +1,5 @@
 // shadowrun_item_location_tree_view.dart (New file or renamed)
+import 'package:chummer5x/models/items/weapon_accessory.dart';
 import 'package:flutter/material.dart';
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
@@ -80,122 +81,29 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
     return defaultGearLocationGuid; // Fallback, though ideally all types are covered
   }
 
-  // Helper method to check if an item or its children match the search query
-  bool _itemMatchesSearch(ShadowrunItem item, String query) {
-    if (query.isEmpty) return true;
-
-    final String lowerQuery = query.toLowerCase();
-
-    // Check if current item matches
-    if (item.name.toLowerCase().contains(lowerQuery) ||
-        item.category.toLowerCase().contains(lowerQuery)) {
-      return true;
-    }
-
-    // Check if any child matches recursively (only applicable to Gear, Vehicle, Weapon)
-    if (item is Gear && item.children != null) {
-      for (var child in item.children!) {
-        if (_itemMatchesSearch(child, query)) {
-          return true;
-        }
-      }
-    } else if (item is Vehicle) {
-      // Check Vehicle's nested items (mods, mounts, gears, weapons)
-      for (var mod in item.mods) {
-        if (mod.name.toLowerCase().contains(lowerQuery)) return true;
-      }
-      for (var mount in item.weaponMounts) {
-        if (mount.name.toLowerCase().contains(lowerQuery)) return true;
-      }
-      for (var gear in item.gears) {
-        if (_itemMatchesSearch(gear, query)) {
-          return true;
-        } // Recursively check nested gear
-      }
-      if (item.weapons != null) {
-        for (var weapon in item.weapons!) {
-          if (_itemMatchesSearch(weapon, query)) {
-            return true;
-          } // Recursively check nested weapon
-        }
-      }
-    } else if (item is Armor) {
-      if (item.armorMods != null) {
-        for (var mod in item.armorMods!) {
-          if (mod.name.toLowerCase().contains(lowerQuery)) return true;
-        }
-      }
-    } else if (item is Weapon) {
-      if (item.accessories != null) {
-        for (var acc in item.accessories!) {
-          if (acc.name.toLowerCase().contains(lowerQuery)) return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  // Helper method to filter item list based on search query
-  List<ShadowrunItem> _filterItems(List<ShadowrunItem> items, String query) {
+  // Helper method to filter items using the polymorphic approach
+  List<ShadowrunItem> _filterItemsByType(List<ShadowrunItem> items, String query) {
     if (query.isEmpty) return items;
 
     List<ShadowrunItem> filteredItems = [];
-
-    for (var item in items) {
-      if (_itemMatchesSearch(item, query)) {
-        // If this item or its children match, include it but filter its children
-        // This part becomes tricky as creating a "filtered copy" requires knowing the specific type
-        // For now, we'll add the original item. If deep filtering of children is needed,
-        // you'd need to create a new instance of the specific item type with filtered children.
-        // This is a simplification to make the genericization easier.
-        // For complex nested structures, consider a separate 'copyWith' method on each ShadowrunItem subclass.
-
-        // For Gear, we can still filter children explicitly because we know the type and it has 'children'.
-        if (item is Gear && item.children != null) {
-          Gear originalGear = item;
-          Gear filteredGear = Gear(
-            sourceId: originalGear.sourceId,
-            locationGuid: originalGear.locationGuid,
-            name: originalGear.name,
-            category: originalGear.category,
-            source: originalGear.source,
-            page: originalGear.page,
-            equipped: originalGear.equipped,
-            wirelessOn: originalGear.wirelessOn,
-            stolen: originalGear.stolen,
-            capacity: originalGear.capacity,
-            armorCapacity: originalGear.armorCapacity,
-            minRating: originalGear.minRating,
-            maxRating: originalGear.maxRating,
-            rating: originalGear.rating,
-            qty: originalGear.qty,
-            avail: originalGear.avail,
-            cost: originalGear.cost,
-            weight: originalGear.weight,
-            extra: originalGear.extra,
-            bonded: originalGear.bonded,
-            forcedValue: originalGear.forcedValue,
-            parentId: originalGear.parentId,
-            allowRename: originalGear.allowRename,
-            children: _filterItems(originalGear.children!.cast<T>(), query)
-                .cast<Gear>(), // Recursive call for children
-            location: originalGear.location,
-            notes: originalGear.notes,
-            notesColor: originalGear.notesColor,
-            discountedCost: originalGear.discountedCost,
-            sortOrder: originalGear.sortOrder,
-          ); // Cast back to T for adding to list
-          filteredItems.add(filteredGear);
-        } else {
-          // For other types, we just add the item if it matches.
-          // Filtering of nested items (like Vehicle mods) is handled by _itemMatchesSearch
-          // determining if the parent should be included. We don't modify the nested lists here.
-          filteredItems.add(item);
-        }
+    
+    // Use hierarchy filtering for all items
+    for (final item in items) {
+      final filteredItem = item.filterWithHierarchy(query);
+      if (filteredItem != null) {
+        filteredItems.add(filteredItem);
       }
     }
+    
     return filteredItems;
+  }
+
+  // Helper method to check if an individual item matches the search (for highlighting)
+  bool _itemMatchesForHighlighting(ShadowrunItem item, String query) {
+    // Only highlight if there's actually a search query
+    if (query.isEmpty) return false;
+    
+    return item.matchesSearch(query);
   }
 
   // Helper method to recursively build item tiles with nested children
@@ -216,6 +124,12 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
         hasExpandableChildren = true;
         childrenToDisplay = item.children!;
       }
+      else if (item is WeaponAccessory &&
+          item.gears != null &&
+          item.gears!.isNotEmpty) {
+        hasExpandableChildren = true;
+        childrenToDisplay = item.gears!;
+      }
       // else if (item is Vehicle &&
       //     (item.mods.isNotEmpty ||
       //         item.weaponMounts.isNotEmpty ||
@@ -229,24 +143,24 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
       //     ...item.gears,
       //     ...(item.weapons ?? []),
       //   ];
-      // } else if (item is Armor &&
-      //     item.armorMods != null &&
-      //     item.armorMods!.isNotEmpty) {
-      //   hasExpandableChildren = true;
-      //   childrenToDisplay = item.armorMods!;
-      // } else if (item is Weapon &&
-      //     item.accessories != null &&
-      //     item.accessories!.isNotEmpty) {
-      //   hasExpandableChildren = true;
-      //   childrenToDisplay = item.accessories!;
-      // }
+      // } 
+      else if (item is Armor &&
+          item.armorMods != null &&
+          item.armorMods!.isNotEmpty) {
+        hasExpandableChildren = true;
+        childrenToDisplay = item.armorMods!;
+      } 
+      else if (item is Weapon &&
+          item.accessories != null &&
+          item.accessories!.isNotEmpty) {
+        hasExpandableChildren = true;
+        childrenToDisplay = item.accessories!;
+      }
 
       final EdgeInsets padding = EdgeInsets.only(left: indentLevel * 16.0);
 
       // Check if this specific item matches the search (for highlighting)
-      final bool itemMatches = _searchQuery.isNotEmpty &&
-          (item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              item.category.toLowerCase().contains(_searchQuery.toLowerCase()));
+      final bool itemMatches = _itemMatchesForHighlighting(item, _searchQuery);
 
       // Dynamic subtitle based on item type
       String subtitleText = 'Category: ${item.category}';
@@ -392,10 +306,9 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
     if (item is Gear) {
       return item.getIcon(color);
     } else if (item is Armor) {
-      return Icon(Icons.shield_outlined, color: color);
+      return item.getIcon(color);
     } else if (item is Weapon) {
-      return Icon(Icons.gavel_outlined,
-          color: color); // Or a more weapon-appropriate icon
+      return item.getIcon(color);
     } else if (item is Vehicle) {
       return Icon(Icons.directions_car_outlined, color: color);
     }
@@ -531,7 +444,7 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
 
           // Apply search filter
           final List<ShadowrunItem> filteredItems =
-              _filterItems(itemsInLocation, _searchQuery);
+              _filterItemsByType(itemsInLocation, _searchQuery);
 
           // Skip locations with no matching items when filtering
           if (_searchQuery.isNotEmpty && filteredItems.isEmpty) {

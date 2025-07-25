@@ -168,4 +168,170 @@ class Vehicle extends ShadowrunItem {
       gears: element.getElement('gears')?.findAllElements('gear').map((e) => Gear.fromXml(e)).toList() ?? [],
     );
   }
+
+  Vehicle copyWith({
+    String? sourceId,
+    String? locationGuid,
+    String? name,
+    String? category,
+    String? avail,
+    String? source,
+    String? page,
+    int? sortOrder,
+    bool? stolen,
+    String? notes,
+    String? notesColor,
+    bool? discountedCost,
+    bool? active,
+    bool? homeNode,
+    int? cost,
+    String? handling,
+    String? offRoadHandling,
+    String? accel,
+    String? offRoadAccel,
+    String? speed,
+    String? offRoadSpeed,
+    String? pilot,
+    String? body,
+    String? seats,
+    String? armor,
+    String? sensor,
+    String? addSlots,
+    String? modSlots,
+    String? powertrainModSlots,
+    String? protectionModSlots,
+    String? weaponModSlots,
+    String? bodyModSlots,
+    String? electromagneticModSlots,
+    String? cosmeticModSlots,
+    String? physicalCmFilled,
+    String? vehicleName,
+    bool? dealerConnection,
+    List<VehicleMod>? mods,
+    List<WeaponMount>? weaponMounts,
+    List<Gear>? gears,
+    List<Weapon>? weapons,
+  }) {
+    return Vehicle(
+      sourceId: sourceId ?? this.sourceId!,
+      locationGuid: locationGuid ?? this.locationGuid!,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      avail: avail ?? this.avail,
+      source: source ?? this.source,
+      page: page ?? this.page,
+      sortOrder: sortOrder ?? this.sortOrder,
+      stolen: stolen ?? this.stolen,
+      notes: notes ?? this.notes,
+      notesColor: notesColor ?? this.notesColor,
+      discountedCost: discountedCost ?? this.discountedCost,
+      active: active ?? this.active,
+      homeNode: homeNode ?? this.homeNode,
+      cost: cost ?? this.cost,
+      handling: handling ?? this.handling,
+      offRoadHandling: offRoadHandling ?? this.offRoadHandling,
+      accel: accel ?? this.accel,
+      offRoadAccel: offRoadAccel ?? this.offRoadAccel,
+      speed: speed ?? this.speed,
+      offRoadSpeed: offRoadSpeed ?? this.offRoadSpeed,
+      pilot: pilot ?? this.pilot,
+      body: body ?? this.body,
+      seats: seats ?? this.seats,
+      armor: armor ?? this.armor,
+      sensor: sensor ?? this.sensor,
+      addSlots: addSlots ?? this.addSlots,
+      modSlots: modSlots ?? this.modSlots,
+      powertrainModSlots: powertrainModSlots ?? this.powertrainModSlots,
+      protectionModSlots: protectionModSlots ?? this.protectionModSlots,
+      weaponModSlots: weaponModSlots ?? this.weaponModSlots,
+      bodyModSlots: bodyModSlots ?? this.bodyModSlots,
+      electromagneticModSlots: electromagneticModSlots ?? this.electromagneticModSlots,
+      cosmeticModSlots: cosmeticModSlots ?? this.cosmeticModSlots,
+      physicalCmFilled: physicalCmFilled ?? this.physicalCmFilled,
+      vehicleName: vehicleName ?? this.vehicleName,
+      dealerConnection: dealerConnection ?? this.dealerConnection,
+      mods: mods ?? this.mods,
+      weaponMounts: weaponMounts ?? this.weaponMounts,
+      gears: gears ?? this.gears,
+      weapons: weapons ?? this.weapons,
+    );
+  }
+
+  @override
+  Vehicle? filterWithHierarchy(String query) {
+    if (query.isEmpty) return this;
+    
+    // Filter nested collections
+    final filteredMods = mods
+        .map((mod) => mod.filterWithHierarchy(query))
+        .where((mod) => mod != null)
+        .cast<VehicleMod>()
+        .toList();
+    
+    final filteredWeaponMounts = weaponMounts
+        .map((mount) => mount.filterWithHierarchy(query))
+        .where((mount) => mount != null)
+        .cast<WeaponMount>()
+        .toList();
+    
+    final filteredGears = gears
+        .map((gear) => gear.filterWithHierarchy(query))
+        .where((gear) => gear != null)
+        .cast<Gear>()
+        .toList();
+    
+    final filteredWeapons = weapons
+        ?.map((weapon) => weapon.filterWithHierarchy(query))
+        .where((weapon) => weapon != null)
+        .cast<Weapon>()
+        .toList();
+    
+    // Include this vehicle if it matches OR if it has any matching nested items
+    if (matchesSearch(query) || 
+        filteredMods.isNotEmpty || 
+        filteredWeaponMounts.isNotEmpty || 
+        filteredGears.isNotEmpty || 
+        (filteredWeapons?.isNotEmpty ?? false)) {
+      return copyWith(
+        mods: filteredMods,
+        weaponMounts: filteredWeaponMounts,
+        gears: filteredGears,
+        weapons: filteredWeapons,
+      );
+    }
+    
+    return null;
+  }
+
+  @override
+  bool matchesSearch(String query) {
+    if (query.isEmpty) return true;
+    
+    // Check base fields first (name, category)
+    if (super.matchesSearch(query)) return true;
+    
+    final String lowerQuery = query.toLowerCase();
+    
+    // Check Vehicle's mods
+    if (mods.any((mod) => mod.name.toLowerCase().contains(lowerQuery))) {
+      return true;
+    }
+    
+    // Check Vehicle's weapon mounts
+    if (weaponMounts.any((mount) => mount.name.toLowerCase().contains(lowerQuery))) {
+      return true;
+    }
+    
+    // Check Vehicle's gears recursively
+    if (gears.any((gear) => gear.matchesSearch(query))) {
+      return true;
+    }
+    
+    // Check Vehicle's weapons recursively
+    if (weapons?.any((weapon) => weapon.matchesSearch(query)) ?? false) {
+      return true;
+    }
+    
+    return false;
+  }
 }

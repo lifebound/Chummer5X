@@ -1,10 +1,9 @@
+import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/gear.dart';
 
-class WeaponAccessory {
-  final String? sourceId;
+class WeaponAccessory extends ShadowrunItem {
   final String? guid;
-  final String name;
   final String mount;
   final String extraMount;
   final String? rc;
@@ -15,13 +14,8 @@ class WeaponAccessory {
   final bool rcDeployable;
   final bool specialModification;
   final String? conceal;
-  final String avail;
-  final String cost; // Can be "Weapon Cost"
   final String? weight;
   final bool included;
-  final bool equipped;
-  final String source;
-  final String page;
   final String? accuracy;
   final List<Gear>? gears; // Accessories can contain gears
   final String? ammoReplace;
@@ -35,9 +29,6 @@ class WeaponAccessory {
   final String? fireModeReplace;
   final String? ap;
   final String? apReplace;
-  final String? notes;
-  final String? notesColor;
-  final bool discountedCost;
   final int singleShot;
   final int shortBurst;
   final int longBurst;
@@ -47,15 +38,16 @@ class WeaponAccessory {
   final int rangeModifier;
   final String? extra;
   final String? ammoBonus;
-  final bool wirelessOn;
-  final bool stolen;
-  final int sortOrder;
   final String? parentId;
 
   WeaponAccessory({
-    this.sourceId,
+    required super.name,
+    required super.category,
+    required super.source,
+    required super.page,
+    required super.avail,
+    required super.cost,
     this.guid,
-    required this.name,
     required this.mount,
     required this.extraMount,
     this.rc,
@@ -66,13 +58,8 @@ class WeaponAccessory {
     this.rcDeployable = false,
     this.specialModification = false,
     this.conceal,
-    required this.avail,
-    required this.cost,
     this.weight,
     this.included = false,
-    this.equipped = false,
-    required this.source,
-    required this.page,
     this.accuracy,
     this.gears,
     this.ammoReplace,
@@ -86,9 +73,6 @@ class WeaponAccessory {
     this.fireModeReplace,
     this.ap,
     this.apReplace,
-    this.notes,
-    this.notesColor,
-    this.discountedCost = false,
     this.singleShot = 0,
     this.shortBurst = 0,
     this.longBurst = 0,
@@ -98,15 +82,18 @@ class WeaponAccessory {
     this.rangeModifier = 0,
     this.extra,
     this.ammoBonus,
-    this.wirelessOn = false,
-    this.stolen = false,
-    this.sortOrder = 0,
-    this.parentId,
+    this.parentId, 
+    required super.equipped, 
+    super.notes, 
+    super.notesColor, 
+    required super.discountedCost, 
+    required super.wirelessOn, 
+    required super.stolen, 
+    required super.sortOrder, 
   });
 
   factory WeaponAccessory.fromXml(XmlElement xmlElement) {
     return WeaponAccessory(
-      sourceId: xmlElement.getElement('sourceid')?.innerText,
       guid: xmlElement.getElement('guid')?.innerText,
       name: xmlElement.getElement('name')?.innerText ?? 'Unnamed Accessory',
       mount: xmlElement.getElement('mount')?.innerText ?? 'None',
@@ -120,7 +107,7 @@ class WeaponAccessory {
       specialModification: xmlElement.getElement('specialmodification')?.innerText == 'True',
       conceal: xmlElement.getElement('conceal')?.innerText,
       avail: xmlElement.getElement('avail')?.innerText ?? '',
-      cost: xmlElement.getElement('cost')?.innerText ?? '0',
+      cost: int.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
       weight: xmlElement.getElement('weight')?.innerText,
       included: xmlElement.getElement('included')?.innerText == 'True',
       equipped: xmlElement.getElement('equipped')?.innerText == 'True',
@@ -154,7 +141,151 @@ class WeaponAccessory {
       wirelessOn: xmlElement.getElement('wirelesson')?.innerText == 'True',
       stolen: xmlElement.getElement('stolen')?.innerText == 'True',
       sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
-      parentId: xmlElement.getElement('parentid')?.innerText,
+      parentId: xmlElement.getElement('parentid')?.innerText, 
+      category: xmlElement.getElement('category')?.innerText ?? 'Unknown',
     );
+  }
+
+  @override
+  bool matchesSearch(String query) {
+    if (query.isEmpty) return true;
+    
+    // Check base fields first (name, category)
+    if (super.matchesSearch(query)) return true;
+    
+    final String lowerQuery = query.toLowerCase();
+    
+    // Check WeaponAccessory-specific fields
+    if (mount.toLowerCase().contains(lowerQuery) ||
+        extraMount.toLowerCase().contains(lowerQuery)) {
+      return true;
+    }
+    
+    // Check nested gears
+    return gears?.any((gear) => gear.matchesSearch(query)) ?? false;
+  }
+
+  WeaponAccessory copyWith({
+    String? name,
+    String? category,
+    String? source,
+    String? page,
+    String? avail,
+    int? cost,
+    String? guid,
+    String? mount,
+    String? extraMount,
+    String? rc,
+    int? maxRating,
+    int? rating,
+    String? ratingLabel,
+    int? rcGroup,
+    bool? rcDeployable,
+    bool? specialModification,
+    String? conceal,
+    String? weight,
+    bool? included,
+    String? accuracy,
+    List<Gear>? gears,
+    String? ammoReplace,
+    int? ammoSlots,
+    String? modifyAmmoCapacity,
+    String? damageType,
+    String? damage,
+    String? reach,
+    String? damageReplace,
+    String? fireMode,
+    String? fireModeReplace,
+    String? ap,
+    String? apReplace,
+    int? singleShot,
+    int? shortBurst,
+    int? longBurst,
+    int? fullBurst,
+    int? suppressive,
+    int? rangeBonus,
+    int? rangeModifier,
+    String? extra,
+    String? ammoBonus,
+    String? parentId,
+    bool? equipped,
+    String? notes,
+    String? notesColor,
+    bool? discountedCost,
+    bool? wirelessOn,
+    bool? stolen,
+    int? sortOrder,
+  }) {
+    return WeaponAccessory(
+      name: name ?? this.name,
+      category: category ?? this.category,
+      source: source ?? this.source,
+      page: page ?? this.page,
+      avail: avail ?? this.avail,
+      cost: cost ?? this.cost,
+      guid: guid ?? this.guid,
+      mount: mount ?? this.mount,
+      extraMount: extraMount ?? this.extraMount,
+      rc: rc ?? this.rc,
+      maxRating: maxRating ?? this.maxRating,
+      rating: rating ?? this.rating,
+      ratingLabel: ratingLabel ?? this.ratingLabel,
+      rcGroup: rcGroup ?? this.rcGroup,
+      rcDeployable: rcDeployable ?? this.rcDeployable,
+      specialModification: specialModification ?? this.specialModification,
+      conceal: conceal ?? this.conceal,
+      weight: weight ?? this.weight,
+      included: included ?? this.included,
+      accuracy: accuracy ?? this.accuracy,
+      gears: gears ?? this.gears,
+      ammoReplace: ammoReplace ?? this.ammoReplace,
+      ammoSlots: ammoSlots ?? this.ammoSlots,
+      modifyAmmoCapacity: modifyAmmoCapacity ?? this.modifyAmmoCapacity,
+      damageType: damageType ?? this.damageType,
+      damage: damage ?? this.damage,
+      reach: reach ?? this.reach,
+      damageReplace: damageReplace ?? this.damageReplace,
+      fireMode: fireMode ?? this.fireMode,
+      fireModeReplace: fireModeReplace ?? this.fireModeReplace,
+      ap: ap ?? this.ap,
+      apReplace: apReplace ?? this.apReplace,
+      singleShot: singleShot ?? this.singleShot,
+      shortBurst: shortBurst ?? this.shortBurst,
+      longBurst: longBurst ?? this.longBurst,
+      fullBurst: fullBurst ?? this.fullBurst,
+      suppressive: suppressive ?? this.suppressive,
+      rangeBonus: rangeBonus ?? this.rangeBonus,
+      rangeModifier: rangeModifier ?? this.rangeModifier,
+      extra: extra ?? this.extra,
+      ammoBonus: ammoBonus ?? this.ammoBonus,
+      parentId: parentId ?? this.parentId,
+      equipped: equipped ?? super.equipped,
+      notes: notes ?? super.notes,
+      notesColor: notesColor ?? super.notesColor,
+      discountedCost: discountedCost ?? super.discountedCost,
+      wirelessOn: wirelessOn ?? super.wirelessOn,
+      stolen: stolen ?? super.stolen,
+      sortOrder: sortOrder ?? super.sortOrder,
+    );
+  }
+
+  @override
+  WeaponAccessory? filterWithHierarchy(String query) {
+    if (query.isEmpty) return this;
+    
+    // Filter nested gears
+    final filteredGears = gears
+        ?.map((gear) => gear.filterWithHierarchy(query))
+        .where((gear) => gear != null)
+        .cast<Gear>()
+        .toList();
+    
+    // Include this accessory if it matches OR if it has matching gears
+    if (matchesSearch(query) || (filteredGears?.isNotEmpty ?? false)) {
+      // Create a new WeaponAccessory with filtered gears
+      return copyWith(gears: filteredGears);
+    }
+    
+    return null;
   }
 }

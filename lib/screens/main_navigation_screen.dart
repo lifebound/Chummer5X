@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:chummer5x/widgets/armor_location_tree_view.dart';
-import 'package:chummer5x/widgets/weapon_location_tree_view.dart';
+import 'package:chummer5x/models/items/armor.dart';
+import 'package:chummer5x/models/items/weapon.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -4257,7 +4257,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ArmorLocationTreeView(allLocations: _currentCharacter?.armorLocations ?? {}, allArmors: _currentCharacter?.armor ?? []),
+            child: ShadowrunItemLocationTreeView<Armor>(allLocations: _currentCharacter?.armorLocations ?? {}, allItems: _currentCharacter?.armor ?? []),
           ),
         ],
       ),
@@ -4276,7 +4276,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: WeaponLocationTreeView(allLocations: _currentCharacter?.weaponLocations ?? {}, allWeapons: _currentCharacter?.weapons ?? []),
+            child: ShadowrunItemLocationTreeView<Weapon>(allLocations: _currentCharacter?.weaponLocations ?? {}, allItems: _currentCharacter?.weapons ?? []),
           ),
         ],
       ),

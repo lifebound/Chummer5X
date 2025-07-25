@@ -125,6 +125,125 @@ class Armor extends ShadowrunItem {
       sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
     );
   }
+  Armor copyWith({
+    String? sourceId,
+    String? locationGuid,
+    String? name,
+    String? category,
+    String? avail,
+    int? cost,
+    bool? equipped,
+    bool? active,
+    bool? homeNode,
+    bool? wirelessOn,
+    bool? stolen,
+    String? deviceRating,
+    String? programLimit,
+    String? overclocked,
+    String? attack,
+    String? sleaze,
+    String? dataProcessing,
+    String? firewall,
+    List<String>? attributeArray,
+    String? modAttack,
+    String? modSleaze,
+    String? modDataProcessing,
+    String? modFirewall,
+    List<String>? modAttributeArray,
+    bool? canSwapAttributes,
+    int? matrixCmFilled,
+    int? matrixCmBonus,
+    String? notes,
+    String? notesColor,
+    bool? discountedCost,
+    int? sortOrder,
+    bool? canFormPersona,
+    String? source,
+    String? page,
+    String? armorValue,
+    String? armorOverride,
+    String? armorCapacity,
+    String? weight,
+    String? armorName,
+    String? extra,
+    int? damage,
+    int? rating,
+    int? maxRating,
+    String? ratingLabel,
+    bool? encumbrance,
+    List<ArmorMod>? armorMods,
+    String? location,
+  }) {
+    return Armor(
+      sourceId: sourceId ?? this.sourceId,
+      locationGuid: locationGuid ?? this.locationGuid,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      avail: avail ?? this.avail,
+      cost: cost ?? this.cost,
+      equipped: equipped ?? this.equipped,
+      active: active ?? this.active,
+      homeNode: homeNode ?? this.homeNode,
+      wirelessOn: wirelessOn ?? this.wirelessOn,
+      stolen: stolen ?? this.stolen,
+      deviceRating: deviceRating ?? this.deviceRating,
+      programLimit: programLimit ?? this.programLimit,
+      overclocked: overclocked ?? this.overclocked,
+      attack: attack ?? this.attack,
+      sleaze: sleaze ?? this.sleaze,
+      dataProcessing: dataProcessing ?? this.dataProcessing,
+      firewall: firewall ?? this.firewall,
+      attributeArray: attributeArray ?? this.attributeArray,
+      modAttack: modAttack ?? this.modAttack,
+      modSleaze: modSleaze ?? this.modSleaze,
+      modDataProcessing: modDataProcessing ?? this.modDataProcessing,
+      modFirewall: modFirewall ?? this.modFirewall,
+      modAttributeArray: modAttributeArray ?? this.modAttributeArray,
+      canSwapAttributes: canSwapAttributes ?? this.canSwapAttributes,
+      matrixCmFilled: matrixCmFilled ?? this.matrixCmFilled,
+      matrixCmBonus: matrixCmBonus ?? this.matrixCmBonus,
+      notes: notes ?? this.notes,
+      notesColor: notesColor ?? this.notesColor,
+      discountedCost: discountedCost ?? this.discountedCost,
+      sortOrder: sortOrder ?? this.sortOrder,
+      canFormPersona: canFormPersona ?? this.canFormPersona,
+      source: source ?? this.source,
+      page: page ?? this.page,
+      armorValue: armorValue ?? this.armorValue,
+      armorOverride: armorOverride ?? this.armorOverride,
+      armorCapacity: armorCapacity ?? this.armorCapacity,
+      weight: weight ?? this.weight,
+      armorName: armorName ?? this.armorName,
+      extra: extra ?? this.extra,
+      damage: damage ?? this.damage,
+      rating: rating ?? this.rating,
+      maxRating: maxRating ?? this.maxRating,
+      ratingLabel: ratingLabel ?? this.ratingLabel,
+      encumbrance: encumbrance ?? this.encumbrance,
+      armorMods: armorMods ?? this.armorMods,
+      location: location ?? this.location,
+    );
+  }
+
+  @override
+  Armor? filterWithHierarchy(String query) {
+    if (query.isEmpty) return this;
+    
+    // Filter nested armor mods
+    final filteredArmorMods = armorMods
+        ?.map((mod) => mod.filterWithHierarchy(query))
+        .where((mod) => mod != null)
+        .cast<ArmorMod>()
+        .toList();
+    
+    // Include this armor if it matches OR if it has matching mods
+    if (matchesSearch(query) || (filteredArmorMods?.isNotEmpty ?? false)) {
+      return copyWith(armorMods: filteredArmorMods);
+    }
+    
+    return null;
+  }
+
   @override
   Icon getIcon(Color? color) {
     return switch (category.toLowerCase()) {
@@ -135,5 +254,18 @@ class Armor extends ShadowrunItem {
       'high-fashion armor clothing' => Icon(Symbols.shield_person, color: color),
       _ => Icon(Icons.miscellaneous_services_outlined, color: color)
     };
+  }
+
+  @override
+  bool matchesSearch(String query) {
+    if (query.isEmpty) return true;
+    
+    // Check base fields first (name, category)
+    if (super.matchesSearch(query)) return true;
+    
+    // Check if any armor mod matches
+    return armorMods?.any((mod) => 
+        mod.name.toLowerCase().contains(query.toLowerCase())
+    ) ?? false;
   }
 }

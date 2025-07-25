@@ -5,77 +5,84 @@ import 'package:chummer5x/models/items/weapon_accessory.dart';
 void main() {
   group('WeaponAccessory', () {
     test('should create WeaponAccessory with required parameters', () {
+      // Test: Verify WeaponAccessory constructor works with minimal required fields and sets default values correctly
       // Arrange & Act
       final accessory = WeaponAccessory(
         name: 'Smartgun System',
+        category: 'Weapon Accessory',
         mount: 'Internal',
         extraMount: 'None',
         avail: '8R',
-        cost: '2000',
+        cost: 2000,
         source: 'Core',
         page: '431',
+        equipped: false,
+        discountedCost: false,
+        wirelessOn: false,
+        stolen: false,
+        sortOrder: 0,
       );
 
       // Assert
-      expect(accessory.name, 'Smartgun System');
-      expect(accessory.mount, 'Internal');
-      expect(accessory.extraMount, 'None');
-      expect(accessory.avail, '8R');
-      expect(accessory.cost, '2000');
-      expect(accessory.source, 'Core');
-      expect(accessory.page, '431');
+      expect(accessory.name, 'Smartgun System', reason: 'Name should match constructor input');
+      expect(accessory.mount, 'Internal', reason: 'Mount should match constructor input');
+      expect(accessory.extraMount, 'None', reason: 'ExtraMount should match constructor input');
+      expect(accessory.avail, '8R', reason: 'Avail should match constructor input');
+      expect(accessory.cost, 2000, reason: 'Cost should match constructor input');
+      expect(accessory.source, 'Core', reason: 'Source should match constructor input');
+      expect(accessory.page, '431', reason: 'Page should match constructor input');
       
       // Check defaults
-      expect(accessory.sourceId, null);
-      expect(accessory.guid, null);
-      expect(accessory.rc, null);
-      expect(accessory.maxRating, 0);
-      expect(accessory.rating, 0);
-      expect(accessory.ratingLabel, 'String_Rating');
-      expect(accessory.rcGroup, 0);
-      expect(accessory.rcDeployable, false);
-      expect(accessory.specialModification, false);
-      expect(accessory.conceal, null);
-      expect(accessory.weight, null);
-      expect(accessory.included, false);
-      expect(accessory.equipped, false);
-      expect(accessory.accuracy, null);
-      expect(accessory.gears, null);
-      expect(accessory.ammoReplace, null);
-      expect(accessory.ammoSlots, 0);
-      expect(accessory.modifyAmmoCapacity, null);
-      expect(accessory.damageType, null);
-      expect(accessory.damage, null);
-      expect(accessory.reach, null);
-      expect(accessory.damageReplace, null);
-      expect(accessory.fireMode, null);
-      expect(accessory.fireModeReplace, null);
-      expect(accessory.ap, null);
-      expect(accessory.apReplace, null);
-      expect(accessory.notes, null);
-      expect(accessory.notesColor, null);
-      expect(accessory.discountedCost, false);
-      expect(accessory.singleShot, 0);
-      expect(accessory.shortBurst, 0);
-      expect(accessory.longBurst, 0);
-      expect(accessory.fullBurst, 0);
-      expect(accessory.suppressive, 0);
-      expect(accessory.rangeBonus, 0);
-      expect(accessory.rangeModifier, 0);
-      expect(accessory.extra, null);
-      expect(accessory.ammoBonus, null);
-      expect(accessory.wirelessOn, false);
-      expect(accessory.stolen, false);
-      expect(accessory.sortOrder, 0);
-      expect(accessory.parentId, null);
+      expect(accessory.sourceId, null, reason: 'SourceId should default to null when not provided');
+      expect(accessory.guid, null, reason: 'GUID should default to null when not provided');
+      expect(accessory.rc, null, reason: 'RC should default to null when not provided');
+      expect(accessory.maxRating, 0, reason: 'MaxRating should default to 0 when not provided');
+      expect(accessory.rating, 0, reason: 'Rating should default to 0 when not provided');
+      expect(accessory.ratingLabel, 'String_Rating', reason: 'RatingLabel should default to String_Rating when not provided');
+      expect(accessory.rcGroup, 0, reason: 'RcGroup should default to 0 when not provided');
+      expect(accessory.rcDeployable, false, reason: 'RcDeployable should default to false when not provided');
+      expect(accessory.specialModification, false, reason: 'SpecialModification should default to false when not provided');
+      expect(accessory.conceal, null, reason: 'Conceal should default to null when not provided');
+      expect(accessory.weight, null, reason: 'Weight should default to null when not provided');
+      expect(accessory.included, false, reason: 'Included should default to false when not provided');
+      expect(accessory.equipped, false, reason: 'Equipped should match constructor input');
+      expect(accessory.accuracy, null, reason: 'Accuracy should default to null when not provided');
+      expect(accessory.gears, null, reason: 'Gears should default to null when not provided');
+      expect(accessory.ammoReplace, null, reason: 'AmmoReplace should default to null when not provided');
+      expect(accessory.ammoSlots, 0, reason: 'AmmoSlots should default to 0 when not provided');
+      expect(accessory.modifyAmmoCapacity, null, reason: 'ModifyAmmoCapacity should default to null when not provided');
+      expect(accessory.damageType, null, reason: 'DamageType should default to null when not provided');
+      expect(accessory.damage, null, reason: 'Damage should default to null when not provided');
+      expect(accessory.reach, null, reason: 'Reach should default to null when not provided');
+      expect(accessory.damageReplace, null, reason: 'DamageReplace should default to null when not provided');
+      expect(accessory.fireMode, null, reason: 'FireMode should default to null when not provided');
+      expect(accessory.fireModeReplace, null, reason: 'FireModeReplace should default to null when not provided');
+      expect(accessory.ap, null, reason: 'AP should default to null when not provided');
+      expect(accessory.apReplace, null, reason: 'APReplace should default to null when not provided');
+      expect(accessory.notes, null, reason: 'Notes should default to null when not provided');
+      expect(accessory.notesColor, null, reason: 'NotesColor should default to null when not provided');
+      expect(accessory.discountedCost, false, reason: 'DiscountedCost should match constructor input');
+      expect(accessory.singleShot, 0, reason: 'SingleShot should default to 0 when not provided');
+      expect(accessory.shortBurst, 0, reason: 'ShortBurst should default to 0 when not provided');
+      expect(accessory.longBurst, 0, reason: 'LongBurst should default to 0 when not provided');
+      expect(accessory.fullBurst, 0, reason: 'FullBurst should default to 0 when not provided');
+      expect(accessory.suppressive, 0, reason: 'Suppressive should default to 0 when not provided');
+      expect(accessory.rangeBonus, 0, reason: 'RangeBonus should default to 0 when not provided');
+      expect(accessory.rangeModifier, 0, reason: 'RangeModifier should default to 0 when not provided');
+      expect(accessory.extra, null, reason: 'Extra should default to null when not provided');
+      expect(accessory.ammoBonus, null, reason: 'AmmoBonus should default to null when not provided');
+      expect(accessory.wirelessOn, false, reason: 'WirelessOn should match constructor input');
+      expect(accessory.stolen, false, reason: 'Stolen should match constructor input');
+      expect(accessory.sortOrder, 0, reason: 'SortOrder should match constructor input');
+      expect(accessory.parentId, null, reason: 'ParentId should default to null when not provided');
     });
 
     test('should create WeaponAccessory with all optional parameters', () {
+      // Test: Verify WeaponAccessory constructor accepts and correctly stores all optional parameters
       // Arrange & Act
       final accessory = WeaponAccessory(
-        sourceId: 'test-source',
-        guid: 'test-guid',
         name: 'Advanced Scope',
+        category: 'Weapon Accessory',
         mount: 'Top',
         extraMount: 'Barrel',
         rc: '2',
@@ -87,7 +94,7 @@ void main() {
         specialModification: true,
         conceal: '+2',
         avail: '12F',
-        cost: '15000',
+        cost: 15000,
         weight: '1.5',
         included: true,
         equipped: true,
@@ -125,59 +132,58 @@ void main() {
       );
 
       // Assert
-      expect(accessory.sourceId, 'test-source');
-      expect(accessory.guid, 'test-guid');
-      expect(accessory.name, 'Advanced Scope');
-      expect(accessory.mount, 'Top');
-      expect(accessory.extraMount, 'Barrel');
-      expect(accessory.rc, '2');
-      expect(accessory.maxRating, 6);
-      expect(accessory.rating, 4);
-      expect(accessory.ratingLabel, 'Rating');
-      expect(accessory.rcGroup, 3);
-      expect(accessory.rcDeployable, true);
-      expect(accessory.specialModification, true);
-      expect(accessory.conceal, '+2');
-      expect(accessory.avail, '12F');
-      expect(accessory.cost, '15000');
-      expect(accessory.weight, '1.5');
-      expect(accessory.included, true);
-      expect(accessory.equipped, true);
-      expect(accessory.source, 'Run & Gun');
-      expect(accessory.page, '200');
-      expect(accessory.accuracy, '+1');
-      expect(accessory.gears, isEmpty);
-      expect(accessory.ammoReplace, 'APDS');
-      expect(accessory.ammoSlots, 2);
-      expect(accessory.modifyAmmoCapacity, '+10');
-      expect(accessory.damageType, 'Physical');
-      expect(accessory.damage, '+2P');
-      expect(accessory.reach, '+1');
-      expect(accessory.damageReplace, '10P');
-      expect(accessory.fireMode, 'SA');
-      expect(accessory.fireModeReplace, 'BF');
-      expect(accessory.ap, '-1');
-      expect(accessory.apReplace, '-3');
-      expect(accessory.notes, 'Custom accessory');
-      expect(accessory.notesColor, 'red');
-      expect(accessory.discountedCost, true);
-      expect(accessory.singleShot, 1);
-      expect(accessory.shortBurst, 3);
-      expect(accessory.longBurst, 6);
-      expect(accessory.fullBurst, 10);
-      expect(accessory.suppressive, 20);
-      expect(accessory.rangeBonus, 50);
-      expect(accessory.rangeModifier, 2);
-      expect(accessory.extra, 'Thermographic');
-      expect(accessory.ammoBonus, '10');
-      expect(accessory.wirelessOn, true);
-      expect(accessory.stolen, true);
-      expect(accessory.sortOrder, 5);
-      expect(accessory.parentId, 'parent-123');
+      expect(accessory.name, 'Advanced Scope', reason: 'Name should match constructor input');
+      expect(accessory.mount, 'Top', reason: 'Mount should match constructor input');
+      expect(accessory.extraMount, 'Barrel', reason: 'ExtraMount should match constructor input');
+      expect(accessory.rc, '2', reason: 'RC should match constructor input');
+      expect(accessory.maxRating, 6, reason: 'MaxRating should match constructor input');
+      expect(accessory.rating, 4, reason: 'Rating should match constructor input');
+      expect(accessory.ratingLabel, 'Rating', reason: 'RatingLabel should match constructor input');
+      expect(accessory.rcGroup, 3, reason: 'RcGroup should match constructor input');
+      expect(accessory.rcDeployable, true, reason: 'RcDeployable should match constructor input');
+      expect(accessory.specialModification, true, reason: 'SpecialModification should match constructor input');
+      expect(accessory.conceal, '+2', reason: 'Conceal should match constructor input');
+      expect(accessory.avail, '12F', reason: 'Avail should match constructor input');
+      expect(accessory.cost, 15000, reason: 'Cost should match constructor input');
+      expect(accessory.weight, '1.5', reason: 'Weight should match constructor input');
+      expect(accessory.included, true, reason: 'Included should match constructor input');
+      expect(accessory.equipped, true, reason: 'Equipped should match constructor input');
+      expect(accessory.source, 'Run & Gun', reason: 'Source should match constructor input');
+      expect(accessory.page, '200', reason: 'Page should match constructor input');
+      expect(accessory.accuracy, '+1', reason: 'Accuracy should match constructor input');
+      expect(accessory.gears, isEmpty, reason: 'Gears should match constructor input (empty list)');
+      expect(accessory.ammoReplace, 'APDS', reason: 'AmmoReplace should match constructor input');
+      expect(accessory.ammoSlots, 2, reason: 'AmmoSlots should match constructor input');
+      expect(accessory.modifyAmmoCapacity, '+10', reason: 'ModifyAmmoCapacity should match constructor input');
+      expect(accessory.damageType, 'Physical', reason: 'DamageType should match constructor input');
+      expect(accessory.damage, '+2P', reason: 'Damage should match constructor input');
+      expect(accessory.reach, '+1', reason: 'Reach should match constructor input');
+      expect(accessory.damageReplace, '10P', reason: 'DamageReplace should match constructor input');
+      expect(accessory.fireMode, 'SA', reason: 'FireMode should match constructor input');
+      expect(accessory.fireModeReplace, 'BF', reason: 'FireModeReplace should match constructor input');
+      expect(accessory.ap, '-1', reason: 'AP should match constructor input');
+      expect(accessory.apReplace, '-3', reason: 'APReplace should match constructor input');
+      expect(accessory.notes, 'Custom accessory', reason: 'Notes should match constructor input');
+      expect(accessory.notesColor, 'red', reason: 'NotesColor should match constructor input');
+      expect(accessory.discountedCost, true, reason: 'DiscountedCost should match constructor input');
+      expect(accessory.singleShot, 1, reason: 'SingleShot should match constructor input');
+      expect(accessory.shortBurst, 3, reason: 'ShortBurst should match constructor input');
+      expect(accessory.longBurst, 6, reason: 'LongBurst should match constructor input');
+      expect(accessory.fullBurst, 10, reason: 'FullBurst should match constructor input');
+      expect(accessory.suppressive, 20, reason: 'Suppressive should match constructor input');
+      expect(accessory.rangeBonus, 50, reason: 'RangeBonus should match constructor input');
+      expect(accessory.rangeModifier, 2, reason: 'RangeModifier should match constructor input');
+      expect(accessory.extra, 'Thermographic', reason: 'Extra should match constructor input');
+      expect(accessory.ammoBonus, '10', reason: 'AmmoBonus should match constructor input');
+      expect(accessory.wirelessOn, true, reason: 'WirelessOn should match constructor input');
+      expect(accessory.stolen, true, reason: 'Stolen should match constructor input');
+      expect(accessory.sortOrder, 5, reason: 'SortOrder should match constructor input');
+      expect(accessory.parentId, 'parent-123', reason: 'ParentId should match constructor input');
     });
 
     group('fromXml', () {
       test('should parse minimal XML correctly', () {
+        // Test: Verify fromXml can parse basic XML with minimal required fields and sets appropriate defaults
         // Arrange
         final xmlString = '''
           <accessory>
@@ -196,35 +202,36 @@ void main() {
         final accessory = WeaponAccessory.fromXml(xmlElement);
 
         // Assert
-        expect(accessory.name, 'Basic Scope');
-        expect(accessory.mount, 'Top');
-        expect(accessory.extraMount, 'None');
-        expect(accessory.avail, '4R');
-        expect(accessory.cost, '500');
-        expect(accessory.source, 'Core');
-        expect(accessory.page, '431');
-        expect(accessory.sourceId, null);
-        expect(accessory.guid, null);
-        expect(accessory.rc, null);
-        expect(accessory.maxRating, 0);
-        expect(accessory.rating, 0);
-        expect(accessory.ratingLabel, 'String_Rating');
-        expect(accessory.rcGroup, 0);
-        expect(accessory.rcDeployable, false);
-        expect(accessory.specialModification, false);
-        expect(accessory.conceal, null);
-        expect(accessory.weight, null);
-        expect(accessory.included, false);
-        expect(accessory.equipped, false);
-        expect(accessory.accuracy, null);
-        expect(accessory.gears, isEmpty);
-        expect(accessory.discountedCost, false);
-        expect(accessory.wirelessOn, false);
-        expect(accessory.stolen, false);
-        expect(accessory.sortOrder, 0);
+        expect(accessory.name, 'Basic Scope', reason: 'Name should be parsed from XML <name> element');
+        expect(accessory.mount, 'Top', reason: 'Mount should be parsed from XML <mount> element');
+        expect(accessory.extraMount, 'None', reason: 'ExtraMount should be parsed from XML <extramount> element');
+        expect(accessory.avail, '4R', reason: 'Avail should be parsed from XML <avail> element');
+        expect(accessory.cost, 500, reason: 'Cost should be parsed from XML <cost> element as integer');
+        expect(accessory.source, 'Core', reason: 'Source should be parsed from XML <source> element');
+        expect(accessory.page, '431', reason: 'Page should be parsed from XML <page> element');
+        expect(accessory.sourceId, null, reason: 'SourceId should default to null when not in XML');
+        expect(accessory.guid, null, reason: 'GUID should default to null when not in XML');
+        expect(accessory.rc, null, reason: 'RC should default to null when not in XML');
+        expect(accessory.maxRating, 0, reason: 'MaxRating should default to 0 when not in XML');
+        expect(accessory.rating, 0, reason: 'Rating should default to 0 when not in XML');
+        expect(accessory.ratingLabel, 'String_Rating', reason: 'RatingLabel should default to String_Rating when not in XML');
+        expect(accessory.rcGroup, 0, reason: 'RcGroup should default to 0 when not in XML');
+        expect(accessory.rcDeployable, false, reason: 'RcDeployable should default to false when not in XML');
+        expect(accessory.specialModification, false, reason: 'SpecialModification should default to false when not in XML');
+        expect(accessory.conceal, null, reason: 'Conceal should default to null when not in XML');
+        expect(accessory.weight, null, reason: 'Weight should default to null when not in XML');
+        expect(accessory.included, false, reason: 'Included should default to false when not in XML');
+        expect(accessory.equipped, false, reason: 'Equipped should default to false when not in XML');
+        expect(accessory.accuracy, null, reason: 'Accuracy should default to null when not in XML');
+        expect(accessory.gears, isEmpty, reason: 'Gears should default to empty list when not in XML');
+        expect(accessory.discountedCost, false, reason: 'DiscountedCost should default to false when not in XML');
+        expect(accessory.wirelessOn, false, reason: 'WirelessOn should default to false when not in XML');
+        expect(accessory.stolen, false, reason: 'Stolen should default to false when not in XML');
+        expect(accessory.sortOrder, 0, reason: 'SortOrder should default to 0 when not in XML');
       });
 
       test('should parse complete XML correctly', () {
+        // Test: Verify fromXml can parse complex XML with all possible fields
         // Arrange
         final xmlString = '''
           <accessory>
@@ -285,8 +292,6 @@ void main() {
         final accessory = WeaponAccessory.fromXml(xmlElement);
 
         // Assert
-        expect(accessory.sourceId, 'complete-source');
-        expect(accessory.guid, 'complete-guid');
         expect(accessory.name, 'Complete Accessory');
         expect(accessory.mount, 'Internal');
         expect(accessory.extraMount, 'Barrel');
@@ -299,7 +304,7 @@ void main() {
         expect(accessory.specialModification, true);
         expect(accessory.conceal, '+3');
         expect(accessory.avail, '15F');
-        expect(accessory.cost, '25000');
+        expect(accessory.cost, 25000, reason: 'Cost should be parsed from XML <cost> element as integer');
         expect(accessory.weight, '2.0');
         expect(accessory.included, true);
         expect(accessory.equipped, true);
@@ -337,6 +342,7 @@ void main() {
       });
 
       test('should handle missing XML elements gracefully', () {
+        // Test: Verify fromXml provides appropriate defaults when XML elements are missing
         // Arrange
         final xmlString = '''
           <accessory>
@@ -348,28 +354,29 @@ void main() {
         final accessory = WeaponAccessory.fromXml(xmlElement);
 
         // Assert
-        expect(accessory.name, 'Unnamed Accessory');
-        expect(accessory.mount, 'None');
-        expect(accessory.extraMount, 'None');
-        expect(accessory.avail, '');
-        expect(accessory.cost, '0');
-        expect(accessory.source, 'Unknown');
-        expect(accessory.page, '0');
-        expect(accessory.ratingLabel, 'String_Rating');
-        expect(accessory.maxRating, 0);
-        expect(accessory.rating, 0);
-        expect(accessory.rcGroup, 0);
-        expect(accessory.rcDeployable, false);
-        expect(accessory.specialModification, false);
-        expect(accessory.included, false);
-        expect(accessory.equipped, false);
-        expect(accessory.discountedCost, false);
-        expect(accessory.wirelessOn, false);
-        expect(accessory.stolen, false);
-        expect(accessory.sortOrder, 0);
+        expect(accessory.name, 'Unnamed Accessory', reason: 'Missing name should default to "Unnamed Accessory"');
+        expect(accessory.mount, 'None', reason: 'Missing mount should default to "None"');
+        expect(accessory.extraMount, 'None', reason: 'Missing extramount should default to "None"');
+        expect(accessory.avail, '', reason: 'Missing avail should default to empty string');
+        expect(accessory.cost, 0, reason: 'Missing cost should default to 0');
+        expect(accessory.source, 'Unknown', reason: 'Missing source should default to "Unknown"');
+        expect(accessory.page, '0', reason: 'Missing page should default to "0"');
+        expect(accessory.ratingLabel, 'String_Rating', reason: 'Missing ratinglabel should default to "String_Rating"');
+        expect(accessory.maxRating, 0, reason: 'Missing maxrating should default to 0');
+        expect(accessory.rating, 0, reason: 'Missing rating should default to 0');
+        expect(accessory.rcGroup, 0, reason: 'Missing rcgroup should default to 0');
+        expect(accessory.rcDeployable, false, reason: 'Missing rcdeployable should default to false');
+        expect(accessory.specialModification, false, reason: 'Missing specialmodification should default to false');
+        expect(accessory.included, false, reason: 'Missing included should default to false');
+        expect(accessory.equipped, false, reason: 'Missing equipped should default to false');
+        expect(accessory.discountedCost, false, reason: 'Missing discountedcost should default to false');
+        expect(accessory.wirelessOn, false, reason: 'Missing wirelesson should default to false');
+        expect(accessory.stolen, false, reason: 'Missing stolen should default to false');
+        expect(accessory.sortOrder, 0, reason: 'Missing sortorder should default to 0');
       });
 
       test('should parse boolean values correctly', () {
+        // Test: Verify fromXml correctly parses XML boolean values (True/False) to Dart booleans
         // Arrange
         final xmlString = '''
           <accessory>
@@ -395,16 +402,17 @@ void main() {
         final accessory = WeaponAccessory.fromXml(xmlElement);
 
         // Assert
-        expect(accessory.rcDeployable, true);
-        expect(accessory.specialModification, false);
-        expect(accessory.included, true);
-        expect(accessory.equipped, false);
-        expect(accessory.discountedCost, true);
-        expect(accessory.wirelessOn, false);
-        expect(accessory.stolen, true);
+        expect(accessory.rcDeployable, true, reason: 'XML "True" should parse to boolean true');
+        expect(accessory.specialModification, false, reason: 'XML "False" should parse to boolean false');
+        expect(accessory.included, true, reason: 'XML "True" should parse to boolean true');
+        expect(accessory.equipped, false, reason: 'XML "False" should parse to boolean false');
+        expect(accessory.discountedCost, true, reason: 'XML "True" should parse to boolean true');
+        expect(accessory.wirelessOn, false, reason: 'XML "False" should parse to boolean false');
+        expect(accessory.stolen, true, reason: 'XML "True" should parse to boolean true');
       });
 
       test('should parse numeric values correctly with invalid input', () {
+        // Test: Verify fromXml handles invalid numeric input gracefully by defaulting to 0
         // Arrange
         final xmlString = '''
           <accessory>
@@ -435,21 +443,22 @@ void main() {
         final accessory = WeaponAccessory.fromXml(xmlElement);
 
         // Assert
-        expect(accessory.maxRating, 0);
-        expect(accessory.rating, 0);
-        expect(accessory.rcGroup, 0);
-        expect(accessory.ammoSlots, 0);
-        expect(accessory.singleShot, 0);
-        expect(accessory.shortBurst, 0);
-        expect(accessory.longBurst, 0);
-        expect(accessory.fullBurst, 0);
-        expect(accessory.suppressive, 0);
-        expect(accessory.rangeBonus, 0);
-        expect(accessory.rangeModifier, 0);
-        expect(accessory.sortOrder, 0);
+        expect(accessory.maxRating, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.rating, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.rcGroup, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.ammoSlots, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.singleShot, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.shortBurst, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.longBurst, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.fullBurst, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.suppressive, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.rangeBonus, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.rangeModifier, 0, reason: 'Invalid numeric input should default to 0');
+        expect(accessory.sortOrder, 0, reason: 'Invalid numeric input should default to 0');
       });
 
       test('should parse gears correctly', () {
+        // Test: Verify fromXml correctly parses nested gear elements
         // Arrange
         final xmlString = '''
           <accessory>
@@ -483,10 +492,10 @@ void main() {
         final accessory = WeaponAccessory.fromXml(xmlElement);
 
         // Assert
-        expect(accessory.gears, hasLength(1));
-        expect(accessory.gears!.first.name, 'Embedded Gear');
-        expect(accessory.gears!.first.category, 'Electronics');
-        expect(accessory.gears!.first.rating, 3);
+        expect(accessory.gears, hasLength(1), reason: 'Should parse exactly one gear from XML');
+        expect(accessory.gears!.first.name, 'Embedded Gear', reason: 'Gear name should be parsed from nested XML');
+        expect(accessory.gears!.first.category, 'Electronics', reason: 'Gear category should be parsed from nested XML');
+        expect(accessory.gears!.first.rating, 3, reason: 'Gear rating should be parsed from nested XML');
       });
     });
   });

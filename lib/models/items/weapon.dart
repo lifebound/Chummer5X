@@ -1,8 +1,10 @@
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
+import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/weapon_accessory.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 
 class Weapon extends ShadowrunItem {
@@ -220,5 +222,213 @@ class Weapon extends ShadowrunItem {
       sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
       weaponType: xmlElement.getElement('weapontype')?.innerText,
     );
+  }
+  @override
+  Icon getIcon(Color? color) {
+    return switch (category.toLowerCase()) {
+      'flamethrower' => Icon(Symbols.local_fire_department, color: color),
+      'swords' => Icon(Symbols.swords, color: color),
+      'clubs' => Icon(Symbols.gavel, color: color),
+      'sniper rifles' => Icon(Symbols.point_scan, color: color),
+      'grenade launcher' => Icon(Symbols.bomb, color: color),
+      var cat when cat.contains('pistol') => Icon(Symbols.recenter, color: color),
+      var cat when cat.contains('rifle') => Icon(Symbols.target, color: color),
+      _ => Icon(Symbols.manufacturing, color: color)
+    };
+  }
+
+  @override
+  bool matchesSearch(String query) {
+    if (query.isEmpty) return true;
+    
+    // Check base fields first (name, category)
+    if (super.matchesSearch(query)) return true;
+    
+    // Check if any accessory matches (using their own matchesSearch method)
+    return accessories?.any((acc) => acc.matchesSearch(query)) ?? false;
+  }
+
+  Weapon copyWith({
+    String? sourceId,
+    String? locationGuid,
+    String? name,
+    String? category,
+    String? avail,
+    int? cost,
+    bool? equipped,
+    bool? active,
+    bool? homeNode,
+    bool? wirelessOn,
+    bool? stolen,
+    String? deviceRating,
+    String? programLimit,
+    String? overclocked,
+    String? attack,
+    String? sleaze,
+    String? dataProcessing,
+    String? firewall,
+    List<String>? attributeArray,
+    String? modAttack,
+    String? modSleaze,
+    String? modDataProcessing,
+    String? modFirewall,
+    List<String>? modAttributeArray,
+    bool? canSwapAttributes,
+    int? matrixCmFilled,
+    int? matrixCmBonus,
+    String? notes,
+    String? notesColor,
+    bool? discountedCost,
+    int? sortOrder,
+    bool? canFormPersona,
+    String? source,
+    String? page,
+    String? type,
+    String? spec,
+    String? spec2,
+    int? reach,
+    String? damage,
+    String? ap,
+    String? mode,
+    int? rc,
+    String? ammo,
+    bool? cyberware,
+    String? ammoCategory,
+    int? ammoSlots,
+    String? sizeCategory,
+    String? firingMode,
+    String? minRating,
+    String? maxRating,
+    int? rating,
+    String? accuracy,
+    int? activeAmmoSlot,
+    String? conceal,
+    String? weight,
+    String? useSkill,
+    String? useSkillSpec,
+    String? range,
+    String? alternateRange,
+    int? rangeMultiply,
+    int? singleShot,
+    int? shortBurst,
+    int? longBurst,
+    int? fullBurst,
+    int? suppressive,
+    bool? allowSingleShot,
+    bool? allowShortBurst,
+    bool? allowLongBurst,
+    bool? allowFullBurst,
+    bool? allowSuppressive,
+    String? parentId,
+    bool? allowAccessory,
+    bool? included,
+    bool? requireAmmo,
+    String? mount,
+    String? extraMount,
+    List<WeaponAccessory>? accessories,
+    String? location,
+    String? weaponType,
+  }) {
+    return Weapon(
+      sourceId: sourceId ?? this.sourceId,
+      locationGuid: locationGuid ?? this.locationGuid,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      avail: avail ?? this.avail,
+      cost: cost ?? this.cost,
+      equipped: equipped ?? this.equipped,
+      active: active ?? this.active,
+      homeNode: homeNode ?? this.homeNode,
+      wirelessOn: wirelessOn ?? this.wirelessOn,
+      stolen: stolen ?? this.stolen,
+      deviceRating: deviceRating ?? this.deviceRating,
+      programLimit: programLimit ?? this.programLimit,
+      overclocked: overclocked ?? this.overclocked,
+      attack: attack ?? this.attack,
+      sleaze: sleaze ?? this.sleaze,
+      dataProcessing: dataProcessing ?? this.dataProcessing,
+      firewall: firewall ?? this.firewall,
+      attributeArray: attributeArray ?? this.attributeArray,
+      modAttack: modAttack ?? this.modAttack,
+      modSleaze: modSleaze ?? this.modSleaze,
+      modDataProcessing: modDataProcessing ?? this.modDataProcessing,
+      modFirewall: modFirewall ?? this.modFirewall,
+      modAttributeArray: modAttributeArray ?? this.modAttributeArray,
+      canSwapAttributes: canSwapAttributes ?? this.canSwapAttributes,
+      matrixCmFilled: matrixCmFilled ?? this.matrixCmFilled,
+      matrixCmBonus: matrixCmBonus ?? this.matrixCmBonus,
+      notes: notes ?? this.notes,
+      notesColor: notesColor ?? this.notesColor,
+      discountedCost: discountedCost ?? this.discountedCost,
+      sortOrder: sortOrder ?? this.sortOrder,
+      canFormPersona: canFormPersona ?? this.canFormPersona,
+      source: source ?? this.source,
+      page: page ?? this.page,
+      type: type ?? this.type,
+      spec: spec ?? this.spec,
+      spec2: spec2 ?? this.spec2,
+      reach: reach ?? this.reach,
+      damage: damage ?? this.damage,
+      ap: ap ?? this.ap,
+      mode: mode ?? this.mode,
+      rc: rc ?? this.rc,
+      ammo: ammo ?? this.ammo,
+      cyberware: cyberware ?? this.cyberware,
+      ammoCategory: ammoCategory ?? this.ammoCategory,
+      ammoSlots: ammoSlots ?? this.ammoSlots,
+      sizeCategory: sizeCategory ?? this.sizeCategory,
+      firingMode: firingMode ?? this.firingMode,
+      minRating: minRating ?? this.minRating,
+      maxRating: maxRating ?? this.maxRating,
+      rating: rating ?? this.rating,
+      accuracy: accuracy ?? this.accuracy,
+      activeAmmoSlot: activeAmmoSlot ?? this.activeAmmoSlot,
+      conceal: conceal ?? this.conceal,
+      weight: weight ?? this.weight,
+      useSkill: useSkill ?? this.useSkill,
+      useSkillSpec: useSkillSpec ?? this.useSkillSpec,
+      range: range ?? this.range,
+      alternateRange: alternateRange ?? this.alternateRange,
+      rangeMultiply: rangeMultiply ?? this.rangeMultiply,
+      singleShot: singleShot ?? this.singleShot,
+      shortBurst: shortBurst ?? this.shortBurst,
+      longBurst: longBurst ?? this.longBurst,
+      fullBurst: fullBurst ?? this.fullBurst,
+      suppressive: suppressive ?? this.suppressive,
+      allowSingleShot: allowSingleShot ?? this.allowSingleShot,
+      allowShortBurst: allowShortBurst ?? this.allowShortBurst,
+      allowLongBurst: allowLongBurst ?? this.allowLongBurst,
+      allowFullBurst: allowFullBurst ?? this.allowFullBurst,
+      allowSuppressive: allowSuppressive ?? this.allowSuppressive,
+      parentId: parentId ?? this.parentId,
+      allowAccessory: allowAccessory ?? this.allowAccessory,
+      included: included ?? this.included,
+      requireAmmo: requireAmmo ?? this.requireAmmo,
+      mount: mount ?? this.mount,
+      extraMount: extraMount ?? this.extraMount,
+      accessories: accessories ?? this.accessories,
+      location: location ?? this.location,
+      weaponType: weaponType ?? this.weaponType,
+    );
+  }
+
+  @override
+  Weapon? filterWithHierarchy(String query) {
+    if (query.isEmpty) return this;
+    
+    // Filter nested accessories
+    final filteredAccessories = accessories
+        ?.map((acc) => acc.filterWithHierarchy(query))
+        .where((acc) => acc != null)
+        .cast<WeaponAccessory>()
+        .toList();
+    
+    // Include this weapon if it matches OR if it has matching accessories
+    if (matchesSearch(query) || (filteredAccessories?.isNotEmpty ?? false)) {
+      // Use copyWith to return filtered version
+      return copyWith(accessories: filteredAccessories);
+    }
+    
+    return null;
   }
 }

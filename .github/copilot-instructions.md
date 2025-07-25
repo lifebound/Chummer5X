@@ -41,6 +41,10 @@ This is a Flutter application for viewing and interacting with Shadowrun charact
 
 ### Test-Driven Development (TDD)
 - **Test First**: Always write tests before implementing new features
+- **Unit Tests**: Cover all models, services, and widgets
+- **Informative Tests**: Ensure tests are descriptive and cover edge cases
+- **Reason Statements**: ALWAYS add `reason:` parameter to ALL `expect()` statements explaining what is being tested and why
+- **Clear Test Debugging**: Reason statements should make test failures immediately understandable without examining code
 - **Red-Green-Refactor**: Write failing test → implement code → make tests pass → refactor
 - **Comprehensive Testing**: Cover all skill calculation logic, XML parsing, and UI behavior
 - **Iteration**: Continue until all tests pass

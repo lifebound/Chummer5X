@@ -1,5 +1,6 @@
 import 'package:chummer5x/models/items/location.dart';
 import 'package:xml/xml.dart';
+import 'package:flutter/material.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:chummer5x/models/items/gear.dart';
 import 'package:chummer5x/models/items/vehicle_mod.dart';
@@ -333,5 +334,36 @@ class Vehicle extends ShadowrunItem {
     }
     
     return false;
+  }
+
+  @override
+  String get details {
+    return 'Category: $category, Pilot: $pilot, Body: $body, Armor: $armor, Source: $source p. $page, Cost: $cost¥, Availability: $avail';
+  }
+
+  @override
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildDetailRow(context, 'Category', category),
+        buildDetailRow(context, 'Handling', handling),
+        buildDetailRow(context, 'Speed', speed),
+        buildDetailRow(context, 'Acceleration', accel),
+        buildDetailRow(context, 'Body', body),
+        buildDetailRow(context, 'Armor', armor),
+        buildDetailRow(context, 'Pilot', pilot),
+        buildDetailRow(context, 'Sensor', sensor),
+        buildDetailRow(context, 'Source', '$source p. $page'),
+        buildDetailRow(context, 'Availability', avail),
+        buildDetailRow(context, 'Cost', '$cost¥'),
+        const Divider(height: 24, thickness: 1),
+        buildToggleRow(context, 'Active', active, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, active: value);
+          }
+        }),
+      ],
+    );
   }
 }

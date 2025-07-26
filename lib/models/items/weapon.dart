@@ -22,6 +22,7 @@ class Weapon extends ShadowrunItem {
   final int ammoSlots;
   final String? sizeCategory;
   final String firingMode;
+  // TODO: These should be int? instead of String? - ratings are always integers
   final String? minRating;
   final String? maxRating;
   final int rating;
@@ -430,5 +431,52 @@ class Weapon extends ShadowrunItem {
     }
     
     return null;
+  }
+
+  @override
+  String get details {
+    return 'Category: $category, Damage: $damage, AP: $ap, Source: $source p. $page, Cost: $cost¥, Availability: $avail';
+  }
+
+  @override
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildDetailRow(context, 'Category', category),
+        buildDetailRow(context, 'Type', type),
+        buildDetailRow(context, 'Damage', damage, attributes: _getDefaultAttributes()),
+        buildDetailRow(context, 'AP', ap.toString()),
+        buildDetailRow(context, 'Mode', mode),
+        buildDetailRow(context, 'RC', rc.toString()),
+        buildDetailRow(context, 'Accuracy', accuracy),
+        buildDetailRow(context, 'Source', '$source p. $page'),
+        buildDetailRow(context, 'Availability', avail),
+        buildDetailRow(context, 'Cost', '$cost¥'),
+        if (reach > 0) buildDetailRow(context, 'Reach', reach.toString()),
+        if (weight != null) buildDetailRow(context, 'Weight', weight!),
+        const Divider(height: 24, thickness: 1),
+        buildToggleRow(context, 'Equipped', equipped, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, equipped: value);
+          }
+        }),
+        buildToggleRow(context, 'Wireless', wirelessOn, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, wireless: value);
+          }
+        }),
+      ],
+    );
+  }
+
+  /// Helper method to provide default attributes for expression evaluation
+  /// TODO: Replace with actual character attributes when character context is available
+  Map<String, int> _getDefaultAttributes() {
+    return {
+      'STR': 3, 'BOD': 3, 'AGI': 3, 'REA': 3,
+      'CHA': 3, 'INT': 3, 'LOG': 3, 'WIL': 3,
+      'EDG': 3, 'MAG': 0, 'RES': 0,
+    };
   }
 }

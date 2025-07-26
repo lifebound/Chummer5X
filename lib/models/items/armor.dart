@@ -268,4 +268,36 @@ class Armor extends ShadowrunItem {
         mod.name.toLowerCase().contains(query.toLowerCase())
     ) ?? false;
   }
+
+  @override
+  String get details {
+    return 'Category: $category, Armor: $armorValue, Source: $source p. $page, Cost: $cost¥, Availability: $avail';
+  }
+
+  @override
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildDetailRow(context, 'Category', category),
+        buildDetailRow(context, 'Armor Value', armorValue.toString()),
+        buildDetailRow(context, 'Source', '$source p. $page'),
+        buildDetailRow(context, 'Availability', avail),
+        buildDetailRow(context, 'Cost', '$cost¥'),
+        if (weight != null) buildDetailRow(context, 'Weight', weight!),
+        if (location != null) buildDetailRow(context, 'Location', location!),
+        const Divider(height: 24, thickness: 1),
+        buildToggleRow(context, 'Equipped', equipped, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, equipped: value);
+          }
+        }),
+        buildToggleRow(context, 'Wireless', wirelessOn, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, wireless: value);
+          }
+        }),
+      ],
+    );
+  }
 }

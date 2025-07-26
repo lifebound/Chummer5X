@@ -521,6 +521,7 @@ class EnhancedChummerXmlService {
     if (powersElement != null) {
       for (final powerElement in powersElement.findElements('power')) {
         final name = _getElementText(powerElement, 'name');
+        // TODO: Parse rating as int instead of String - ratings are always integers
         final rating = _getElementText(powerElement, 'rating');
         final extra = _getElementText(powerElement, 'extra');
         final source = _getElementText(powerElement, 'source') ?? '';

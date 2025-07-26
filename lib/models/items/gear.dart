@@ -8,6 +8,7 @@ class Gear extends ShadowrunItem {
   // ... Gear-specific final fields remain as they are.
   final String? capacity;
   final String? armorCapacity;
+  // TODO: These should be int? instead of String? - ratings are always integers
   final String? minRating;
   final String? maxRating;
   final int rating;
@@ -246,5 +247,44 @@ class Gear extends ShadowrunItem {
     }
     
     return null;
+  }
+
+  @override
+  String get details {
+    return 'Category: $category, Source: $source p. $page, Cost: $cost¥, Quantity: $qty, Availability: $avail';
+  }
+
+  @override
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildDetailRow(context, 'Category', category),
+        buildDetailRow(context, 'Source', '$source p. $page'),
+        buildDetailRow(context, 'Availability', avail),
+        buildDetailRow(context, 'Cost', '$cost¥'),
+        buildDetailRow(context, 'Quantity', qty.toString()),
+        if (rating > 0) buildDetailRow(context, 'Rating', rating.toString()),
+        if (capacity != null) buildDetailRow(context, 'Capacity', capacity!, rating: rating),
+        if (weight != null) buildDetailRow(context, 'Weight', weight!),
+        const Divider(height: 24, thickness: 1),
+        buildToggleRow(context, 'Equipped', equipped, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, equipped: value);
+          }
+        }),
+        buildToggleRow(context, 'Wireless', wirelessOn, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, wireless: value);
+          }
+        }),
+        if (category.toLowerCase() == 'commlinks')
+          buildToggleRow(context, 'Active Commlink', active, (value) {
+            if (onUpdate != null) {
+              onUpdate(this, active: value);
+            }
+          }),
+      ],
+    );
   }
 }

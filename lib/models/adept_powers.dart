@@ -1,5 +1,6 @@
 class AdeptPower {
   final String name;
+  // TODO: This should be int? instead of String? - rating is always an integer
   final String? rating;
   final String? extra;
   final double? pointsPerLevel; // Optional field for points per level

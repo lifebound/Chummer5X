@@ -7,16 +7,19 @@ import 'package:chummer5x/models/items/gear.dart'; // Still needed for type chec
 import 'package:chummer5x/models/items/armor.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 import 'package:chummer5x/models/items/vehicle.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
 
 class ShadowrunItemLocationTreeView<T extends ShadowrunItem>
     extends StatefulWidget {
   final Map<String, Location> allLocations;
   final List<T> allItems; // Generic list of ShadowrunItem
+  final ShadowrunCharacter? character; // Add character for attribute access
 
   const ShadowrunItemLocationTreeView({
     super.key,
     required this.allLocations,
     required this.allItems,
+    this.character, // Optional character parameter
   });
 
   @override
@@ -521,55 +524,47 @@ class ItemDetailsPanel extends StatelessWidget {
   final ShadowrunItem item;
   final Function(Gear, {bool? equipped, bool? wireless, bool? active})
       onUpdateGear;
+  final ShadowrunCharacter? character; // Add character parameter
 
-  const ItemDetailsPanel(
-      {super.key, required this.item, required this.onUpdateGear});
+  const ItemDetailsPanel({
+    super.key, 
+    required this.item, 
+    required this.onUpdateGear,
+    this.character, // Optional character parameter
+  });
 
   @override
   Widget build(BuildContext context) {
-    // You'll need to use 'is' checks to display type-specific details
-    // similar to how you build the subtitle in your tree view.
-    String details = '';
-    if (item is Gear) {
-      // Details are now handled by _GearDetailsContent
-    } else if (item is Armor) {
-      final detailItem = item as Armor;
-      details =
-          'Category: ${detailItem.category}\nArmor Value: ${detailItem.armorValue}\nCost: ${detailItem.cost}¥\nDamage: ${detailItem.damage}\nNotes: ${detailItem.notes ?? 'None'}';
-      // Add more Armor specific details
-    }
-    // ... similarly for Weapon and Vehicle
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            item.name,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          Text(
-            item.runtimeType
-                .toString()
-                .split(' ')
-                .last, // Display the actual class name
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(fontStyle: FontStyle.italic),
-          ),
-          const Divider(),
-          if (item is Gear)
-            _GearDetailsContent(
-              gear: item as Gear,
-              onUpdate: onUpdateGear,
-            )
-          else
-            Text(details),
-          // You can add more complex widgets here to display nested lists (mods, children, etc.)
-          // For example, if item is a Vehicle, display its mods and mounts in sub-sections.
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              item.name,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Text(
+              item.runtimeType
+                  .toString()
+                  .split(' ')
+                  .last, // Display the actual class name
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(fontStyle: FontStyle.italic),
+            ),
+            const Divider(),
+            item.getDetailsContent(context, onUpdate: (ShadowrunItem updatedItem, {bool? equipped, bool? wireless, bool? active}) {
+              if (updatedItem is Gear) {
+                onUpdateGear(updatedItem, equipped: equipped, wireless: wireless, active: active);
+              }
+            }),
+            // You can add more complex widgets here to display nested lists (mods, children, etc.)
+            // For example, if item is a Vehicle, display its mods and mounts in sub-sections.
+          ],
+        ),
       ),
     );
   }
@@ -614,18 +609,12 @@ class ItemDetailsModal extends StatelessWidget {
                 ?.copyWith(fontStyle: FontStyle.italic),
           ),
           const Divider(),
-          // Display details here, using the new shared widget
-          if (item is Gear)
-            _GearDetailsContent(
-              gear: item as Gear,
-              onUpdate: onUpdateGear,
-            )
-          else ...[
-            // Fallback for other item types
-            Text('Category: ${item.category}'),
-            //if (item is Armor) Text('Armor Value: ${item.armorValue}'),
-            // ... and so on for all relevant fields based on type
-          ],
+          // Display details here, using the new ShadowrunItem methods
+          item.getDetailsContent(context, onUpdate: (ShadowrunItem updatedItem, {bool? equipped, bool? wireless, bool? active}) {
+            if (updatedItem is Gear) {
+              onUpdateGear(updatedItem, equipped: equipped, wireless: wireless, active: active);
+            }
+          }),
           const SizedBox(height: 20), // Padding at the bottom for modal
         ],
       ),
@@ -633,65 +622,4 @@ class ItemDetailsModal extends StatelessWidget {
   }
 }
 
-/// A shared widget to display the detailed content for a Gear item.
-class _GearDetailsContent extends StatelessWidget {
-  final Gear gear;
-  final Function(Gear, {bool? equipped, bool? wireless, bool? active}) onUpdate;
 
-  const _GearDetailsContent({required this.gear, required this.onUpdate});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildDetailRow(context, 'Category', gear.category),
-        _buildDetailRow(context, 'Source', '${gear.source} p. ${gear.page}'),
-        _buildDetailRow(context, 'Availability', gear.avail),
-        _buildDetailRow(context, 'Cost', '${gear.cost}¥'),
-        _buildDetailRow(context, 'Quantity', gear.qty.toString()),
-        const Divider(height: 24, thickness: 1),
-        _buildToggleRow(context, 'Equipped', gear.equipped, (value) {
-          onUpdate(gear, equipped: value);
-          debugPrint('Equipped toggled to: $value');
-        }),
-        _buildToggleRow(context, 'Wireless', gear.wirelessOn, (value) {
-          onUpdate(gear, wireless: value);
-          debugPrint('Wireless toggled to: $value');
-        }),
-        if (gear.category.toLowerCase() == 'commlinks')
-          _buildToggleRow(context, 'Active Commlink', gear.active, (value) {
-            onUpdate(gear, active: value);
-            debugPrint('Active Commlink toggled to: $value');
-          }),
-      ],
-    );
-  }
-
-  Widget _buildDetailRow(BuildContext context, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: Theme.of(context).textTheme.titleSmall),
-          Text(value, style: Theme.of(context).textTheme.bodyLarge),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleRow(BuildContext context, String label, bool value,
-      ValueChanged<bool> onChanged) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.titleSmall),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-}

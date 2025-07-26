@@ -1,5 +1,6 @@
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:xml/xml.dart';
+import 'package:flutter/material.dart';
 import 'package:chummer5x/models/items/gear.dart';
 
 class WeaponAccessory extends ShadowrunItem {
@@ -287,5 +288,39 @@ class WeaponAccessory extends ShadowrunItem {
     }
     
     return null;
+  }
+
+  @override
+  String get details {
+    return 'Category: $category, Mount: $mount, Source: $source p. $page, Cost: $cost¥, Availability: $avail';
+  }
+
+  @override
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildDetailRow(context, 'Category', category),
+        buildDetailRow(context, 'Mount', mount),
+        if (rating > 0) buildDetailRow(context, 'Rating', rating.toString()),
+        if (ratingLabel != 'String_Rating') buildDetailRow(context, 'Rating Label', ratingLabel),
+        buildDetailRow(context, 'Source', '$source p. $page'),
+        buildDetailRow(context, 'Availability', avail),
+        buildDetailRow(context, 'Cost', '$cost¥'),
+        if (rc != null) buildDetailRow(context, 'RC', rc!, rating: rating),
+        if (accuracy != null) buildDetailRow(context, 'Accuracy', accuracy!, rating: rating),
+        const Divider(height: 24, thickness: 1),
+        buildToggleRow(context, 'Equipped', equipped, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, equipped: value);
+          }
+        }),
+        buildToggleRow(context, 'Wireless', wirelessOn, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, wireless: value);
+          }
+        }),
+      ],
+    );
   }
 }

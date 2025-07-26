@@ -1,5 +1,6 @@
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:xml/xml.dart';
+import 'package:flutter/material.dart';
 
 
 class ArmorMod extends ShadowrunItem {
@@ -128,6 +129,38 @@ class ArmorMod extends ShadowrunItem {
   ArmorMod? filterWithHierarchy(String query) {
     if (query.isEmpty) return this;
     return matchesSearch(query) ? this : null;
+  }
+
+  @override
+  String get details {
+    return 'Category: $category, Source: $source p. $page, Cost: $cost¥, Availability: $avail';
+  }
+
+  @override
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildDetailRow(context, 'Category', category),
+        if (rating > 0) buildDetailRow(context, 'Rating', rating.toString()),
+        if (ratingLabel != 'String_Rating') buildDetailRow(context, 'Rating Label', ratingLabel),
+        buildDetailRow(context, 'Source', '$source p. $page'),
+        buildDetailRow(context, 'Availability', avail),
+        buildDetailRow(context, 'Cost', '$cost¥'),
+        if (weight != null) buildDetailRow(context, 'Weight', weight!),
+        const Divider(height: 24, thickness: 1),
+        buildToggleRow(context, 'Equipped', equipped, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, equipped: value);
+          }
+        }),
+        buildToggleRow(context, 'Wireless', wirelessOn, (value) {
+          if (onUpdate != null) {
+            onUpdate(this, wireless: value);
+          }
+        }),
+      ],
+    );
   }
 
 }

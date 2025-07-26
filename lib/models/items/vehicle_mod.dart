@@ -9,6 +9,7 @@ class VehicleMod {
   final String? limit;
   final String slots;
   final String? capacity;
+  // TODO: These should be int instead of String - ratings are always integers
   final String rating;
   final String maxRating;
   final String ratingLabel;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:chummer5x/models/items/armor.dart';
 import 'package:chummer5x/models/items/weapon.dart';
+import 'package:chummer5x/models/items/vehicle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -45,6 +46,7 @@ enum NavigationSection {
   initiationGrades,
   submersionGrades,
   gear,
+  vehiclesAndDrones,
   combat,
   contacts,
   notes,
@@ -116,7 +118,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildCharacterContent(BuildContext context) {
     // For Notes and Gear sections, use minimal constraints to maximize space usage
-    if (_currentSection == NavigationSection.notes || _currentSection == NavigationSection.gear) {
+    if (_currentSection == NavigationSection.notes || _currentSection == NavigationSection.gear || _currentSection == NavigationSection.vehiclesAndDrones) {
       return Padding(
         padding: const EdgeInsets.all(8.0), // Minimal padding for tabbed sections
         child: _buildCurrentView(context),
@@ -323,6 +325,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               NavigationSection.gear,
               Icons.inventory,
               'Gear',
+            ),
+            _buildNavigationTile(
+              context,
+              NavigationSection.vehiclesAndDrones,
+              Icons.directions_car,
+              'Vehicles & Drones',
             ),
             _buildNavigationTile(
               context,
@@ -602,6 +610,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return _buildSubmersionGradesView(context);
       case NavigationSection.gear:
         return _buildGearView(context);
+      case NavigationSection.vehiclesAndDrones:
+        return _buildVehiclesAndDronesView(context);
       case NavigationSection.combat:
         return _buildCombatView(context);
       case NavigationSection.contacts:
@@ -1214,6 +1224,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildVehiclesAndDronesView(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Vehicles & Drones',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ShadowrunItemLocationTreeView<Vehicle>(
+              allLocations: _currentCharacter?.vehicleLocations ?? {},
+              allItems: _currentCharacter?.vehicles ?? [],
+            ),
+          ),
+        ],
       ),
     );
   }

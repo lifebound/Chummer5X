@@ -139,14 +139,14 @@ class Gear extends ShadowrunItem {
     final pageText = xmlElement.getElement('page')?.innerText;
 
     final String rawLocationGuid =
-        xmlElement.getElement('location')?.innerText ?? '';
+        xmlElement.getElement('guid')?.innerText ?? '';
     final String locationGuid =
         rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultGearLocationGuid;
 
     String finalName;
-    //finalName is the nameText. if extraText is not empty, append it inside parentheses
+    //finalName uses extraText if present, otherwise nameText, or falls back to default
     if (extraText?.isNotEmpty == true) {
-      finalName = '$nameText ($extraText)';
+      finalName = extraText!;
     } else if (nameText?.isNotEmpty == true) {
       finalName = nameText!;
     } else {

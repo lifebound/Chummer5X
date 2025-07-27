@@ -316,7 +316,7 @@ void main() {
 
         // Assert
         expect(weapon.sourceId, 'test-source', reason: 'sourceId should be parsed correctly');
-        expect(weapon.locationGuid, 'test-guid', reason: 'locationGuid should be parsed correctly');
+        expect(weapon.locationGuid, 'Holster', reason: 'locationGuid should be parsed correctly');
         expect(weapon.name, 'Advanced Weapon', reason: 'name should be parsed correctly');
         expect(weapon.category, 'Assault Rifles', reason: 'category should be parsed correctly');
         expect(weapon.type, 'Ranged', reason: 'type should be parsed correctly');

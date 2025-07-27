@@ -49,40 +49,40 @@ void main() {
       );
 
       // Assert
-      expect(vehicle.name, 'Ares Roadmaster');
-      expect(vehicle.category, 'Truck');
-      expect(vehicle.source, 'Core');
-      expect(vehicle.page, '462');
-      expect(vehicle.handling, '5');
-      expect(vehicle.offRoadHandling, '4');
-      expect(vehicle.accel, '2');
-      expect(vehicle.offRoadAccel, '1');
-      expect(vehicle.speed, '4');
-      expect(vehicle.offRoadSpeed, '3');
-      expect(vehicle.pilot, '1');
-      expect(vehicle.body, '16');
-      expect(vehicle.seats, '8');
-      expect(vehicle.armor, '12');
-      expect(vehicle.sensor, '2');
-      expect(vehicle.addSlots, '0');
-      expect(vehicle.modSlots, '3');
-      expect(vehicle.powertrainModSlots, '1');
-      expect(vehicle.protectionModSlots, '1');
-      expect(vehicle.weaponModSlots, '1');
-      expect(vehicle.bodyModSlots, '0');
-      expect(vehicle.electromagneticModSlots, '0');
-      expect(vehicle.cosmeticModSlots, '0');
-      expect(vehicle.physicalCmFilled, '0');
-      expect(vehicle.vehicleName, 'My Roadmaster');
-      expect(vehicle.dealerConnection, false);
-      expect(vehicle.mods, isEmpty);
-      expect(vehicle.weaponMounts, isEmpty);
-      expect(vehicle.gears, isEmpty);
-      expect(vehicle.weapons, isNull);
-      expect(vehicle.equipped, true); // Default from constructor
-      expect(vehicle.wirelessOn, false); // Default from constructor
-      expect(vehicle.canFormPersona, false); // Default from constructor
-      expect(vehicle.matrixCmBonus, 0); // Default from constructor
+      expect(vehicle.name, 'Ares Roadmaster', reason: 'Name should match the value provided in constructor');
+      expect(vehicle.category, 'Truck', reason: 'Category should match the value provided in constructor');
+      expect(vehicle.source, 'Core', reason: 'Source should match the value provided in constructor');
+      expect(vehicle.page, '462', reason: 'Page should match the value provided in constructor');
+      expect(vehicle.handling, '5', reason: 'Handling should match the value provided in constructor');
+      expect(vehicle.offRoadHandling, '4', reason: 'Off-road handling should match the value provided in constructor');
+      expect(vehicle.accel, '2', reason: 'Acceleration should match the value provided in constructor');
+      expect(vehicle.offRoadAccel, '1', reason: 'Off-road acceleration should match the value provided in constructor');
+      expect(vehicle.speed, '4', reason: 'Speed should match the value provided in constructor');
+      expect(vehicle.offRoadSpeed, '3', reason: 'Off-road speed should match the value provided in constructor');
+      expect(vehicle.pilot, '1', reason: 'Pilot rating should match the value provided in constructor');
+      expect(vehicle.body, '16', reason: 'Body should match the value provided in constructor');
+      expect(vehicle.seats, '8', reason: 'Seats should match the value provided in constructor');
+      expect(vehicle.armor, '12', reason: 'Armor should match the value provided in constructor');
+      expect(vehicle.sensor, '2', reason: 'Sensor should match the value provided in constructor');
+      expect(vehicle.addSlots, '0', reason: 'Add slots should match the value provided in constructor');
+      expect(vehicle.modSlots, '3', reason: 'Mod slots should match the value provided in constructor');
+      expect(vehicle.powertrainModSlots, '1', reason: 'Powertrain mod slots should match the value provided in constructor');
+      expect(vehicle.protectionModSlots, '1', reason: 'Protection mod slots should match the value provided in constructor');
+      expect(vehicle.weaponModSlots, '1', reason: 'Weapon mod slots should match the value provided in constructor');
+      expect(vehicle.bodyModSlots, '0', reason: 'Body mod slots should match the value provided in constructor');
+      expect(vehicle.electromagneticModSlots, '0', reason: 'Electromagnetic mod slots should match the value provided in constructor');
+      expect(vehicle.cosmeticModSlots, '0', reason: 'Cosmetic mod slots should match the value provided in constructor');
+      expect(vehicle.physicalCmFilled, '0', reason: 'Physical CM filled should match the value provided in constructor');
+      expect(vehicle.vehicleName, 'My Roadmaster', reason: 'Vehicle name should match the value provided in constructor');
+      expect(vehicle.dealerConnection, false, reason: 'Dealer connection should match the value provided in constructor');
+      expect(vehicle.mods, isEmpty, reason: 'Mods should be empty as provided in constructor');
+      expect(vehicle.weaponMounts, isEmpty, reason: 'Weapon mounts should be empty as provided in constructor');
+      expect(vehicle.gears, isEmpty, reason: 'Gears should be empty as provided in constructor');
+      expect(vehicle.weapons, isNull, reason: 'Weapons should be null when not specified in constructor');
+      expect(vehicle.equipped, true, reason: 'Equipped should default to true when not specified in constructor');
+      expect(vehicle.wirelessOn, false, reason: 'Wireless should default to false when not specified in constructor');
+      expect(vehicle.canFormPersona, false, reason: 'Can form persona should default to false when not specified in constructor');
+      expect(vehicle.matrixCmBonus, 0, reason: 'Matrix CM bonus should default to 0 when not specified in constructor');
     });
 
     test('should create Vehicle with optional parameters', () {
@@ -156,35 +156,35 @@ void main() {
       );
 
       // Assert
-      expect(vehicle.name, 'Custom Vehicle');
-      expect(vehicle.category, 'Car');
-      expect(vehicle.source, 'Data Trails');
-      expect(vehicle.page, '234');
-      expect(vehicle.stolen, true);
-      expect(vehicle.discountedCost, true);
-      expect(vehicle.active, true);
-      expect(vehicle.homeNode, true);
-      expect(vehicle.dealerConnection, true);
-      expect(vehicle.programLimit, '5');
-      expect(vehicle.overclocked, '1');
-      expect(vehicle.attack, '4');
-      expect(vehicle.sleaze, '5');
-      expect(vehicle.dataProcessing, '6');
-      expect(vehicle.firewall, '7');
-      expect(vehicle.attributeArray, ['A', 'S', 'D', 'F']);
-      expect(vehicle.modAttack, '1');
-      expect(vehicle.modSleaze, '1');
-      expect(vehicle.modDataProcessing, '1');
-      expect(vehicle.modFirewall, '1');
-      expect(vehicle.modAttributeArray, ['MA', 'MS', 'MD', 'MF']);
-      expect(vehicle.canSwapAttributes, true);
-      expect(vehicle.gears, hasLength(1));
-      expect(vehicle.gears.first.name, 'Test Gear');
-      expect(vehicle.weapons, hasLength(0));
-      expect(vehicle.notes, 'Custom notes');
-      expect(vehicle.notesColor, 'red');
-      expect(vehicle.deviceRating, '4');
-      expect(vehicle.matrixCmFilled, 2);
+      expect(vehicle.name, 'Custom Vehicle', reason: 'Name should match the value provided in constructor');
+      expect(vehicle.category, 'Car', reason: 'Category should match the value provided in constructor');
+      expect(vehicle.source, 'Data Trails', reason: 'Source should match the value provided in constructor');
+      expect(vehicle.page, '234', reason: 'Page should match the value provided in constructor');
+      expect(vehicle.stolen, true, reason: 'Stolen status should match the value provided in constructor');
+      expect(vehicle.discountedCost, true, reason: 'Discounted cost status should match the value provided in constructor');
+      expect(vehicle.active, true, reason: 'Active status should match the value provided in constructor');
+      expect(vehicle.homeNode, true, reason: 'Home node status should match the value provided in constructor');
+      expect(vehicle.dealerConnection, true, reason: 'Dealer connection should match the value provided in constructor');
+      expect(vehicle.programLimit, '5', reason: 'Program limit should match the value provided in constructor');
+      expect(vehicle.overclocked, '1', reason: 'Overclocked should match the value provided in constructor');
+      expect(vehicle.attack, '4', reason: 'Attack should match the value provided in constructor');
+      expect(vehicle.sleaze, '5', reason: 'Sleaze should match the value provided in constructor');
+      expect(vehicle.dataProcessing, '6', reason: 'Data processing should match the value provided in constructor');
+      expect(vehicle.firewall, '7', reason: 'Firewall should match the value provided in constructor');
+      expect(vehicle.attributeArray, ['A', 'S', 'D', 'F'], reason: 'Attribute array should match the list provided in constructor');
+      expect(vehicle.modAttack, '1', reason: 'Mod attack should match the value provided in constructor');
+      expect(vehicle.modSleaze, '1', reason: 'Mod sleaze should match the value provided in constructor');
+      expect(vehicle.modDataProcessing, '1', reason: 'Mod data processing should match the value provided in constructor');
+      expect(vehicle.modFirewall, '1', reason: 'Mod firewall should match the value provided in constructor');
+      expect(vehicle.modAttributeArray, ['MA', 'MS', 'MD', 'MF'], reason: 'Mod attribute array should match the list provided in constructor');
+      expect(vehicle.canSwapAttributes, true, reason: 'Can swap attributes should match the value provided in constructor');
+      expect(vehicle.gears, hasLength(1), reason: 'Gears should contain one gear as provided in constructor');
+      expect(vehicle.gears.first.name, 'Test Gear', reason: 'First gear name should match the gear provided in constructor');
+      expect(vehicle.weapons, hasLength(0), reason: 'Weapons should be empty as provided in constructor');
+      expect(vehicle.notes, 'Custom notes', reason: 'Notes should match the value provided in constructor');
+      expect(vehicle.notesColor, 'red', reason: 'Notes color should match the value provided in constructor');
+      expect(vehicle.deviceRating, '4', reason: 'Device rating should match the value provided in constructor');
+      expect(vehicle.matrixCmFilled, 2, reason: 'Matrix CM filled should match the value provided in constructor');
     });
 
     group('fromXml', () {
@@ -238,42 +238,42 @@ void main() {
         final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
-        expect(vehicle.sourceId, 'test-source');
-        expect(vehicle.locationGuid, 'test-guid');
-        expect(vehicle.name, 'Basic Vehicle');
-        expect(vehicle.category, 'Car');
-        expect(vehicle.handling, '4');
-        expect(vehicle.offRoadHandling, '2');
-        expect(vehicle.accel, '2');
-        expect(vehicle.offRoadAccel, '1');
-        expect(vehicle.speed, '4');
-        expect(vehicle.offRoadSpeed, '2');
-        expect(vehicle.pilot, '1');
-        expect(vehicle.body, '10');
-        expect(vehicle.seats, '4');
-        expect(vehicle.armor, '6');
-        expect(vehicle.sensor, '2');
-        expect(vehicle.source, 'Core');
-        expect(vehicle.page, '460');
-        expect(vehicle.addSlots, '0');
-        expect(vehicle.modSlots, '2');
-        expect(vehicle.powertrainModSlots, '1');
-        expect(vehicle.protectionModSlots, '1');
-        expect(vehicle.weaponModSlots, '0');
-        expect(vehicle.bodyModSlots, '0');
-        expect(vehicle.electromagneticModSlots, '0');
-        expect(vehicle.cosmeticModSlots, '1');
-        expect(vehicle.physicalCmFilled, '0');
-        expect(vehicle.vehicleName, 'My Car');
-        expect(vehicle.dealerConnection, false);
-        expect(vehicle.stolen, false);
-        expect(vehicle.discountedCost, false);
-        expect(vehicle.active, false);
-        expect(vehicle.homeNode, false);
-        expect(vehicle.deviceRating, '2');
-        expect(vehicle.mods, isEmpty);
-        expect(vehicle.weaponMounts, isEmpty);
-        expect(vehicle.gears, isEmpty);
+        expect(vehicle.sourceId, 'test-source', reason: 'Source ID should be parsed from XML sourceid element');
+        expect(vehicle.locationGuid, '00000000-0000-0000-0000-000000000004', reason: 'Location GUID should be parsed from XML guid element');
+        expect(vehicle.name, 'Basic Vehicle', reason: 'Name should be parsed from XML name element');
+        expect(vehicle.category, 'Car', reason: 'Category should be parsed from XML category element');
+        expect(vehicle.handling, '4', reason: 'Handling should be parsed from XML handling element');
+        expect(vehicle.offRoadHandling, '2', reason: 'Off-road handling should be parsed from XML offroadhandling element');
+        expect(vehicle.accel, '2', reason: 'Acceleration should be parsed from XML accel element');
+        expect(vehicle.offRoadAccel, '1', reason: 'Off-road acceleration should be parsed from XML offroadaccel element');
+        expect(vehicle.speed, '4', reason: 'Speed should be parsed from XML speed element');
+        expect(vehicle.offRoadSpeed, '2', reason: 'Off-road speed should be parsed from XML offroadspeed element');
+        expect(vehicle.pilot, '1', reason: 'Pilot rating should be parsed from XML pilot element');
+        expect(vehicle.body, '10', reason: 'Body should be parsed from XML body element');
+        expect(vehicle.seats, '4', reason: 'Seats should be parsed from XML seats element');
+        expect(vehicle.armor, '6', reason: 'Armor should be parsed from XML armor element');
+        expect(vehicle.sensor, '2', reason: 'Sensor should be parsed from XML sensor element');
+        expect(vehicle.source, 'Core', reason: 'Source should be parsed from XML source element');
+        expect(vehicle.page, '460', reason: 'Page should be parsed from XML page element');
+        expect(vehicle.addSlots, '0', reason: 'Add slots should be parsed from XML addslots element');
+        expect(vehicle.modSlots, '2', reason: 'Mod slots should be parsed from XML modslots element');
+        expect(vehicle.powertrainModSlots, '1', reason: 'Powertrain mod slots should be parsed from XML powertrainmodslots element');
+        expect(vehicle.protectionModSlots, '1', reason: 'Protection mod slots should be parsed from XML protectionmodslots element');
+        expect(vehicle.weaponModSlots, '0', reason: 'Weapon mod slots should be parsed from XML weaponmodslots element');
+        expect(vehicle.bodyModSlots, '0', reason: 'Body mod slots should be parsed from XML bodymodslots element');
+        expect(vehicle.electromagneticModSlots, '0', reason: 'Electromagnetic mod slots should be parsed from XML electromagneticmodslots element');
+        expect(vehicle.cosmeticModSlots, '1', reason: 'Cosmetic mod slots should be parsed from XML cosmeticmodslots element');
+        expect(vehicle.physicalCmFilled, '0', reason: 'Physical CM filled should be parsed from XML physicalcmfilled element');
+        expect(vehicle.vehicleName, 'My Car', reason: 'Vehicle name should be parsed from XML vehiclename element');
+        expect(vehicle.dealerConnection, false, reason: 'Dealer connection should be parsed as false from XML dealerconnection element value "False"');
+        expect(vehicle.stolen, false, reason: 'Stolen should be parsed as false from XML stolen element value "False"');
+        expect(vehicle.discountedCost, false, reason: 'Discounted cost should be parsed as false from XML discountedcost element value "False"');
+        expect(vehicle.active, false, reason: 'Active should be parsed as false from XML active element value "False"');
+        expect(vehicle.homeNode, false, reason: 'Home node should be parsed as false from XML homenode element value "False"');
+        expect(vehicle.deviceRating, '2', reason: 'Device rating should be parsed from XML devicerating element');
+        expect(vehicle.mods, isEmpty, reason: 'Mods should be empty when XML mods element contains no child elements');
+        expect(vehicle.weaponMounts, isEmpty, reason: 'Weapon mounts should be empty when XML weaponmounts element contains no child elements');
+        expect(vehicle.gears, isEmpty, reason: 'Gears should be empty when XML gears element contains no child elements');
       });
 
       test('should handle missing XML elements gracefully', () {
@@ -295,24 +295,24 @@ void main() {
         final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
-        expect(vehicle.name, '');
-        expect(vehicle.category, '');
-        expect(vehicle.source, '');
-        expect(vehicle.page, '');
-        expect(vehicle.handling, '');
-        expect(vehicle.pilot, '');
-        expect(vehicle.body, '');
-        expect(vehicle.armor, '');
-        expect(vehicle.vehicleName, '');
-        expect(vehicle.physicalCmFilled, '0');
-        expect(vehicle.dealerConnection, false);
-        expect(vehicle.stolen, false);
-        expect(vehicle.discountedCost, false);
-        expect(vehicle.active, false);
-        expect(vehicle.homeNode, false);
-        expect(vehicle.mods, isEmpty);
-        expect(vehicle.weaponMounts, isEmpty);
-        expect(vehicle.gears, isEmpty);
+        expect(vehicle.name, '', reason: 'Name should default to empty string when XML name element is empty');
+        expect(vehicle.category, '', reason: 'Category should default to empty string when XML category element is empty');
+        expect(vehicle.source, '', reason: 'Source should default to empty string when XML source element is empty');
+        expect(vehicle.page, '', reason: 'Page should default to empty string when XML page element is empty');
+        expect(vehicle.handling, '', reason: 'Handling should default to empty string when XML handling element is missing');
+        expect(vehicle.pilot, '', reason: 'Pilot should default to empty string when XML pilot element is missing');
+        expect(vehicle.body, '', reason: 'Body should default to empty string when XML body element is missing');
+        expect(vehicle.armor, '', reason: 'Armor should default to empty string when XML armor element is missing');
+        expect(vehicle.vehicleName, '', reason: 'Vehicle name should default to empty string when XML vehiclename element is missing');
+        expect(vehicle.physicalCmFilled, '0', reason: 'Physical CM filled should default to "0" when XML physicalcmfilled element is missing');
+        expect(vehicle.dealerConnection, false, reason: 'Dealer connection should default to false when XML dealerconnection element is missing');
+        expect(vehicle.stolen, false, reason: 'Stolen should default to false when XML stolen element is missing');
+        expect(vehicle.discountedCost, false, reason: 'Discounted cost should default to false when XML discountedcost element is missing');
+        expect(vehicle.active, false, reason: 'Active should default to false when XML active element is missing');
+        expect(vehicle.homeNode, false, reason: 'Home node should default to false when XML homenode element is missing');
+        expect(vehicle.mods, isEmpty, reason: 'Mods should be empty when XML mods element is empty');
+        expect(vehicle.weaponMounts, isEmpty, reason: 'Weapon mounts should be empty when XML weaponmounts element is empty');
+        expect(vehicle.gears, isEmpty, reason: 'Gears should be empty when XML gears element is empty');
       });
 
       test('should parse boolean values correctly', () {
@@ -361,12 +361,12 @@ void main() {
         final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
-        expect(vehicle.dealerConnection, true);
-        expect(vehicle.stolen, true);
-        expect(vehicle.discountedCost, true);
-        expect(vehicle.active, true);
-        expect(vehicle.homeNode, true);
-        expect(vehicle.canSwapAttributes, true);
+        expect(vehicle.dealerConnection, true, reason: 'Dealer connection should be parsed as true from XML dealerconnection element value "True"');
+        expect(vehicle.stolen, true, reason: 'Stolen should be parsed as true from XML stolen element value "True"');
+        expect(vehicle.discountedCost, true, reason: 'Discounted cost should be parsed as true from XML discountedcost element value "True"');
+        expect(vehicle.active, true, reason: 'Active should be parsed as true from XML active element value "True"');
+        expect(vehicle.homeNode, true, reason: 'Home node should be parsed as true from XML homenode element value "True"');
+        expect(vehicle.canSwapAttributes, true, reason: 'Can swap attributes should be parsed as true from XML canswapattributes element value "True"');
       });
 
       test('should parse numeric values correctly with invalid input', () {
@@ -412,8 +412,8 @@ void main() {
         final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
-        expect(vehicle.sortOrder, 0);
-        expect(vehicle.matrixCmFilled, 0);
+        expect(vehicle.sortOrder, 0, reason: 'Sort order should default to 0 when XML sortorder element contains invalid text "invalid"');
+        expect(vehicle.matrixCmFilled, 0, reason: 'Matrix CM filled should default to 0 when XML matrixcmfilled element contains invalid text "invalid"');
       });
 
       test('should handle null XML element', () {
@@ -431,15 +431,15 @@ void main() {
         final vehicle = Vehicle.fromXml(xmlElement);
 
         // Assert
-        expect(vehicle.name, '');
-        expect(vehicle.category, '');
-        expect(vehicle.source, '');
-        expect(vehicle.page, '');
-        expect(vehicle.vehicleName, '');
-        expect(vehicle.physicalCmFilled, '0');
-        expect(vehicle.mods, isEmpty);
-        expect(vehicle.weaponMounts, isEmpty);
-        expect(vehicle.gears, isEmpty);
+        expect(vehicle.name, '', reason: 'Name should default to empty string when XML name element is missing');
+        expect(vehicle.category, '', reason: 'Category should default to empty string when XML category element is missing');
+        expect(vehicle.source, '', reason: 'Source should default to empty string when XML source element is missing');
+        expect(vehicle.page, '', reason: 'Page should default to empty string when XML page element is missing');
+        expect(vehicle.vehicleName, '', reason: 'Vehicle name should default to empty string when XML vehiclename element is missing');
+        expect(vehicle.physicalCmFilled, '0', reason: 'Physical CM filled should default to "0" when XML physicalcmfilled element is missing');
+        expect(vehicle.mods, isEmpty, reason: 'Mods should be empty when XML mods element is empty');
+        expect(vehicle.weaponMounts, isEmpty, reason: 'Weapon mounts should be empty when XML weaponmounts element is empty');
+        expect(vehicle.gears, isEmpty, reason: 'Gears should be empty when XML gears element is empty');
       });
     });
   });

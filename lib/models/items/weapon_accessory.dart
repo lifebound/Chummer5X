@@ -296,7 +296,7 @@ class WeaponAccessory extends ShadowrunItem {
   }
 
   @override
-  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+  Widget getDetailsContent(BuildContext context, {Map<String, int>? characterAttributes, Function? onUpdate}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -307,8 +307,8 @@ class WeaponAccessory extends ShadowrunItem {
         buildDetailRow(context, 'Source', '$source p. $page'),
         buildDetailRow(context, 'Availability', avail),
         buildDetailRow(context, 'Cost', '$cost¥'),
-        if (rc != null) buildDetailRow(context, 'RC', rc!, rating: rating),
-        if (accuracy != null) buildDetailRow(context, 'Accuracy', accuracy!, rating: rating),
+        if (rc != null) buildDetailRow(context, 'RC', rc!),
+        if (accuracy != null) buildDetailRow(context, 'Accuracy', accuracy!),
         const Divider(height: 24, thickness: 1),
         buildToggleRow(context, 'Equipped', equipped, (value) {
           if (onUpdate != null) {

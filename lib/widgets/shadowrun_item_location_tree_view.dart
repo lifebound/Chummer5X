@@ -349,7 +349,8 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
                 ? const Center(child: Text('Select an item for details'))
                 : ItemDetailsPanel(
                     item: _selectedItemForDetails!,
-                    onUpdateGear: _updateGearState),
+                    onUpdateGear: _updateGearState,
+                    character: widget.character),
           ),
         ],
       );
@@ -502,6 +503,7 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
           return ItemDetailsModal(
             item: item,
             onUpdateGear: _updateGearState,
+            character: widget.character,
           );
         },
       );
@@ -560,7 +562,7 @@ class ItemDetailsPanel extends StatelessWidget {
               if (updatedItem is Gear) {
                 onUpdateGear(updatedItem, equipped: equipped, wireless: wireless, active: active);
               }
-            }),
+            }, characterAttributes: _getCharacterAttributes()),
             // You can add more complex widgets here to display nested lists (mods, children, etc.)
             // For example, if item is a Vehicle, display its mods and mounts in sub-sections.
           ],
@@ -568,15 +570,39 @@ class ItemDetailsPanel extends StatelessWidget {
       ),
     );
   }
+
+  /// Helper method to extract character attributes into a Map format for expression evaluation
+  Map<String, int>? _getCharacterAttributes() {
+    if (character == null) return null;
+    
+    return {
+      'STR': character!.strength,
+      'BOD': character!.body,
+      'AGI': character!.agility,
+      'REA': character!.reaction,
+      'CHA': character!.charisma,
+      'INT': character!.intuition,
+      'LOG': character!.logic,
+      'WIL': character!.willpower,
+      'EDG': character!.edge,
+      'MAG': character!.magic,
+      'RES': character!.resonance,
+    };
+  }
 }
 
 class ItemDetailsModal extends StatelessWidget {
   final ShadowrunItem item;
   final Function(Gear, {bool? equipped, bool? wireless, bool? active})
       onUpdateGear;
+  final ShadowrunCharacter? character; // Add character parameter
 
-  const ItemDetailsModal(
-      {super.key, required this.item, required this.onUpdateGear});
+  const ItemDetailsModal({
+    super.key, 
+    required this.item, 
+    required this.onUpdateGear,
+    this.character, // Optional character parameter
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -614,11 +640,30 @@ class ItemDetailsModal extends StatelessWidget {
             if (updatedItem is Gear) {
               onUpdateGear(updatedItem, equipped: equipped, wireless: wireless, active: active);
             }
-          }),
+          }, characterAttributes: _getCharacterAttributes()),
           const SizedBox(height: 20), // Padding at the bottom for modal
         ],
       ),
     );
+  }
+
+  /// Helper method to extract character attributes into a Map format for expression evaluation
+  Map<String, int>? _getCharacterAttributes() {
+    if (character == null) return null;
+    
+    return {
+      'STR': character!.strength,
+      'BOD': character!.body,
+      'AGI': character!.agility,
+      'REA': character!.reaction,
+      'CHA': character!.charisma,
+      'INT': character!.intuition,
+      'LOG': character!.logic,
+      'WIL': character!.willpower,
+      'EDG': character!.edge,
+      'MAG': character!.magic,
+      'RES': character!.resonance,
+    };
   }
 }
 

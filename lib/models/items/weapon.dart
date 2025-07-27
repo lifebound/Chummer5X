@@ -439,13 +439,13 @@ class Weapon extends ShadowrunItem {
   }
 
   @override
-  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+  Widget getDetailsContent(BuildContext context, {Map<String, int>? characterAttributes, Function? onUpdate}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildDetailRow(context, 'Category', category),
         buildDetailRow(context, 'Type', type),
-        buildDetailRow(context, 'Damage', damage, attributes: _getDefaultAttributes()),
+        buildDetailRow(context, 'Damage', damage),
         buildDetailRow(context, 'AP', ap.toString()),
         buildDetailRow(context, 'Mode', mode),
         buildDetailRow(context, 'RC', rc.toString()),
@@ -468,15 +468,5 @@ class Weapon extends ShadowrunItem {
         }),
       ],
     );
-  }
-
-  /// Helper method to provide default attributes for expression evaluation
-  /// TODO: Replace with actual character attributes when character context is available
-  Map<String, int> _getDefaultAttributes() {
-    return {
-      'STR': 3, 'BOD': 3, 'AGI': 3, 'REA': 3,
-      'CHA': 3, 'INT': 3, 'LOG': 3, 'WIL': 3,
-      'EDG': 3, 'MAG': 0, 'RES': 0,
-    };
   }
 }

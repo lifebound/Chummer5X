@@ -275,7 +275,7 @@ class Armor extends ShadowrunItem {
   }
 
   @override
-  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+  Widget getDetailsContent(BuildContext context, {Map<String, int>? characterAttributes, Function? onUpdate}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

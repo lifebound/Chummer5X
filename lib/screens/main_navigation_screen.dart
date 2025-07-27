@@ -4276,7 +4276,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ShadowrunItemLocationTreeView<Weapon>(allLocations: _currentCharacter?.weaponLocations ?? {}, allItems: _currentCharacter?.weapons ?? []),
+            child: ShadowrunItemLocationTreeView<Weapon>(allLocations: _currentCharacter?.weaponLocations ?? {}, allItems: _currentCharacter?.weapons ?? [], character: _currentCharacter),
           ),
         ],
       ),

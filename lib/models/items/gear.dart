@@ -255,18 +255,18 @@ class Gear extends ShadowrunItem {
   }
 
   @override
-  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+  Widget getDetailsContent(BuildContext context, {Map<String, int>? characterAttributes, Function? onUpdate}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildDetailRow(context, 'Category', category),
-        buildDetailRow(context, 'Source', '$source p. $page'),
-        buildDetailRow(context, 'Availability', avail),
-        buildDetailRow(context, 'Cost', '$cost¥'),
-        buildDetailRow(context, 'Quantity', qty.toString()),
-        if (rating > 0) buildDetailRow(context, 'Rating', rating.toString()),
-        if (capacity != null) buildDetailRow(context, 'Capacity', capacity!, rating: rating),
-        if (weight != null) buildDetailRow(context, 'Weight', weight!),
+        buildDetailRow(context, 'Category', category, attributes: characterAttributes),
+        buildDetailRow(context, 'Source', '$source p. $page', attributes: characterAttributes),
+        buildDetailRow(context, 'Availability', avail, attributes: characterAttributes),
+        buildDetailRow(context, 'Cost', '$cost¥', attributes: characterAttributes),
+        buildDetailRow(context, 'Quantity', qty.toString(), attributes: characterAttributes),
+        if (rating > 0) buildDetailRow(context, 'Rating', rating.toString(), rating: rating, attributes: characterAttributes),
+        if (capacity != null) buildDetailRow(context, 'Capacity', capacity!, attributes: characterAttributes),
+        if (weight != null) buildDetailRow(context, 'Weight', weight!, attributes: characterAttributes),
         const Divider(height: 24, thickness: 1),
         buildToggleRow(context, 'Equipped', equipped, (value) {
           if (onUpdate != null) {

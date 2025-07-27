@@ -235,14 +235,14 @@ class Cyberware extends ShadowrunItem {
   }
 
   @override
-  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+  Widget getDetailsContent(BuildContext context, {Map<String, int>? characterAttributes, Function? onUpdate}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildDetailRow(context, 'Category', category),
         buildDetailRow(context, 'Improvement Source', improvementSource),
-        buildDetailRow(context, 'Essence Cost', ess, rating: rating),
-        buildDetailRow(context, 'Capacity', capacity, rating: rating),
+        buildDetailRow(context, 'Essence Cost', ess),
+        buildDetailRow(context, 'Capacity', capacity),
         buildDetailRow(context, 'Grade', grade),
         if (rating > 0) buildDetailRow(context, 'Rating', rating.toString()),
         if (ratinglabel != 'String_Rating') buildDetailRow(context, 'Rating Label', ratinglabel),

@@ -131,7 +131,7 @@ abstract class ShadowrunItem {
 
   /// Returns a detailed Column widget for display - overrideable by subclasses
   /// This can include toggles, more verbose information, etc.
-  Widget getDetailsContent(BuildContext context, {Function? onUpdate}) {
+  Widget getDetailsContent(BuildContext context, {Function? onUpdate, Map<String, int>? characterAttributes}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

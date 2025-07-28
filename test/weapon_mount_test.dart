@@ -13,7 +13,7 @@ void main() {
         category: 'Weapon Mounts',
         slots: '2',
         avail: '6R',
-        cost: '5000',
+        cost: 5000,
         freeCost: false,
         markup: '0',
         source: 'Core',
@@ -26,7 +26,7 @@ void main() {
         weaponMountOptions: [],
         mods: [],
         discountedCost: false,
-        sortOrder: '0',
+        sortOrder: 0,
         stolen: false,
       );
 
@@ -37,7 +37,7 @@ void main() {
       expect(weaponMount.category, 'Weapon Mounts');
       expect(weaponMount.slots, '2');
       expect(weaponMount.avail, '6R');
-      expect(weaponMount.cost, '5000');
+      expect(weaponMount.cost, 5000);
       expect(weaponMount.freeCost, false);
       expect(weaponMount.markup, '0');
       expect(weaponMount.source, 'Core');
@@ -50,7 +50,7 @@ void main() {
       expect(weaponMount.weaponMountOptions, isEmpty);
       expect(weaponMount.mods, isEmpty);
       expect(weaponMount.discountedCost, false);
-      expect(weaponMount.sortOrder, '0');
+      expect(weaponMount.sortOrder, 0);
       expect(weaponMount.stolen, false);
       
       // Check optional defaults
@@ -70,7 +70,7 @@ void main() {
         limit: 'Physical',
         slots: '4',
         avail: '12F',
-        cost: '25000',
+        cost: 25000,
         freeCost: true,
         markup: '10',
         extra: 'Gyroscopic',
@@ -86,7 +86,7 @@ void main() {
         notes: 'Custom weapon mount',
         notesColor: 'blue',
         discountedCost: true,
-        sortOrder: '5',
+        sortOrder: 5,
         stolen: true,
       );
 
@@ -98,7 +98,7 @@ void main() {
       expect(weaponMount.limit, 'Physical');
       expect(weaponMount.slots, '4');
       expect(weaponMount.avail, '12F');
-      expect(weaponMount.cost, '25000');
+      expect(weaponMount.cost, 25000);
       expect(weaponMount.freeCost, true);
       expect(weaponMount.markup, '10');
       expect(weaponMount.extra, 'Gyroscopic');
@@ -114,7 +114,7 @@ void main() {
       expect(weaponMount.notes, 'Custom weapon mount');
       expect(weaponMount.notesColor, 'blue');
       expect(weaponMount.discountedCost, true);
-      expect(weaponMount.sortOrder, '5');
+      expect(weaponMount.sortOrder, 5);
       expect(weaponMount.stolen, true);
     });
 

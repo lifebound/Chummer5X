@@ -139,7 +139,7 @@ class Gear extends ShadowrunItem {
     final pageText = xmlElement.getElement('page')?.innerText;
 
     final String rawLocationGuid =
-        xmlElement.getElement('guid')?.innerText ?? '';
+        xmlElement.getElement('location')?.innerText ?? '';
     final String locationGuid =
         rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultGearLocationGuid;
 

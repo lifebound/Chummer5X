@@ -80,7 +80,7 @@ class Armor extends ShadowrunItem {
     final sourceText = xmlElement.getElement('source')?.innerText;
     final pageText = xmlElement.getElement('page')?.innerText;
     
-    final String rawLocationGuid = xmlElement.getElement('guid')?.innerText ?? '';
+    final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
     final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultArmorLocationGuid;
 
 

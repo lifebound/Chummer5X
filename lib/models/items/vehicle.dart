@@ -366,4 +366,25 @@ class Vehicle extends ShadowrunItem {
       ],
     );
   }
+  @override
+  Icon getIcon(Color? color) {
+    
+    //Switch case selets teh icon based on the category of the vehicle
+    switch (category.toLowerCase()) {
+      case 'car':
+        return Icon(Icons.directions_car, color: color);
+      case 'bike':
+        return Icon(Icons.motorcycle, color: color);
+      case 'truck':
+        return Icon(Icons.local_shipping, color: color);
+      case 'van':
+        return Icon(Icons.directions_bus, color: color);
+      case 'boat':
+        return Icon(Icons.directions_boat, color: color);
+      case 'drone':
+        return Icon(Icons.airplanemode_active, color: color);
+      default:
+        return Icon(Icons.directions, color: color);
+    }
+  }
 }

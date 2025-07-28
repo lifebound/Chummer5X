@@ -17,7 +17,7 @@ void main() {
         ratingLabel: 'Rating',
         conditionMonitor: '2',
         avail: '8R',
-        cost: '5000',
+        cost: 5000,
         markup: '0',
         source: 'Core',
         page: '460',
@@ -27,44 +27,44 @@ void main() {
         ammoBonus: '0',
         ammoBonusPercent: '0',
         discountedCost: false,
-        sortOrder: '0',
+        sortOrder: 0,
         stolen: false,
       );
 
       // Assert
-      expect(vehicleMod.sourceId, 'test-source');
-      expect(vehicleMod.guid, 'test-guid');
-      expect(vehicleMod.name, 'Armor Plating');
-      expect(vehicleMod.category, 'Body');
-      expect(vehicleMod.slots, '2');
-      expect(vehicleMod.rating, '3');
-      expect(vehicleMod.maxRating, '6');
-      expect(vehicleMod.ratingLabel, 'Rating');
-      expect(vehicleMod.conditionMonitor, '2');
-      expect(vehicleMod.avail, '8R');
-      expect(vehicleMod.cost, '5000');
-      expect(vehicleMod.markup, '0');
-      expect(vehicleMod.source, 'Core');
-      expect(vehicleMod.page, '460');
-      expect(vehicleMod.included, false);
-      expect(vehicleMod.equipped, true);
-      expect(vehicleMod.wirelessOn, false);
-      expect(vehicleMod.ammoBonus, '0');
-      expect(vehicleMod.ammoBonusPercent, '0');
-      expect(vehicleMod.discountedCost, false);
-      expect(vehicleMod.sortOrder, '0');
-      expect(vehicleMod.stolen, false);
+      expect(vehicleMod.sourceId, 'test-source', reason: 'Source ID should match the value provided in constructor');
+      expect(vehicleMod.guid, 'test-guid', reason: 'GUID should match the value provided in constructor');
+      expect(vehicleMod.name, 'Armor Plating', reason: 'Name should match the value provided in constructor');
+      expect(vehicleMod.category, 'Body', reason: 'Category should match the value provided in constructor');
+      expect(vehicleMod.slots, '2', reason: 'Slots should match the value provided in constructor');
+      expect(vehicleMod.rating, '3', reason: 'Rating should match the value provided in constructor');
+      expect(vehicleMod.maxRating, '6', reason: 'Max rating should match the value provided in constructor');
+      expect(vehicleMod.ratingLabel, 'Rating', reason: 'Rating label should match the value provided in constructor');
+      expect(vehicleMod.conditionMonitor, '2', reason: 'Condition monitor should match the value provided in constructor');
+      expect(vehicleMod.avail, '8R', reason: 'Availability should match the value provided in constructor');
+      expect(vehicleMod.cost, 5000, reason: 'Cost should match the value provided in constructor');
+      expect(vehicleMod.markup, '0', reason: 'Markup should match the value provided in constructor');
+      expect(vehicleMod.source, 'Core', reason: 'Source should match the value provided in constructor');
+      expect(vehicleMod.page, '460', reason: 'Page should match the value provided in constructor');
+      expect(vehicleMod.included, false, reason: 'Included status should match the value provided in constructor');
+      expect(vehicleMod.equipped, true, reason: 'Equipped status should match the value provided in constructor');
+      expect(vehicleMod.wirelessOn, false, reason: 'Wireless status should match the value provided in constructor');
+      expect(vehicleMod.ammoBonus, '0', reason: 'Ammo bonus should match the value provided in constructor');
+      expect(vehicleMod.ammoBonusPercent, '0', reason: 'Ammo bonus percent should match the value provided in constructor');
+      expect(vehicleMod.discountedCost, false, reason: 'Discounted cost should match the value provided in constructor');
+      expect(vehicleMod.sortOrder, 0, reason: 'Sort order should match the value provided in constructor');
+      expect(vehicleMod.stolen, false, reason: 'Stolen status should match the value provided in constructor');
       
       // Check optional defaults
-      expect(vehicleMod.limit, null);
-      expect(vehicleMod.capacity, null);
-      expect(vehicleMod.extra, null);
-      expect(vehicleMod.subsystems, null);
-      expect(vehicleMod.weaponMountCategories, null);
-      expect(vehicleMod.ammoReplace, null);
-      expect(vehicleMod.weapons, null);
-      expect(vehicleMod.notes, null);
-      expect(vehicleMod.notesColor, null);
+      expect(vehicleMod.limit, null, reason: 'Limit should be null when not provided in constructor');
+      expect(vehicleMod.capacity, null, reason: 'Capacity should be null when not provided in constructor');
+      expect(vehicleMod.extra, null, reason: 'Extra should be null when not provided in constructor');
+      expect(vehicleMod.subsystems, null, reason: 'Subsystems should be null when not provided in constructor');
+      expect(vehicleMod.weaponMountCategories, null, reason: 'Weapon mount categories should be null when not provided in constructor');
+      expect(vehicleMod.ammoReplace, null, reason: 'Ammo replace should be null when not provided in constructor');
+      expect(vehicleMod.weapons, null, reason: 'Weapons should be null when not provided in constructor');
+      expect(vehicleMod.notes, null, reason: 'Notes should be null when not provided in constructor');
+      expect(vehicleMod.notesColor, null, reason: 'Notes color should be null when not provided in constructor');
     });
 
     test('should create VehicleMod with all optional parameters', () {
@@ -82,7 +82,7 @@ void main() {
         ratingLabel: 'Rating',
         conditionMonitor: '4',
         avail: '12F',
-        cost: '25000',
+        cost: 25000,
         markup: '10',
         extra: 'Cybereyes',
         source: 'Run & Gun',
@@ -99,42 +99,42 @@ void main() {
         notes: 'Advanced modification',
         notesColor: 'green',
         discountedCost: true,
-        sortOrder: '5',
+        sortOrder: 5,
         stolen: true,
       );
 
       // Assert
-      expect(vehicleMod.sourceId, 'advanced-source');
-      expect(vehicleMod.guid, 'advanced-guid');
-      expect(vehicleMod.name, 'Advanced Sensor Array');
-      expect(vehicleMod.category, 'Sensor');
-      expect(vehicleMod.limit, 'Physical');
-      expect(vehicleMod.slots, '4');
-      expect(vehicleMod.capacity, '8');
-      expect(vehicleMod.rating, '5');
-      expect(vehicleMod.maxRating, '6');
-      expect(vehicleMod.ratingLabel, 'Rating');
-      expect(vehicleMod.conditionMonitor, '4');
-      expect(vehicleMod.avail, '12F');
-      expect(vehicleMod.cost, '25000');
-      expect(vehicleMod.markup, '10');
-      expect(vehicleMod.extra, 'Cybereyes');
-      expect(vehicleMod.source, 'Run & Gun');
-      expect(vehicleMod.page, '123');
-      expect(vehicleMod.included, true);
-      expect(vehicleMod.equipped, true);
-      expect(vehicleMod.wirelessOn, true);
-      expect(vehicleMod.subsystems, 'Camera, Microphone');
-      expect(vehicleMod.weaponMountCategories, 'Light Weapons');
-      expect(vehicleMod.ammoBonus, '10');
-      expect(vehicleMod.ammoBonusPercent, '25');
-      expect(vehicleMod.ammoReplace, 'APDS');
-      expect(vehicleMod.weapons, isEmpty);
-      expect(vehicleMod.notes, 'Advanced modification');
-      expect(vehicleMod.notesColor, 'green');
-      expect(vehicleMod.discountedCost, true);
-      expect(vehicleMod.sortOrder, '5');
-      expect(vehicleMod.stolen, true);
+      expect(vehicleMod.sourceId, 'advanced-source', reason: 'Source ID should match the value provided in constructor');
+      expect(vehicleMod.guid, 'advanced-guid', reason: 'GUID should match the value provided in constructor');
+      expect(vehicleMod.name, 'Advanced Sensor Array', reason: 'Name should match the value provided in constructor');
+      expect(vehicleMod.category, 'Sensor', reason: 'Category should match the value provided in constructor');
+      expect(vehicleMod.limit, 'Physical', reason: 'Limit should match the value provided in constructor');
+      expect(vehicleMod.slots, '4', reason: 'Slots should match the value provided in constructor');
+      expect(vehicleMod.capacity, '8', reason: 'Capacity should match the value provided in constructor');
+      expect(vehicleMod.rating, '5', reason: 'Rating should match the value provided in constructor');
+      expect(vehicleMod.maxRating, '6', reason: 'Max rating should match the value provided in constructor');
+      expect(vehicleMod.ratingLabel, 'Rating', reason: 'Rating label should match the value provided in constructor');
+      expect(vehicleMod.conditionMonitor, '4', reason: 'Condition monitor should match the value provided in constructor');
+      expect(vehicleMod.avail, '12F', reason: 'Availability should match the value provided in constructor');
+      expect(vehicleMod.cost, 25000, reason: 'Cost should match the value provided in constructor');
+      expect(vehicleMod.markup, '10', reason: 'Markup should match the value provided in constructor');
+      expect(vehicleMod.extra, 'Cybereyes', reason: 'Extra should match the value provided in constructor');
+      expect(vehicleMod.source, 'Run & Gun', reason: 'Source should match the value provided in constructor');
+      expect(vehicleMod.page, '123', reason: 'Page should match the value provided in constructor');
+      expect(vehicleMod.included, true, reason: 'Included status should match the value provided in constructor');
+      expect(vehicleMod.equipped, true, reason: 'Equipped status should match the value provided in constructor');
+      expect(vehicleMod.wirelessOn, true, reason: 'Wireless status should match the value provided in constructor');
+      expect(vehicleMod.subsystems, 'Camera, Microphone', reason: 'Subsystems should match the value provided in constructor');
+      expect(vehicleMod.weaponMountCategories, 'Light Weapons', reason: 'Weapon mount categories should match the value provided in constructor');
+      expect(vehicleMod.ammoBonus, '10', reason: 'Ammo bonus should match the value provided in constructor');
+      expect(vehicleMod.ammoBonusPercent, '25', reason: 'Ammo bonus percent should match the value provided in constructor');
+      expect(vehicleMod.ammoReplace, 'APDS', reason: 'Ammo replace should match the value provided in constructor');
+      expect(vehicleMod.weapons, isEmpty, reason: 'Weapons should be empty list as provided in constructor');
+      expect(vehicleMod.notes, 'Advanced modification', reason: 'Notes should match the value provided in constructor');
+      expect(vehicleMod.notesColor, 'green', reason: 'Notes color should match the value provided in constructor');
+      expect(vehicleMod.discountedCost, true, reason: 'Discounted cost should match the value provided in constructor');
+      expect(vehicleMod.sortOrder, 5, reason: 'Sort order should match the value provided in constructor');
+      expect(vehicleMod.stolen, true, reason: 'Stolen status should match the value provided in constructor');
     });
 
     group('fromXmlElement', () {
@@ -172,37 +172,37 @@ void main() {
         final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
 
         // Assert
-        expect(vehicleMod.sourceId, 'basic-source');
-        expect(vehicleMod.guid, 'basic-guid');
-        expect(vehicleMod.name, 'Basic Mod');
-        expect(vehicleMod.category, 'Body');
-        expect(vehicleMod.slots, '1');
-        expect(vehicleMod.rating, '2');
-        expect(vehicleMod.maxRating, '4');
-        expect(vehicleMod.ratingLabel, 'Rating');
-        expect(vehicleMod.conditionMonitor, '1');
-        expect(vehicleMod.avail, '4R');
-        expect(vehicleMod.cost, '2000');
-        expect(vehicleMod.markup, '0');
-        expect(vehicleMod.source, 'Core');
-        expect(vehicleMod.page, '450');
-        expect(vehicleMod.included, false);
-        expect(vehicleMod.equipped, true);
-        expect(vehicleMod.wirelessOn, false);
-        expect(vehicleMod.ammoBonus, '0');
-        expect(vehicleMod.ammoBonusPercent, '0');
-        expect(vehicleMod.discountedCost, false);
-        expect(vehicleMod.sortOrder, '0');
-        expect(vehicleMod.stolen, false);
-        expect(vehicleMod.limit, null);
-        expect(vehicleMod.capacity, null);
-        expect(vehicleMod.extra, null);
-        expect(vehicleMod.subsystems, null);
-        expect(vehicleMod.weaponMountCategories, null);
-        expect(vehicleMod.ammoReplace, null);
-        expect(vehicleMod.weapons, isEmpty);
-        expect(vehicleMod.notes, null);
-        expect(vehicleMod.notesColor, null);
+        expect(vehicleMod.sourceId, 'basic-source', reason: 'Source ID should be parsed from XML sourceid element');
+        expect(vehicleMod.guid, 'basic-guid', reason: 'GUID should be parsed from XML guid element');
+        expect(vehicleMod.name, 'Basic Mod', reason: 'Name should be parsed from XML name element');
+        expect(vehicleMod.category, 'Body', reason: 'Category should be parsed from XML category element');
+        expect(vehicleMod.slots, '1', reason: 'Slots should be parsed from XML slots element');
+        expect(vehicleMod.rating, '2', reason: 'Rating should be parsed from XML rating element');
+        expect(vehicleMod.maxRating, '4', reason: 'Max rating should be parsed from XML maxrating element');
+        expect(vehicleMod.ratingLabel, 'Rating', reason: 'Rating label should be parsed from XML ratinglabel element');
+        expect(vehicleMod.conditionMonitor, '1', reason: 'Condition monitor should be parsed from XML conditionmonitor element');
+        expect(vehicleMod.avail, '4R', reason: 'Availability should be parsed from XML avail element');
+        expect(vehicleMod.cost, 2000, reason: 'Cost should be parsed from XML cost element');
+        expect(vehicleMod.markup, '0', reason: 'Markup should be parsed from XML markup element');
+        expect(vehicleMod.source, 'Core', reason: 'Source should be parsed from XML source element');
+        expect(vehicleMod.page, '450', reason: 'Page should be parsed from XML page element');
+        expect(vehicleMod.included, false, reason: 'Included should be parsed as false from XML included element value "False"');
+        expect(vehicleMod.equipped, true, reason: 'Equipped should be parsed as true from XML equipped element value "True"');
+        expect(vehicleMod.wirelessOn, false, reason: 'Wireless on should be parsed as false from XML wirelesson element value "False"');
+        expect(vehicleMod.ammoBonus, '0', reason: 'Ammo bonus should be parsed from XML ammobonus element');
+        expect(vehicleMod.ammoBonusPercent, '0', reason: 'Ammo bonus percent should be parsed from XML ammobonuspercent element');
+        expect(vehicleMod.discountedCost, false, reason: 'Discounted cost should be parsed as false from XML discountedcost element value "False"');
+        expect(vehicleMod.sortOrder, 0, reason: 'Sort order should be parsed from XML sortorder element');
+        expect(vehicleMod.stolen, false, reason: 'Stolen should be parsed as false from XML stolen element value "False"');
+        expect(vehicleMod.limit, null, reason: 'Limit should be null when XML limit element is missing');
+        expect(vehicleMod.capacity, null, reason: 'Capacity should be null when XML capacity element is missing');
+        expect(vehicleMod.extra, null, reason: 'Extra should be null when XML extra element is missing');
+        expect(vehicleMod.subsystems, null, reason: 'Subsystems should be null when XML subsystems element is missing');
+        expect(vehicleMod.weaponMountCategories, null, reason: 'Weapon mount categories should be null when XML weaponmountcategories element is missing');
+        expect(vehicleMod.ammoReplace, null, reason: 'Ammo replace should be null when XML ammoreplace element is missing');
+        expect(vehicleMod.weapons, isEmpty, reason: 'Weapons should be empty when XML weapons element is missing');
+        expect(vehicleMod.notes, null, reason: 'Notes should be null when XML notes element is missing');
+        expect(vehicleMod.notesColor, null, reason: 'Notes color should be null when XML notesColor element is missing');
       });
 
       test('should parse complete XML correctly', () {
@@ -248,37 +248,37 @@ void main() {
         final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
 
         // Assert
-        expect(vehicleMod.sourceId, 'complete-source');
-        expect(vehicleMod.guid, 'complete-guid');
-        expect(vehicleMod.name, 'Complete Mod');
-        expect(vehicleMod.category, 'Sensor');
-        expect(vehicleMod.limit, 'Physical');
-        expect(vehicleMod.slots, '3');
-        expect(vehicleMod.capacity, '6');
-        expect(vehicleMod.rating, '4');
-        expect(vehicleMod.maxRating, '6');
-        expect(vehicleMod.ratingLabel, 'Rating');
-        expect(vehicleMod.conditionMonitor, '3');
-        expect(vehicleMod.avail, '10F');
-        expect(vehicleMod.cost, '15000');
-        expect(vehicleMod.markup, '5');
-        expect(vehicleMod.extra, 'Cybereyes');
-        expect(vehicleMod.source, 'Chrome Flesh');
-        expect(vehicleMod.page, '200');
-        expect(vehicleMod.included, true);
-        expect(vehicleMod.equipped, true);
-        expect(vehicleMod.wirelessOn, true);
-        expect(vehicleMod.subsystems, 'Camera, Microphone');
-        expect(vehicleMod.weaponMountCategories, 'Light Weapons');
-        expect(vehicleMod.ammoBonus, '5');
-        expect(vehicleMod.ammoBonusPercent, '15');
-        expect(vehicleMod.ammoReplace, 'APDS');
-        expect(vehicleMod.weapons, isEmpty);
-        expect(vehicleMod.notes, 'Custom modification');
-        expect(vehicleMod.notesColor, 'blue');
-        expect(vehicleMod.discountedCost, true);
-        expect(vehicleMod.sortOrder, '3');
-        expect(vehicleMod.stolen, true);
+        expect(vehicleMod.sourceId, 'complete-source', reason: 'Source ID should be parsed from XML sourceid element');
+        expect(vehicleMod.guid, 'complete-guid', reason: 'GUID should be parsed from XML guid element');
+        expect(vehicleMod.name, 'Complete Mod', reason: 'Name should be parsed from XML name element');
+        expect(vehicleMod.category, 'Sensor', reason: 'Category should be parsed from XML category element');
+        expect(vehicleMod.limit, 'Physical', reason: 'Limit should be parsed from XML limit element');
+        expect(vehicleMod.slots, '3', reason: 'Slots should be parsed from XML slots element');
+        expect(vehicleMod.capacity, '6', reason: 'Capacity should be parsed from XML capacity element');
+        expect(vehicleMod.rating, '4', reason: 'Rating should be parsed from XML rating element');
+        expect(vehicleMod.maxRating, '6', reason: 'Max rating should be parsed from XML maxrating element');
+        expect(vehicleMod.ratingLabel, 'Rating', reason: 'Rating label should be parsed from XML ratinglabel element');
+        expect(vehicleMod.conditionMonitor, '3', reason: 'Condition monitor should be parsed from XML conditionmonitor element');
+        expect(vehicleMod.avail, '10F', reason: 'Availability should be parsed from XML avail element');
+        expect(vehicleMod.cost, 15000, reason: 'Cost should be parsed from XML cost element');
+        expect(vehicleMod.markup, '5', reason: 'Markup should be parsed from XML markup element');
+        expect(vehicleMod.extra, 'Cybereyes', reason: 'Extra should be parsed from XML extra element');
+        expect(vehicleMod.source, 'Chrome Flesh', reason: 'Source should be parsed from XML source element');
+        expect(vehicleMod.page, '200', reason: 'Page should be parsed from XML page element');
+        expect(vehicleMod.included, true, reason: 'Included should be parsed as true from XML included element value "True"');
+        expect(vehicleMod.equipped, true, reason: 'Equipped should be parsed as true from XML equipped element value "True"');
+        expect(vehicleMod.wirelessOn, true, reason: 'Wireless on should be parsed as true from XML wirelesson element value "True"');
+        expect(vehicleMod.subsystems, 'Camera, Microphone', reason: 'Subsystems should be parsed from XML subsystems element');
+        expect(vehicleMod.weaponMountCategories, 'Light Weapons', reason: 'Weapon mount categories should be parsed from XML weaponmountcategories element');
+        expect(vehicleMod.ammoBonus, '5', reason: 'Ammo bonus should be parsed from XML ammobonus element');
+        expect(vehicleMod.ammoBonusPercent, '15', reason: 'Ammo bonus percent should be parsed from XML ammobonuspercent element');
+        expect(vehicleMod.ammoReplace, 'APDS', reason: 'Ammo replace should be parsed from XML ammoreplace element');
+        expect(vehicleMod.weapons, isEmpty, reason: 'Weapons should be empty when XML weapons element is empty');
+        expect(vehicleMod.notes, 'Custom modification', reason: 'Notes should be parsed from XML notes element');
+        expect(vehicleMod.notesColor, 'blue', reason: 'Notes color should be parsed from XML notesColor element');
+        expect(vehicleMod.discountedCost, true, reason: 'Discounted cost should be parsed as true from XML discountedcost element value "True"');
+        expect(vehicleMod.sortOrder, 3, reason: 'Sort order should be parsed from XML sortorder element');
+        expect(vehicleMod.stolen, true, reason: 'Stolen should be parsed as true from XML stolen element value "True"');
       });
 
       test('should handle missing XML elements gracefully', () {
@@ -293,28 +293,28 @@ void main() {
         final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
 
         // Assert
-        expect(vehicleMod.sourceId, '');
-        expect(vehicleMod.guid, '');
-        expect(vehicleMod.name, '');
-        expect(vehicleMod.category, '');
-        expect(vehicleMod.slots, '');
-        expect(vehicleMod.rating, '0');
-        expect(vehicleMod.maxRating, '0');
-        expect(vehicleMod.ratingLabel, '');
-        expect(vehicleMod.conditionMonitor, '0');
-        expect(vehicleMod.avail, '');
-        expect(vehicleMod.cost, '');
-        expect(vehicleMod.markup, '0');
-        expect(vehicleMod.source, '');
-        expect(vehicleMod.page, '');
-        expect(vehicleMod.included, false);
-        expect(vehicleMod.equipped, false);
-        expect(vehicleMod.wirelessOn, false);
-        expect(vehicleMod.ammoBonus, '0');
-        expect(vehicleMod.ammoBonusPercent, '0');
-        expect(vehicleMod.discountedCost, false);
-        expect(vehicleMod.sortOrder, '0');
-        expect(vehicleMod.stolen, false);
+        expect(vehicleMod.sourceId, '', reason: 'Source ID should default to empty string when XML sourceid element is missing');
+        expect(vehicleMod.guid, '', reason: 'GUID should default to empty string when XML guid element is missing');
+        expect(vehicleMod.name, '', reason: 'Name should default to empty string when XML name element is missing');
+        expect(vehicleMod.category, '', reason: 'Category should default to empty string when XML category element is missing');
+        expect(vehicleMod.slots, '', reason: 'Slots should default to empty string when XML slots element is missing');
+        expect(vehicleMod.rating, '0', reason: 'Rating should default to "0" when XML rating element is missing');
+        expect(vehicleMod.maxRating, '0', reason: 'Max rating should default to "0" when XML maxrating element is missing');
+        expect(vehicleMod.ratingLabel, '', reason: 'Rating label should default to empty string when XML ratinglabel element is missing');
+        expect(vehicleMod.conditionMonitor, '0', reason: 'Condition monitor should default to "0" when XML conditionmonitor element is missing');
+        expect(vehicleMod.avail, '', reason: 'Availability should default to empty string when XML avail element is missing');
+        expect(vehicleMod.cost, 0, reason: 'Cost should default to 0 when XML cost element is missing');
+        expect(vehicleMod.markup, '0', reason: 'Markup should default to "0" when XML markup element is missing');
+        expect(vehicleMod.source, '', reason: 'Source should default to empty string when XML source element is missing');
+        expect(vehicleMod.page, '', reason: 'Page should default to empty string when XML page element is missing');
+        expect(vehicleMod.included, false, reason: 'Included should default to false when XML included element is missing');
+        expect(vehicleMod.equipped, false, reason: 'Equipped should default to false when XML equipped element is missing');
+        expect(vehicleMod.wirelessOn, false, reason: 'Wireless on should default to false when XML wirelesson element is missing');
+        expect(vehicleMod.ammoBonus, '0', reason: 'Ammo bonus should default to "0" when XML ammobonus element is missing');
+        expect(vehicleMod.ammoBonusPercent, '0', reason: 'Ammo bonus percent should default to "0" when XML ammobonuspercent element is missing');
+        expect(vehicleMod.discountedCost, false, reason: 'Discounted cost should default to false when XML discountedcost element is missing');
+        expect(vehicleMod.sortOrder, 0, reason: 'Sort order should default to 0 when XML sortorder element is missing');
+        expect(vehicleMod.stolen, false, reason: 'Stolen should default to false when XML stolen element is missing');
       });
 
       test('should parse boolean values correctly', () {
@@ -351,11 +351,11 @@ void main() {
         final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
 
         // Assert
-        expect(vehicleMod.included, true);
-        expect(vehicleMod.equipped, false);
-        expect(vehicleMod.wirelessOn, true);
-        expect(vehicleMod.discountedCost, true);
-        expect(vehicleMod.stolen, false);
+        expect(vehicleMod.included, true, reason: 'Included should be parsed as true from XML included element value "True"');
+        expect(vehicleMod.equipped, false, reason: 'Equipped should be parsed as false from XML equipped element value "False"');
+        expect(vehicleMod.wirelessOn, true, reason: 'Wireless on should be parsed as true from XML wirelesson element value "True"');
+        expect(vehicleMod.discountedCost, true, reason: 'Discounted cost should be parsed as true from XML discountedcost element value "True"');
+        expect(vehicleMod.stolen, false, reason: 'Stolen should be parsed as false from XML stolen element value "False"');
       });
 
       test('should parse weapons correctly', () {
@@ -408,10 +408,10 @@ void main() {
         final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
 
         // Assert
-        expect(vehicleMod.weapons, hasLength(1));
-        expect(vehicleMod.weapons!.first.name, 'Mounted Gun');
-        expect(vehicleMod.weapons!.first.category, 'Assault Rifles');
-        expect(vehicleMod.weapons!.first.damage, '8P');
+        expect(vehicleMod.weapons, hasLength(1), reason: 'Weapons should contain exactly one weapon parsed from XML');
+        expect(vehicleMod.weapons!.first.name, 'Mounted Gun', reason: 'First weapon name should be parsed from XML weapon element');
+        expect(vehicleMod.weapons!.first.category, 'Assault Rifles', reason: 'First weapon category should be parsed from XML weapon element');
+        expect(vehicleMod.weapons!.first.damage, '8P', reason: 'First weapon damage should be parsed from XML weapon element');
       });
     });
   });

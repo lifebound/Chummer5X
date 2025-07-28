@@ -1,5 +1,7 @@
 // shadowrun_item_location_tree_view.dart (New file or renamed)
+import 'package:chummer5x/models/items/vehicle_mod.dart';
 import 'package:chummer5x/models/items/weapon_accessory.dart';
+import 'package:chummer5x/models/items/weapon_mount.dart';
 import 'package:flutter/material.dart';
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
@@ -133,22 +135,38 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
         hasExpandableChildren = true;
         childrenToDisplay = item.gears!;
       }
-      // else if (item is Vehicle &&
-      //     (item.mods.isNotEmpty ||
-      //         item.weaponMounts.isNotEmpty ||
-      //         item.gears.isNotEmpty ||
-      //         (item.weapons != null && item.weapons!.isNotEmpty))) {
-      //   hasExpandableChildren = true;
-      //   // Combine all nested lists for display under the ExpansionTile
-      //   childrenToDisplay = [
-      //     ...item.mods,
-      //     ...item.weaponMounts,
-      //     ...item.gears,
-      //     ...(item.weapons ?? []),
-      //   ];
-      // } 
+      else if (item is Vehicle &&
+          (item.mods.isNotEmpty ||
+              item.weaponMounts.isNotEmpty ||
+              item.gears.isNotEmpty ||
+              (item.weapons != null && item.weapons!.isNotEmpty))) {
+        hasExpandableChildren = true;
+        // Combine all nested lists for display under the ExpansionTile
+        childrenToDisplay = [
+          ...item.mods,
+          ...item.weaponMounts,
+          ...item.gears,
+          ...(item.weapons ?? []),
+        ];
+      }
+      else if (item is VehicleMod &&
+          item.weapons != null &&
+          item.weapons!.isNotEmpty) {
+        hasExpandableChildren = true;
+        childrenToDisplay = item.weapons!;
+      } 
+      else if (item is WeaponMount &&
+          item.weapons != null &&
+          item.weapons!.isNotEmpty) {
+        hasExpandableChildren = true;
+        childrenToDisplay = item.weapons!;
+      } 
+      else if (item is WeaponMount &&
+          item.mods.isNotEmpty) {
+        hasExpandableChildren = true;
+        childrenToDisplay = item.mods;
+      }
       else if (item is Armor &&
-          item.armorMods != null &&
           item.armorMods!.isNotEmpty) {
         hasExpandableChildren = true;
         childrenToDisplay = item.armorMods!;

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
 import 'shadowrun_item.dart'; // Import the base class
+import 'location.dart'; // Import for default location GUIDs
+import 'package:chummer5x/models/items/cyberware_grades.dart';
+import 'package:math_expressions/math_expressions.dart';
+
 
 class Cyberware extends ShadowrunItem {
   final String? guid;
   final String? limbslot;
   final int? limbslotcount;
   final bool inheritattributes;
-  final String ess; // Can be a fixed value or an expression like "Rating * 0.2"
+  final double ess; // Can be a fixed value or an expression like "Rating * 0.2"
   final String capacity; // Can be a fixed value or an expression like "[2]"
   final String? weight;
   final String? parentid;
@@ -131,6 +135,9 @@ class Cyberware extends ShadowrunItem {
     int getInt(XmlElement element, String tagName, {int defaultValue = 0}) {
       return int.tryParse(getText(element, tagName) ?? '') ?? defaultValue;
     }
+    double getDouble(XmlElement element, String tagName, {double defaultValue = 0.0}) {
+      return double.tryParse(getText(element, tagName) ?? '') ?? defaultValue;
+    }
 
     // Helper to get list of names from a parent element like <pairinclude>
     List<String> getIncludedNames(XmlElement parentElement, String tagName) {
@@ -144,18 +151,44 @@ class Cyberware extends ShadowrunItem {
       return names;
     }
 
+    final improvementSource = getText(xmlElement, 'improvementsource') ?? 'Cyberware'; // Default to Cyberware
+
+    
+    //get the value of improvementSource. if its 'cyberware', set locationGuid to defaultCyberwareLocationGuid. if its 'bioware', set locationGuid to defaultBiowareLocationGuid.
+    String locationGuid;
+    Grade cyberwareGrade;
+    final name = getText(xmlElement, 'name')!;
+    if (improvementSource == 'Cyberware' && name != 'Essence Hole') {
+      locationGuid = defaultCyberwareLocationGuid; // Switch to Cyberware location
+      cyberwareGrade = GradeTypeDetails.fromName(getText(xmlElement, 'grade') ?? 'Standard',isCyberware: true).details;
+    }
+    else{
+      locationGuid = defaultBiowareLocationGuid; // Switch to Bioware location
+      cyberwareGrade = GradeTypeDetails.fromName(getText(xmlElement, 'grade') ?? 'Standard',isCyberware: false).details;
+    }
+    
+    int rating = _calculateTrueRating(cyberwareGrade, getInt(xmlElement, 'rating', defaultValue: 1));
+    String availString = getText(xmlElement, 'avail') ?? '0';
+    String essString = getText(xmlElement, 'ess') ?? '0';
+    String costString = getText(xmlElement, 'cost') ?? '0';
+
+
+    String avail = _calculateAvailability(cyberwareGrade, rating, availString);
+    double essenceValue = _calculateEssence(cyberwareGrade, rating, essString);
+    double costValue = _calculateCost(cyberwareGrade, rating, costString);
+
     return Cyberware(
       guid: getText(xmlElement, 'guid'),
       sourceId: getText(xmlElement, 'sourceid'),
-      name: getText(xmlElement, 'name')!,
+      name: name,
       category: getText(xmlElement, 'category')!,
       limbslot: getText(xmlElement, 'limbslot'),
       limbslotcount: getInt(xmlElement, 'limbslotcount', defaultValue: 1),
       inheritattributes: getBool(xmlElement, 'inheritattributes'),
-      ess: getText(xmlElement, 'ess')!,
+      ess: essenceValue,
       capacity: getText(xmlElement, 'capacity')!,
-      avail: getText(xmlElement, 'avail')!,
-      cost: getInt(xmlElement, 'cost'),
+      avail: avail,
+      cost: costValue,
       weight: getText(xmlElement, 'weight'),
       source: getText(xmlElement, 'source')!,
       page: getText(xmlElement, 'page')!,
@@ -199,7 +232,7 @@ class Cyberware extends ShadowrunItem {
       isgeneware: getBool(xmlElement, 'isgeneware'),
       active: getBool(xmlElement, 'active'),
       homeNode: getBool(xmlElement, 'homenode'),
-      deviceRating: getText(xmlElement, 'devicerating'),
+      deviceRating: cyberwareGrade.deviceRating.toString(),
       programLimit: getText(xmlElement, 'programlimit'),
       overclocked: getText(xmlElement, 'overclocked'),
       canFormPersona: getText(xmlElement, 'canformpersona')?.toLowerCase() == 'true' ? true : (getText(xmlElement, 'canformpersona')?.toLowerCase() == 'false' ? false : null),
@@ -215,6 +248,7 @@ class Cyberware extends ShadowrunItem {
       modAttributeArray: getText(xmlElement, 'modattributearray')?.split(','), // Assuming comma separated
       canSwapAttributes: getBool(xmlElement, 'canswapattributes'),
       sortOrder: getInt(xmlElement, 'sortorder'),
+      locationGuid: locationGuid,
     );
   }
 
@@ -241,7 +275,7 @@ class Cyberware extends ShadowrunItem {
       children: [
         buildDetailRow(context, 'Category', category),
         buildDetailRow(context, 'Improvement Source', improvementSource),
-        buildDetailRow(context, 'Essence Cost', ess),
+        buildDetailRow(context, 'Essence Cost', ess.toString()),
         buildDetailRow(context, 'Capacity', capacity),
         buildDetailRow(context, 'Grade', grade),
         if (rating > 0) buildDetailRow(context, 'Rating', rating.toString()),
@@ -269,5 +303,119 @@ class Cyberware extends ShadowrunItem {
         }),
       ],
     );
+  }
+
+  static String _calculateAvailability(Grade gradeType, int rating, String availText) {
+    // availability has a few options on how it can be formatted, so we need to handle that.
+    //it can be a simple number (eg: "10"), it can a number and a restriction indicator (eg: "10R"),
+    // or it can be a formulaa like "Rating + 2" or "Rating - 1".
+    // if its a formlua, we need to parse it, and use math_expressions to evaluate it.
+    
+    //first check if we're using FixedValues, which is a special case.
+    //we need that value to continue parsing the availability.
+    if(availText.contains(RegExp(r'FixedValues\('))) {
+      // Parse the fixed values and return the value corresponding to the rating
+      availText = _parseFixedValue(availText, rating).toString();
+    }
+
+    String avail;
+
+      var context = ContextModel()
+        ..bindVariableName('Rating', Number(rating)); // Bind the variable name "Rating" to the rating value
+    if (availText.contains(RegExp(r'[+-/*\\/]'))) {
+      // Parse the formula, e.g., "Rating + 2"
+      final expression = GrammarParser().parse(availText.replaceAll(' ', '')); // Remove spaces for parsing
+
+      
+      final evaluator = RealEvaluator(context);
+      avail = evaluator.evaluate(expression).toString(); // Evaluate the expression
+    } else {
+      avail = availText; // Directly use the text if no formula
+    }
+    // now we need to split the availability into a number and a restriction indicator if it has one.
+    final availParts = avail.split(RegExp(r'(?<=[0-9])(?=[a-zA-Z])'));
+    final availNumber = availParts[0];
+    final availRestriction = availParts.length > 1 ? availParts[1] : '';
+
+    // the cyberware grade availability is a string, so we need to use that with math_expressions to modify the availNumber
+    final gradeAvail = gradeType.avail;
+    String finalAvail;
+    final availExpression = GrammarParser().parse('$availNumber + $gradeAvail');
+    final availEvaluator = RealEvaluator(context);
+    final availResult = availEvaluator.evaluate(availExpression);
+    finalAvail = availResult.toInt().toString();
+
+    return finalAvail + availRestriction;
+  }
+  static double _calculateEssence(Grade gradeType, int rating, String essenceText) {
+
+    // essence can be a fixed value, or it can be a formula like "Rating * 0.2" or "Rating - 1".
+    // if its a formula, we need to parse it, and use math_expressions to evaluate it.
+    
+    //first check if we're using FixedValues, which is a special case.
+    //we need that value to continue parsing the essence.
+    if(essenceText.contains(RegExp(r'FixedValues\('))) {
+      // Parse the fixed values and return the value corresponding to the rating
+      essenceText = _parseFixedValue(essenceText, rating).toString();
+    }
+
+   //use math_expressions to evaluate the essenceText
+    double essenceValue;
+    if (essenceText.contains(RegExp(r'[+-/*\\/]'))) {
+     //parse the formulae to use in math_expressions
+      final context = ContextModel()
+        ..bindVariableName('Rating', Number(rating)); // Bind the variable name "Rating" to the rating value
+      final expression = GrammarParser().parse(essenceText.replaceAll(' ', '')); // Remove spaces for parsing
+      
+      final evaluator = RealEvaluator(context);
+      essenceValue = evaluator.evaluate(expression).toDouble(); // Evaluate the expression
+    } else {
+      essenceValue = double.tryParse(essenceText) ?? 0.0; // Fallback to direct parsing
+    }
+    double finalEssenceValue = essenceValue * gradeType.ess;
+
+    //we need to restrict the final value to a maximum of 2 decimal places.
+    finalEssenceValue = double.parse(finalEssenceValue.toStringAsFixed(2));
+    return finalEssenceValue;
+
+  }
+  static double _calculateCost(Grade gradeType, int rating, String costText) {
+
+    // first check if we're using FixedValues, which is a special case.
+    // we need that value to continue parsing the cost.
+    if(costText.contains(RegExp(r'FixedValues\('))) {
+      // Parse the fixed values and return the value corresponding to the rating
+      costText = _parseFixedValue(costText, rating).toString();
+    }
+
+    // Use math_expressions to evaluate the costText
+    int costValue;
+    if (costText.contains(RegExp(r'[+-/*\\/]'))) {
+      final context = ContextModel()
+        ..bindVariableName('Rating', Number(rating)); // Bind the variable name "Rating" to the rating value
+      final expression = GrammarParser().parse(costText.replaceAll(' ', '')); // Remove spaces for parsing
+      
+      final evaluator = RealEvaluator(context);
+      costValue = evaluator.evaluate(expression).toInt(); // Evaluate the expression
+    } else {
+      costValue = int.tryParse(costText) ?? 0; // Fallback to direct parsing
+    }
+    return costValue * gradeType.cost;
+  }
+  static int _calculateTrueRating(Grade gradeType, int rating) {
+    return (rating + gradeType.deviceRating).toInt();
+  }
+  static num _parseFixedValue(String value, int rating) {
+   //sometimes a String comes ascross as "FixedValues(1,2,3,4)" or similar.
+   // we should treat what's inside the parentheses as a list of fixed values,
+   //and return the value that corresponds to the current rating.
+   final match = RegExp(r'FixedValues\(([^)]+)\)').firstMatch(value);
+   if (match != null) {
+     final fixedValues = match.group(1)?.split(',').map((v) => int.tryParse(v.trim()) ?? 0).toList() ?? [];
+     if (rating > 0 && rating <= fixedValues.length) {
+       return fixedValues[rating - 1];
+     }
+   }
+   return 0;
   }
 }

@@ -82,7 +82,7 @@ class Gear extends ShadowrunItem {
     String? maxRating,
     int? rating,
     double? qty,
-    int? cost,
+    double? cost,
     String? weight,
     String? extra,
     bool? bonded,
@@ -171,7 +171,7 @@ class Gear extends ShadowrunItem {
       qty: double.tryParse(xmlElement.getElement('qty')?.innerText ?? '1.0') ??
           1.0,
       avail: parseAvail(xmlElement.getElement('avail'), gearRating),
-      cost: int.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
+      cost: double.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
       weight: xmlElement.getElement('weight')?.innerText,
       extra: xmlElement.getElement('extra')?.innerText,
       bonded: xmlElement.getElement('bonded')?.innerText == 'True',

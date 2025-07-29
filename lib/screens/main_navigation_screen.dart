@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:chummer5x/models/items/armor.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 import 'package:chummer5x/models/items/vehicle.dart';
+import 'package:chummer5x/models/items/cyberware.dart';
+import 'package:chummer5x/models/items/location.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -47,6 +49,7 @@ enum NavigationSection {
   submersionGrades,
   gear,
   vehiclesAndDrones,
+  cyberwareBioware,
   combat,
   contacts,
   notes,
@@ -118,7 +121,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildCharacterContent(BuildContext context) {
     // For Notes and Gear sections, use minimal constraints to maximize space usage
-    if (_currentSection == NavigationSection.notes || _currentSection == NavigationSection.gear || _currentSection == NavigationSection.vehiclesAndDrones) {
+    if (_currentSection == NavigationSection.notes || _currentSection == NavigationSection.gear || _currentSection == NavigationSection.vehiclesAndDrones || _currentSection == NavigationSection.cyberwareBioware) {
       return Padding(
         padding: const EdgeInsets.all(8.0), // Minimal padding for tabbed sections
         child: _buildCurrentView(context),
@@ -331,6 +334,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               NavigationSection.vehiclesAndDrones,
               Icons.directions_car,
               'Vehicles & Drones',
+            ),
+            _buildNavigationTile(
+              context,
+              NavigationSection.cyberwareBioware,
+              Icons.precision_manufacturing,
+              'Cyberware/Bioware',
             ),
             _buildNavigationTile(
               context,
@@ -612,6 +621,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return _buildGearView(context);
       case NavigationSection.vehiclesAndDrones:
         return _buildVehiclesAndDronesView(context);
+      case NavigationSection.cyberwareBioware:
+        return _buildCyberwareBiowareView(context);
       case NavigationSection.combat:
         return _buildCombatView(context);
       case NavigationSection.contacts:
@@ -1249,6 +1260,98 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
+
+  Widget _buildCyberwareBiowareView(BuildContext context) {
+    final totalEssence = _currentCharacter?.essence ?? 6.0;
+    final cyberwareEssence = _calculateCyberwareEssence();
+    final biowareEssence = _calculateBiowareEssence();
+    final essenceHoleAmount = _calculateEssenceHoleAmount();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Cyberware/Bioware',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Row(
+                children: [
+                  _buildEssenceChip(context, 'Total Essence', (totalEssence - cyberwareEssence - biowareEssence - essenceHoleAmount).toStringAsFixed(2)),
+                  const SizedBox(width: 8),
+                  _buildEssenceChip(context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
+                  const SizedBox(width: 8),
+                  _buildEssenceChip(context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
+                  const SizedBox(width: 8),
+                  _buildEssenceChip(context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ShadowrunItemLocationTreeView<Cyberware>(
+              allLocations: _currentCharacter?.cyberwareLocations ?? {},
+              allItems: _currentCharacter?.cyberware ?? [], // Don't assign locations, use original items
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildEssenceChip(BuildContext context, String label, String value) {
+    return Chip(
+      label: Text('$label: $value'),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      labelStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onPrimaryContainer,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  double _calculateCyberwareEssence() {
+    if (_currentCharacter?.cyberware == null) return 0.0;
+    
+    double total = 0.0;
+    for (final item in _currentCharacter!.cyberware) {
+      if (item.improvementSource == 'Cyberware' && item.name.toLowerCase() != 'essence hole') {
+        total += item.ess;
+      }
+    }
+    return total;
+  }
+
+  double _calculateBiowareEssence() {
+    if (_currentCharacter?.cyberware == null) return 0.0;
+    
+    double total = 0.0;
+    for (final item in _currentCharacter!.cyberware) {
+      if (item.improvementSource == 'Bioware') {
+        total += item.ess;
+      }
+    }
+    return total;
+  }
+
+  double _calculateEssenceHoleAmount() {
+    if (_currentCharacter?.cyberware == null) return 0.0;
+    
+    double total = 0.0;
+    for (final item in _currentCharacter!.cyberware) {
+      if (item.name.toLowerCase().contains('essence hole')) {
+        total += item.ess;
+      }
+    }
+    return total;
+  }
+
 
   Widget _buildCombatView(BuildContext context) {
     return Card(

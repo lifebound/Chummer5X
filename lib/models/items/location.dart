@@ -6,6 +6,8 @@ const String defaultGearLocationGuid = '00000000-0000-0000-0000-000000000001';
 const String defaultArmorLocationGuid = '00000000-0000-0000-0000-000000000002';
 const String defaultWeaponLocationGuid = '00000000-0000-0000-0000-000000000003';
 const String defaultVehicleLocationGuid = '00000000-0000-0000-0000-000000000004';
+const String defaultCyberwareLocationGuid = '00000000-0000-0000-0000-000000000005';
+const String defaultBiowareLocationGuid = '00000000-0000-0000-0000-000000000006';
 
 final Location defaultGearLocation = Location(
   guid: defaultGearLocationGuid,
@@ -37,6 +39,22 @@ final Location defaultVehicleLocation = Location(
   notes: 'Default location for unassigned vehicles.',
   notesColor: 'LightGray',
   sortOrder: 0,
+);
+
+final Location defaultCyberwareLocation = Location(
+  guid: defaultCyberwareLocationGuid,
+  name: 'Cyberware',
+  notes: 'Cybernetic enhancements',
+  notesColor: 'Blue',
+  sortOrder: 0,
+);
+
+final Location defaultBiowareLocation = Location(
+  guid: defaultBiowareLocationGuid,
+  name: 'Bioware',
+  notes: 'Biological enhancements',
+  notesColor: 'Green',
+  sortOrder: 1,
 );
 
 

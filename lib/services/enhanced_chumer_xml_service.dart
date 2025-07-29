@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:chummer5x/models/expense_entry.dart';
+import 'package:chummer5x/models/items/cyberware.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
@@ -108,19 +109,24 @@ class EnhancedChummerXmlService {
       
       // Parse gear
       final gear = _parseGear(characterElement);
-      final gearLocations = _parseLocations(characterElement, "gearlocations", defaultGearLocationGuid, 'Gear');
+      final gearLocations = _parseLocations(characterElement, "gearlocations", defaultGearLocationGuid, 'Selected Gear');
 
       // parse armor
       final allArmor = _parseArmor(characterElement);
-      final armorLocations = _parseLocations(characterElement, "armorlocations", defaultArmorLocationGuid, 'Armor');
+      final armorLocations = _parseLocations(characterElement, "armorlocations", defaultArmorLocationGuid, 'Selected Armor');
 
       //parse vehicles
       final vehicles = _parseVehicles(characterElement);
-      final vehicleLocations = _parseLocations(characterElement, "vehicleLocations", defaultVehicleLocationGuid, 'Vehicle');
+      final vehicleLocations = _parseLocations(characterElement, "vehicleLocations", defaultVehicleLocationGuid, 'Selected Vehicle');
 
       // parse weapons
       final allWeapons = _parseWeapons(characterElement);
-      final weaponLocations = _parseLocations(characterElement, "weaponLocations", defaultWeaponLocationGuid, 'Weapon');
+      final weaponLocations = _parseLocations(characterElement, "weaponLocations", defaultWeaponLocationGuid, 'Selected Weapon');
+
+      //parse cyberware and bioware
+      final allCyberware = _parseCyberware(characterElement);
+      final cyberwareLocations = _parseLocations(characterElement, "cyberwareLocations", defaultCyberwareLocationGuid, 'Cyberware');
+      cyberwareLocations.addAll(_parseLocations(characterElement, "biowareLocations", defaultBiowareLocationGuid, 'Bioware'));
 
       // Parse condition monitor
       final conditionMonitor = _parseConditionMonitor(characterElement, calculatedValues);
@@ -191,6 +197,8 @@ class EnhancedChummerXmlService {
         armor: allArmor,
         vehicles: vehicles,
         weapons: allWeapons,
+        cyberware: allCyberware,
+        cyberwareLocations: cyberwareLocations
 
       );
     } catch (e) {
@@ -639,7 +647,7 @@ class EnhancedChummerXmlService {
     //create default location if no locations are found
     if (locationsElement == null || locationsElement.children.isEmpty) {
       locations[defaultName] = Location(
-        name: 'Selected $defaultName',
+        name: defaultName,
         guid: defaultLocationGuid,
         notes: '',
         notesColor: '',
@@ -961,5 +969,14 @@ class EnhancedChummerXmlService {
       debugPrint('Error parsing mugshot: $e');
       return null;
     }
+  }
+
+  static List<Cyberware> _parseCyberware(XmlElement characterElement) {
+    final cyberwareElements = characterElement.findElements('cyberwares').firstOrNull;
+    if (cyberwareElements == null ) {
+      return [];
+    }
+    final individualCyberwareElements = cyberwareElements.findElements('cyberware');
+    return individualCyberwareElements.map((e) => Cyberware.fromXml(e)).toList();
   }
 }

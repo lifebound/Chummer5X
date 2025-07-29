@@ -48,7 +48,7 @@ abstract class ShadowrunItem {
   final bool discountedCost;
   final int sortOrder;
   final bool stolen;
-  final int cost;
+  final double cost;
 
   ShadowrunItem({
     this.sourceId,

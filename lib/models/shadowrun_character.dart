@@ -9,6 +9,7 @@ import 'package:chummer5x/models/spells.dart';
 import 'package:chummer5x/models/adept_powers.dart';
 import 'package:chummer5x/models/complex_forms.dart';
 import 'package:chummer5x/models/items/gear.dart';
+import 'package:chummer5x/models/items/cyberware.dart';
 import 'package:chummer5x/models/condition_monitor.dart';
 //import 'package:chummer5x/models/critter_base.dart';
 import 'package:chummer5x/models/spirit.dart';
@@ -67,6 +68,8 @@ class ShadowrunCharacter {
   final Map<String, Location> vehicleLocations; // Added to track vehicle locations
   final List<Weapon> weapons;
   final Map<String, Location> weaponLocations; // Added to track weapon locations
+  final List<Cyberware> cyberware;
+  final Map<String, Location> cyberwareLocations; // Added to track cyberware locations
 
   // Condition Monitor
   final ConditionMonitor conditionMonitor;
@@ -141,6 +144,8 @@ class ShadowrunCharacter {
     this.vehicleLocations = const {}, // Initialize vehicle locations
     this.weapons = const [],
     this.weaponLocations = const {}, // Initialize weapon locations
+    this.cyberware = const [],
+    this.cyberwareLocations = const {}, // Initialize cyberware locations
   }) : attributes = _ensureEssenceAttribute(attributes);
   
   // Static helper method to ensure ESS attribute is always present

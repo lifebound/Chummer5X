@@ -1,0 +1,260 @@
+---
+# .github/workflows/flutter-release.yml
+# Manually triggered workflow to create a new official Flutter release.
+
+name: Flutter Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_level:
+        type: choice
+        description: 'Select the version bump level (major, minor, or patch)'
+        required: true
+        options:
+          - patch
+          - minor
+          - major
+      release_notes:
+        type: textarea
+        description: 'Provide release notes for this version'
+        required: false
+        default: 'Automated release.'
+
+jobs:
+  prepare-version-and-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to push commits and tags
+    outputs:
+      new_version: ${{ steps.versioning.outputs.new_version }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to get full commit history and tags
+
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get Current Version from pubspec.yaml
+        id: get_current_version
+        run: |
+          # Extract version from pubspec.yaml (e.g., 1.0.0+1 -> 1.0.0)
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          echo "Current version from pubspec.yaml: $CURRENT_VERSION"
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Automatic Version Bump
+        id: versioning
+        uses: actions-ecosystem/action-bump-semver@v1
+        with:
+          current_version: ${{ steps.get_current_version.outputs.current_version }}
+          level: ${{ github.event.inputs.bump_level }} # Use the chosen bump level from workflow_dispatch input
+          target_file: pubspec.yaml # Explicitly target pubspec.yaml
+        
+      - name: Get the New Tag
+        run: |
+          echo "New version tag created: v${{ steps.versioning.outputs.new_version }}"
+          echo "new_version=${{ steps.versioning.outputs.new_version }}" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push New Version and Tag
+        uses: actions-js/push@v1
+        with:
+          github_token: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }} # Use your PAT to trigger subsequent workflows
+          branch: main
+          message: 'chore(release): Bump version to v${{ steps.versioning.outputs.new_version }}'
+          tags: true # This will push the new tag created by action-bump-semver
+
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    needs: prepare-version-and-tag # Depends on the versioning job
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Analyze Code
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Run Tests
+        run: flutter test
+
+  build-web:
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Web Release
+        run: flutter build web --release
+      - name: Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-release
+          path: build/web/
+
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+      - name: Install Linux Dependencies
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Linux Release
+        run: flutter build linux
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: build/linux/x64/release/bundle/
+
+  build-windows:
+    runs-on: windows-latest
+    needs: analyze-and-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Windows Release
+        run: flutter build windows
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: build\windows\x64\runner\Release\
+
+  build-android:
+    runs-on: ubuntu-latest
+    needs: analyze-and-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.32.6
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Android APK Release
+        run: flutter build apk --release
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  create-github-release:
+    runs-on: ubuntu-latest
+    needs: [prepare-version-and-tag, build-web, build-linux, build-windows, build-android] # Depends on all previous jobs
+    permissions:
+      contents: write # Required for creating releases
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed to get the tag
+
+      - name: Fetch All Tags
+        run: git fetch --tags # Explicitly fetch all tags from the remote
+
+      - name: Get Latest Tag
+        id: get_tag
+        run: |
+          # Get the latest tag from the repository to use for the release
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
+          echo "Latest tag found: $LATEST_TAG"
+          if [ -z "$LATEST_TAG" ]; then
+            echo "::error::No tag found to create a release from. Exiting."
+            exit 1
+          fi
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Download Web Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-release
+          path: ./web-artifact
+
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-release
+          path: ./linux-artifact
+
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+          path: ./windows-artifact
+
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-release
+          path: ./android-artifact
+
+      - name: Prepare Artifacts for Release
+        run: |
+          # Zip web artifact
+          cd web-artifact
+          zip -r ../web-release.zip ./*
+          cd ..
+
+          # Zip linux artifact
+          cd linux-artifact
+          zip -r ../linux-release.zip ./*
+          cd ..
+
+          # Zip windows artifact
+          cd windows-artifact
+          zip -r ../windows-release.zip ./*
+          cd ..
+
+          # Android APK is already a single file, just move it to root for easy access
+          mv android-artifact/*.apk android-release.apk
+
+          ls -lh # List prepared artifacts for verification
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          name: Release ${{ steps.get_tag.outputs.tag }}
+          body: ${{ github.event.inputs.release_notes }} # Use release notes from workflow_dispatch input
+          files: |
+            web-release.zip
+            linux-release.zip
+            windows-release.zip
+            android-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use default GITHUB_TOKEN for creating the release

@@ -97,8 +97,24 @@ jobs:
           level: ${{ steps.set_bump_level.outputs.bump_level }}
           # The action will read the version from pubspec.yaml by default
         
+      # --- DEBUGGING STEPS START ---
+      - name: Debug - Check Git Status After Bump
+        if: steps.check_release_commit.outputs.is_release_commit == 'false' && steps.set_bump_level.outputs.bump_level != ''
+        run: |
+          echo "--- Git Status After Version Bump ---"
+          git status
+          echo "-------------------------------------"
+
+      - name: Debug - Check Last Commits After Bump
+        if: steps.check_release_commit.outputs.is_release_commit == 'false' && steps.set_bump_level.outputs.bump_level != ''
+        run: |
+          echo "--- Last 2 Commits After Version Bump ---"
+          git log -n 2 --oneline --decorate --graph
+          echo "-----------------------------------------"
+      # --- DEBUGGING STEPS END ---
+
       - name: Get the New Tag
-        # Only run if a new version was successfully bumped
+        # Only run if a new version was successfully bumped (and thus a new commit/tag should exist)
         if: steps.check_release_commit.outputs.is_release_commit == 'false' && steps.versioning.outputs.new_version != ''
         run: |
           echo "New version tag created: v${{ steps.versioning.outputs.new_version }}"

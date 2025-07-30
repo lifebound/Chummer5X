@@ -26,14 +26,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # We need to fetch tags to get the latest version created by auto-tag
+          # fetch-depth: 0 is crucial to get the full commit history and tags.
+          # We explicitly fetch tags in the next step to ensure they are available.
           fetch-depth: 0
+
+      - name: Fetch All Tags
+        run: git fetch --tags # Explicitly fetch all tags from the remote
 
       - name: Get Latest Tag
         id: get_tag
         run: |
           # Get the latest tag from the repository
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          # Use 'git tag --sort=-v:refname | head -n 1' for a more reliable latest tag retrieval
+          # especially if there are multiple tags on the same commit or non-sequential tags.
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
           echo "Latest tag found: $LATEST_TAG"
           if [ -z "$LATEST_TAG" ]; then
             echo "::error::No tag found to create a release from. Exiting."

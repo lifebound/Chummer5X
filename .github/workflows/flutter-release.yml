@@ -16,7 +16,7 @@ on:
           - minor
           - major
       release_notes:
-        type: textarea
+        type: string
         description: 'Provide release notes for this version'
         required: false
         default: 'Automated release.'
@@ -54,7 +54,6 @@ jobs:
         with:
           current_version: ${{ steps.get_current_version.outputs.current_version }}
           level: ${{ github.event.inputs.bump_level }} # Use the chosen bump level from workflow_dispatch input
-          target_file: pubspec.yaml # Explicitly target pubspec.yaml
         
       - name: Get the New Tag
         run: |
@@ -66,7 +65,6 @@ jobs:
         with:
           github_token: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }} # Use your PAT to trigger subsequent workflows
           branch: main
-          message: 'chore(release): Bump version to v${{ steps.versioning.outputs.new_version }}'
           tags: true # This will push the new tag created by action-bump-semver
 
   analyze-and-test:
@@ -184,20 +182,13 @@ jobs:
         with:
           fetch-depth: 0 # Needed to get the tag
 
-      - name: Fetch All Tags
-        run: git fetch --tags # Explicitly fetch all tags from the remote
-
-      - name: Get Latest Tag
+      - name: Get Tag from Previous Job
         id: get_tag
+        # Use the output from the prepare-version-and-tag job directly
         run: |
-          # Get the latest tag from the repository to use for the release
-          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
-          echo "Latest tag found: $LATEST_TAG"
-          if [ -z "$LATEST_TAG" ]; then
-            echo "::error::No tag found to create a release from. Exiting."
-            exit 1
-          fi
-          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          RELEASE_TAG="v${{ needs.prepare-version-and-tag.outputs.new_version }}"
+          echo "Release tag to use: $RELEASE_TAG"
+          echo "tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
 
       - name: Download Web Artifact
         uses: actions/download-artifact@v4
@@ -248,13 +239,13 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get_tag.outputs.tag }}
+          tag_name: ${{ steps.get_tag.outputs.tag }} # Use the specific tag from the prepare-version-and-tag job
           name: Release ${{ steps.get_tag.outputs.tag }}
-          body: ${{ github.event.inputs.release_notes }} # Use release notes from workflow_dispatch input
+          body: ${{ github.event.inputs.release_notes }}
           files: |
             web-release.zip
             linux-release.zip
             windows-release.zip
             android-release.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use default GITHUB_TOKEN for creating the release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

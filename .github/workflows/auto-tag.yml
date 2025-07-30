@@ -29,9 +29,14 @@ jobs:
         run: |
           # Get the last commit message
           COMMIT_MSG=$(git log --format=%B -n 1)
-          echo "Last commit message: $COMMIT_MSG"
-          # Set an output variable for the commit message
-          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "Last commit message (raw):"
+          echo "$COMMIT_MSG"
+          
+          # Set an output variable for the commit message using multi-line syntax
+          # This is crucial for handling commit messages that span multiple lines.
+          echo "commit_msg<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Check if it's a Release Commit
         id: check_release_commit
@@ -39,6 +44,7 @@ jobs:
           # Check if the commit message contains 'chore(release):'
           # This prevents the workflow from triggering itself in an infinite loop
           # after pushing a new version.
+          # Note: We are checking the full commit message here, including the body.
           if echo "${{ steps.get_commit_message.outputs.commit_msg }}" | grep -q 'chore(release):'; then
             echo "::notice::Skipping auto-tagging as this is a release commit."
             echo "is_release_commit=true" >> $GITHUB_OUTPUT
@@ -68,11 +74,12 @@ jobs:
           BUMP_LEVEL="patch" # Default to a patch bump
           
           # Use conditional logic to determine the bump level based on Conventional Commits
+          # We check for 'BREAKING CHANGE' anywhere in the message, and 'feat:' or 'fix:' in the first line.
           if echo "$COMMIT_MSG" | grep -q 'BREAKING CHANGE'; then
             BUMP_LEVEL="major"
-          elif echo "$COMMIT_MSG" | grep -q 'feat:'; then
+          elif echo "$COMMIT_MSG" | head -n 1 | grep -q 'feat:'; then # Check only the first line for feat:
             BUMP_LEVEL="minor"
-          elif echo "$COMMIT_MSG" | grep -q 'fix:'; then
+          elif echo "$COMMIT_MSG" | head -n 1 | grep -q 'fix:'; then # Check only the first line for fix:
             BUMP_LEVEL="patch"
           fi
 
@@ -110,6 +117,6 @@ jobs:
         if: steps.check_release_commit.outputs.is_release_commit == 'false' && steps.versioning.outputs.new_version != ''
         uses: actions-js/push@v1
         with:
-          github_token: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }} # <--- CHANGED THIS LINE
+          github_token: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
           branch: main
           tags: true # This will push the new tag created by action-bump-semver

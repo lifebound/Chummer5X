@@ -1,0 +1,36 @@
+# .github/workflows/auto-tag.yml
+
+name: Auto Versioning & Tagging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_new_tag:
+    runs-on: ubuntu-latest
+    # Grant permissions for the GITHUB_TOKEN to write to the repository
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # This is required for the action to analyze the full git history
+          fetch-depth: 0
+
+      - name: Automatic Version Bump
+        id: versioning
+        uses: phips28/gh-action-bump-version@master
+        # The GITHUB_TOKEN should be passed as an environment variable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Define the tag prefix to match your release workflow
+          tag-prefix: 'v'
+
+      - name: Get the new tag
+        run: |
+          echo "New version tag created: ${{ steps.versioning.outputs.new_version }}"

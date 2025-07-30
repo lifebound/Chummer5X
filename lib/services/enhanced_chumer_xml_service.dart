@@ -27,6 +27,7 @@ import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/mugshot.dart';
 import 'package:chummer5x/models/items/location.dart';
+import 'package:chummer5x/models/contact.dart';
 
 
 class EnhancedChummerXmlService {
@@ -128,6 +129,9 @@ class EnhancedChummerXmlService {
       final cyberwareLocations = _parseLocations(characterElement, "cyberwareLocations", defaultCyberwareLocationGuid, 'Cyberware');
       cyberwareLocations.addAll(_parseLocations(characterElement, "biowareLocations", defaultBiowareLocationGuid, 'Bioware'));
 
+      // Parse contacts
+      final contacts = _parseContacts(characterElement);
+
       // Parse condition monitor
       final conditionMonitor = _parseConditionMonitor(characterElement, calculatedValues);
       
@@ -198,7 +202,8 @@ class EnhancedChummerXmlService {
         vehicles: vehicles,
         weapons: allWeapons,
         cyberware: allCyberware,
-        cyberwareLocations: cyberwareLocations
+        cyberwareLocations: cyberwareLocations,
+        contacts: contacts
 
       );
     } catch (e) {
@@ -978,5 +983,14 @@ class EnhancedChummerXmlService {
     }
     final individualCyberwareElements = cyberwareElements.findElements('cyberware');
     return individualCyberwareElements.map((e) => Cyberware.fromXml(e)).toList();
+  }
+
+  static List<Contact> _parseContacts(XmlElement characterElement) {
+    final contactsElements = characterElement.findElements('contacts').firstOrNull;
+    if (contactsElements == null) {
+      return [];
+    }
+    final individualContactElements = contactsElements.findElements('contact');
+    return individualContactElements.map((e) => Contact.fromXml(e)).toList();
   }
 }

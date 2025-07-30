@@ -24,6 +24,7 @@ import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/armor.dart';
 import 'package:chummer5x/models/items/vehicle.dart';
 import 'package:chummer5x/models/items/weapon.dart';
+import 'package:chummer5x/models/contact.dart';
 
 
 
@@ -70,6 +71,9 @@ class ShadowrunCharacter {
   final Map<String, Location> weaponLocations; // Added to track weapon locations
   final List<Cyberware> cyberware;
   final Map<String, Location> cyberwareLocations; // Added to track cyberware locations
+
+  // Contacts
+  final List<Contact> contacts;
 
   // Condition Monitor
   final ConditionMonitor conditionMonitor;
@@ -146,6 +150,7 @@ class ShadowrunCharacter {
     this.weaponLocations = const {}, // Initialize weapon locations
     this.cyberware = const [],
     this.cyberwareLocations = const {}, // Initialize cyberware locations
+    this.contacts = const [], // Initialize contacts list
   }) : attributes = _ensureEssenceAttribute(attributes);
   
   // Static helper method to ensure ESS attribute is always present

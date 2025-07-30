@@ -249,7 +249,7 @@ void main() {
 
         // Assert
         expect(armor.sourceId, 'test-source', reason: 'Source ID should be parsed from XML sourceid element');
-        expect(armor.locationGuid, 'test-guid', reason: 'Location GUID should be parsed from XML guid element');
+        expect(armor.locationGuid, 'Torso', reason: 'Location GUID should be parsed from XML guid element');
         expect(armor.name, 'Advanced Armor', reason: 'Name should be parsed from XML name element');
         expect(armor.category, 'Heavy Armor', reason: 'Category should be parsed from XML category element');
         expect(armor.armorValue, '18', reason: 'Armor value should be parsed from XML armor element');

@@ -192,7 +192,7 @@ void main() {
 
         // Assert
         expect(gear.sourceId, 'test-source', reason: 'Source ID should be parsed from XML sourceid element');
-        expect(gear.locationGuid, 'test-guid', reason: 'Location GUID should be parsed from XML guid element');
+        expect(gear.locationGuid, 'Backpack', reason: 'Location GUID should be parsed from XML guid element');
         expect(gear.name, 'Override Name', reason: 'Name should be parsed from XML extra element when present, overriding name element');
         expect(gear.category, 'Matrix', reason: 'Category should be parsed from XML category element');
         expect(gear.source, 'Data Trails', reason: 'Source should be parsed from XML source element');

@@ -18,6 +18,7 @@ import 'package:chummer5x/models/initiation.dart';
 import 'package:chummer5x/models/submersion.dart';
 import 'package:chummer5x/models/calendar.dart';
 import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/models/martial_arts.dart';
 import 'package:chummer5x/models/expense_entry.dart';
 import 'package:chummer5x/models/mugshot.dart';
 import 'package:chummer5x/models/items/location.dart';
@@ -59,6 +60,9 @@ class ShadowrunCharacter {
   final List<AdeptPower> adeptPowers;
   final List<InitiationGrade> initiationGrades; // Added for magic users
   final List<SubmersionGrade> submersionGrades; // Added for technomancers
+  
+  // Combat
+  final List<MartialArt> martialArts; // Added for martial arts and techniques
   
   // Equipment
   final List<Gear> gear;
@@ -125,6 +129,7 @@ class ShadowrunCharacter {
     this.sprites = const [], // Initialize sprites list
     this.complexForms = const [],
     this.adeptPowers = const [],
+    this.martialArts = const [],
     this.gear = const [],
     required this.conditionMonitor,
     this.nuyen = 0,
@@ -412,6 +417,7 @@ class ShadowrunCharacter {
     List<Sprite>? sprites,
     List<ComplexForm>? complexForms,
     List<AdeptPower>? adeptPowers,
+    List<MartialArt>? martialArts,
     List<Gear>? gear,
     ConditionMonitor? conditionMonitor,
     int? nuyen,
@@ -448,6 +454,7 @@ class ShadowrunCharacter {
       sprites: sprites ?? this.sprites,
       complexForms: complexForms ?? this.complexForms,
       adeptPowers: adeptPowers ?? this.adeptPowers,
+      martialArts: martialArts ?? this.martialArts,
       gear: gear ?? this.gear,
       conditionMonitor: conditionMonitor ?? this.conditionMonitor,
       nuyen: nuyen ?? this.nuyen,
@@ -471,6 +478,7 @@ class ShadowrunCharacter {
   bool get shouldShowSpritesTab => isTechnomancer;
   bool get shouldShowInitiationGradesTab => isMagician;
   bool get shouldShowSubmersionGradesTab => isTechnomancer;
+  bool get shouldShowMartialArtsTab => martialArts.isNotEmpty; // Show if character has martial arts
   //check if the character has the spell "Bind"
   bool get canFetterSpirit => spells.any((spell) => spell.name == "Bind");
   //technomancers can fetter sprites only if the have the quality "Resonant Stream: Technoshaman"

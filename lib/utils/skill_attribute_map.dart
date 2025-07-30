@@ -1,4 +1,6 @@
-import '../models/shadowrun_character.dart';
+import 'package:flutter/foundation.dart';
+
+import 'package:chummer5x/models/attributes.dart';
 
 /// Mapping of skill names to their associated attributes in Shadowrun 5th Edition
 /// This is used to calculate total skill ratings by adding the base skill + attribute bonus
@@ -164,38 +166,48 @@ String? getSkillAttribute(String skillName) {
 /// Helper function to calculate total skill rating (skill rating + attribute rating + bonuses)
 /// Takes a ShadowrunCharacter and skill name to calculate the total
 /// Handles defaulting: skills with 0 points use attribute-1 if defaulting allowed, 0 if not
-int calculateTotalSkillRating(String skillName, int skillRating, List<Attribute> attributes, {bool isPrioritySkill = false}) {
+/// CM penalty is applied at the end and result cannot go below 0
+int calculateTotalSkillRating(String skillName, int skillRating, List<Attribute> attributes, {bool isPrioritySkill = false, int conditionMonitorPenalty = 0}) {
   final attributeName = getSkillAttribute(skillName);
+  debugPrint('Calculating total skill rating for $skillName with base rating $skillRating, attribute $attributeName, priority skill: $isPrioritySkill, CM penalty: $conditionMonitorPenalty');
   final priorityBonus = isPrioritySkill ? 2 : 0;
   
   // Handle skills with 0 effective skill points (including priority bonus)
   if (skillRating + priorityBonus == 0) {
     if (!skillAllowsDefaulting(skillName)) {
-      // Skill doesn't allow defaulting - total is 0 regardless of attribute
+      debugPrint('Skill $skillName does not allow defaulting and has no points, returning 0');
+      // Skill doesn't allow defaulting - total is 0 regardless of attribute or CM penalty
       return 0;
     } else {
-      // Skill allows defaulting - use attribute - 1 (plus any priority bonus)
+      debugPrint('Skill $skillName allows defaulting, calculating default rating');
+      // Skill allows defaulting - use attribute - 1 (plus any priority bonus), then apply CM penalty
       if (attributeName != null) {
+        debugPrint('Using attribute $attributeName for defaulting calculation');
         try {
           final attribute = attributes.firstWhere(
             (attr) => attr.name.toUpperCase() == attributeName,
           );
-          // For defaulting: attribute - 1 + priority bonus (if any)
-          return (attribute.totalValue.round() - 1) + priorityBonus;
+          debugPrint('Found attribute $attributeName with total value ${attribute.totalValue}');
+          // For defaulting: attribute - 1 + priority bonus + CM penalty, but never below 0
+          final baseDefault = (attribute.totalValue.round() - 1) + priorityBonus;
+          debugPrint('Base default rating: $baseDefault, applying CM penalty: $conditionMonitorPenalty');
+          return (baseDefault + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
         } catch (e) {
-          // If attribute not found, return just the priority bonus (if any)
-          return priorityBonus;
+          debugPrint('Attribute $attributeName not found, returning just priority bonus + CM penalty');
+          // If attribute not found, return just the priority bonus + CM penalty, but never below 0
+          return (priorityBonus + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
         }
       } else {
-        // No attribute mapping found, return just the priority bonus (if any)
-        return priorityBonus;
+        debugPrint((priorityBonus + conditionMonitorPenalty).toString());
+        // No attribute mapping found, return just the priority bonus + CM penalty, but never below 0
+        return (priorityBonus + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
       }
     }
   }
   
   // Normal calculation for skills with effective points (skill + priority > 0)
   var totalRating = skillRating + priorityBonus;
-  
+  debugPrint('Initial total rating (skill + priority): $totalRating');
   // Add attribute bonus if available
   if (attributeName != null) {
     try {
@@ -207,15 +219,16 @@ int calculateTotalSkillRating(String skillName, int skillRating, List<Attribute>
       // If attribute not found, just continue with current total
     }
   }
-  
-  return totalRating;
+  debugPrint('Total rating after adding attribute: $totalRating');
+  // Apply CM penalty and ensure result is never below 0
+  return (totalRating + conditionMonitorPenalty).clamp(0, double.infinity).toInt();
 }
 
 /// Helper function to calculate specialized skill rating (includes +2 for specialization)
 /// Use this when showing the skill with its specialization bonus
 /// Handles defaulting properly - no specialization bonus if skill doesn't allow defaulting and has 0 points
-int calculateSpecializedSkillRating(String skillName, int skillRating, List<Attribute> attributes, {bool isPrioritySkill = false, bool hasSpecialization = false}) {
-  var totalRating = calculateTotalSkillRating(skillName, skillRating, attributes, isPrioritySkill: isPrioritySkill);
+int calculateSpecializedSkillRating(String skillName, int skillRating, List<Attribute> attributes, {bool isPrioritySkill = false, bool hasSpecialization = false, int conditionMonitorPenalty = 0}) {
+  var totalRating = calculateTotalSkillRating(skillName, skillRating, attributes, isPrioritySkill: isPrioritySkill, conditionMonitorPenalty: conditionMonitorPenalty);
   
   // Add specialization bonus (+2), but only if the skill has a usable rating
   // If the skill has 0 total rating (because it doesn't allow defaulting and has no points), no specialization

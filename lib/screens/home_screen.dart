@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: _isLoading ? null : _createSampleCharacter,
+                onPressed: _isLoading ? null : () {},
                 icon: const Icon(Icons.person_add),
                 label: const Text('Create Sample Character'),
                 style: OutlinedButton.styleFrom(
@@ -102,6 +102,42 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              // OutlinedButton.icon(
+              //   onPressed: _isLoading ? null : _createSampleMagician,
+              //   icon: const Icon(Icons.auto_fix_high),
+              //   label: const Text('Create Sample Magician'),
+              //   style: OutlinedButton.styleFrom(
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 30,
+              //       vertical: 15,
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(height: 16),
+              // OutlinedButton.icon(
+              //   onPressed: _isLoading ? null : _createSampleAdept,
+              //   icon: const Icon(Icons.flash_on),
+              //   label: const Text('Create Sample Adept'),
+              //   style: OutlinedButton.styleFrom(
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 30,
+              //       vertical: 15,
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(height: 16),
+              // OutlinedButton.icon(
+              //   onPressed: _isLoading ? null : _createSampleTechnomancer,
+              //   icon: const Icon(Icons.memory),
+              //   label: const Text('Create Sample Technomancer'),
+              //   style: OutlinedButton.styleFrom(
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 30,
+              //       vertical: 15,
+              //     ),
+              //   ),
+              // ),
             ] else ...[
               Card(
                 elevation: 4,
@@ -184,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final filePath = await FileService.pickChumerFile();
       if (filePath != null) {
-        final character = await EnhancedChumerXmlService.parseCharacterFile(filePath);
+        final character = await EnhancedChummerXmlService.parseCharacterFile(filePath);
         if (character != null) {
           setState(() {
             _currentCharacter = character;
@@ -224,119 +260,5 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _createSampleCharacter() {
-    final sampleCharacter = ShadowrunCharacter(
-      name: 'Sample Runner',
-      alias: 'Chrome',
-      metatype: 'Human',
-      skills: [], // Empty for now
-      limits: {}, // Empty for now
-      attributes: [
-        Attribute(
-          name: 'Body',
-          metatypeCategory: 'Physical',
-          totalValue: 4,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 3,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Agility',
-          metatypeCategory: 'Physical',
-          totalValue: 5,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 4,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Reaction',
-          metatypeCategory: 'Physical',
-          totalValue: 4,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 3,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Strength',
-          metatypeCategory: 'Physical',
-          totalValue: 3,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Charisma',
-          metatypeCategory: 'Mental',
-          totalValue: 3,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Intuition',
-          metatypeCategory: 'Mental',
-          totalValue: 4,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 3,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Logic',
-          metatypeCategory: 'Mental',
-          totalValue: 5,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 4,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Willpower',
-          metatypeCategory: 'Mental',
-          totalValue: 3,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 1,
-        ),
-        Attribute(
-          name: 'Edge',
-          metatypeCategory: 'Special',
-          totalValue: 2,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 2,
-          karma: 0,
-        ),
-      ],
-      conditionMonitor: const ConditionMonitor(
-        physicalCM: 10,
-        physicalCMFilled: 2,
-        physicalCMOverflow: 4,
-        stunCM: 10,
-        stunCMFilled: 1,
-      ),
-      magEnabled: false, // Sample character doesn't have magic enabled
-      resEnabled: false, // Sample character doesn't have resonance enabled  
-      depEnabled: false, // Sample character doesn't have depth enabled
-    );
-    
-    setState(() {
-      _currentCharacter = sampleCharacter;
-    });
-  }
+
 }

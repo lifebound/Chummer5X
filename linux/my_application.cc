@@ -46,7 +46,7 @@ static void my_application_activate(GApplication* application) {
   } else {
     gtk_window_set_title(window, "chummer5x");
   }
-
+  gtk_window_set_icon_from_file(GTK_WINDOW(window),"assets/images/chummer5x.png",NULL);
   gtk_window_set_default_size(window, 1280, 720);
   gtk_widget_show(GTK_WIDGET(window));
 

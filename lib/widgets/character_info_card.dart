@@ -17,18 +17,7 @@ class CharacterInfoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    (character.name?.isNotEmpty == true) ? character.name![0].toUpperCase() : '?',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
+                //_buildCharacterAvatar(context),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -77,11 +66,11 @@ class CharacterInfoCard extends StatelessWidget {
 
   Widget _buildInfoGrid(BuildContext context) {
     final infoItems = [
-      if (character.ethnicity?.isNotEmpty == true) ('Ethnicity', character.ethnicity!),
-      if (character.age?.isNotEmpty == true) ('Age', character.age!),
-      if (character.sex?.isNotEmpty == true) ('Sex', character.sex!),
-      if (character.height?.isNotEmpty == true) ('Height', character.height!),
-      if (character.weight?.isNotEmpty == true) ('Weight', character.weight!),
+      // if (character.ethnicity?.isNotEmpty == true) ('Ethnicity', character.ethnicity!),
+      // if (character.age?.isNotEmpty == true) ('Age', character.age!),
+      // if (character.sex?.isNotEmpty == true) ('Sex', character.sex!),
+      // if (character.height?.isNotEmpty == true) ('Height', character.height!),
+      // if (character.weight?.isNotEmpty == true) ('Weight', character.weight!),
       if (character.karma?.isNotEmpty == true) ('Karma', character.karma!),
       if (character.totalKarma?.isNotEmpty == true) ('Total Karma', character.totalKarma!),
       if (character.streetCred?.isNotEmpty == true) ('Street Cred', character.streetCred!),
@@ -110,7 +99,7 @@ class CharacterInfoCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -140,4 +129,34 @@ class CharacterInfoCard extends StatelessWidget {
       },
     );
   }
+
+  // Widget _buildCharacterAvatar(BuildContext context) {
+  //   // If character has a mugshot, display it as a circular avatar
+  //   if (character.mugshot != null) {
+  //     return CircleAvatar(
+  //       radius: 30,
+  //       backgroundImage: MemoryImage(character.mugshot!.imageData),
+  //       backgroundColor: Theme.of(context).colorScheme.primary,
+  //       onBackgroundImageError: (exception, stackTrace) {
+  //         // If image fails to load, fall back to letter avatar
+  //         debugPrint('Failed to load mugshot image: $exception');
+  //       },
+  //       child: null, // No child when showing image
+  //     );
+  //   }
+
+  //   // Fallback to letter avatar when no mugshot is available
+  //   return CircleAvatar(
+  //     radius: 30,
+  //     backgroundColor: Theme.of(context).colorScheme.primary,
+  //     child: Text(
+  //       (character.name?.isNotEmpty == true) ? character.name![0].toUpperCase() : '?',
+  //       style: TextStyle(
+  //         fontSize: 24,
+  //         fontWeight: FontWeight.bold,
+  //         color: Theme.of(context).colorScheme.onPrimary,
+  //       ),
+  //     ),
+  //   );
+  // }
 }

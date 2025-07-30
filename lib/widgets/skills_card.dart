@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import '../models/shadowrun_character.dart';
-import '../utils/skill_attribute_map.dart';
-import '../utils/skill_group_map.dart';
-import '../utils/responsive_layout.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/utils/skill_attribute_map.dart';
+import 'package:chummer5x/models/skills.dart';
+import 'package:chummer5x/utils/skill_group_map.dart';
+import 'package:chummer5x/utils/responsive_layout.dart';
 
 enum SkillOrganization {
-  alphabetical('Alphabetical'),
-  byAttribute('By Attribute'),
-  byCategory('By Category'),
-  bySkillGroup('By Skill Group');
+  none('No Grouping'),
+  alphabetical('Group Alphabetical'),
+  byAttribute('Group By Attribute'),
+  byCategory('Group By Category'),
+  bySkillGroup('Group By Skill Group');
 
   const SkillOrganization(this.displayName);
   final String displayName;
@@ -23,6 +25,16 @@ enum SkillFilter {
   final String displayName;
 }
 
+enum SkillSort {
+  name('Sort by Name'),
+  attribute('Sort by Attribute'),
+  baseSkill('Sort by Base Skill'),
+  totalSkill('Sort by Total Rating');
+
+  const SkillSort(this.displayName);
+  final String displayName;
+}
+
 class SkillsCard extends StatefulWidget {
   final ShadowrunCharacter character;
 
@@ -33,8 +45,10 @@ class SkillsCard extends StatefulWidget {
 }
 
 class _SkillsCardState extends State<SkillsCard> {
-  SkillOrganization _organization = SkillOrganization.alphabetical;
+  SkillOrganization _organization = SkillOrganization.none;
   SkillFilter _filter = SkillFilter.showAll;
+  SkillSort _sort = SkillSort.name;
+  bool _sortReversed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +82,10 @@ class _SkillsCardState extends State<SkillsCard> {
       );
     }
 
-    // Apply filters and organization
+    // Apply filters, sorting, and organization
     final filteredSkills = _filterSkills(skills);
-    final skillGroups = _organizeSkills(filteredSkills);
+    final sortedSkills = _sortSkills(filteredSkills);
+    final skillGroups = _organizeSkills(sortedSkills);
     
     return Card(
       child: Padding(
@@ -96,7 +111,8 @@ class _SkillsCardState extends State<SkillsCard> {
         return skills.where((skill) {
           final baseRating = int.tryParse(skill.base ?? '0') ?? 0;
           final karmaRating = int.tryParse(skill.karma ?? '0') ?? 0;
-          final skillRating = baseRating + karmaRating + skill.skillGroupTotal;
+          final priorityBonus = skill.isPrioritySkill ? 2 : 0;
+          final skillRating = baseRating + karmaRating + skill.skillGroupTotal + priorityBonus;
           return skillRating > 0;
         }).toList();
       
@@ -107,14 +123,84 @@ class _SkillsCardState extends State<SkillsCard> {
             skill.skillGroupTotal, 
             widget.character.attributes, 
             isPrioritySkill: skill.isPrioritySkill,
+            conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
           );
           return totalRating > 0;
         }).toList();
       
       case SkillFilter.showAll:
-      default:
         return skills;
     }
+  }
+
+  List<Skill> _sortSkills(List<Skill> skills) {
+    final sortedList = List<Skill>.from(skills);
+    
+    switch (_sort) {
+      case SkillSort.name:
+        sortedList.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      
+      case SkillSort.attribute:
+        sortedList.sort((a, b) {
+          final attrA = getSkillAttribute(a.name) ?? '';
+          final attrB = getSkillAttribute(b.name) ?? '';
+          final result = attrA.compareTo(attrB);
+          // Secondary sort by name if attributes are the same
+          return result != 0 ? result : a.name.compareTo(b.name);
+        });
+        break;
+      
+      case SkillSort.baseSkill:
+        sortedList.sort((a, b) {
+          final baseA = int.tryParse(a.base ?? '0') ?? 0;
+          final baseB = int.tryParse(b.base ?? '0') ?? 0;
+          final karmaA = int.tryParse(a.karma ?? '0') ?? 0;
+          final karmaB = int.tryParse(b.karma ?? '0') ?? 0;
+          final skillRatingA = baseA + karmaA + a.skillGroupTotal;
+          final skillRatingB = baseB + karmaB + b.skillGroupTotal;
+          final result = skillRatingA.compareTo(skillRatingB);
+          // Secondary sort by name if ratings are the same
+          return result != 0 ? result : a.name.compareTo(b.name);
+        });
+        break;
+      
+      case SkillSort.totalSkill:
+        sortedList.sort((a, b) {
+          final baseA = int.tryParse(a.base ?? '0') ?? 0;
+          final baseB = int.tryParse(b.base ?? '0') ?? 0;
+          final karmaA = int.tryParse(a.karma ?? '0') ?? 0;
+          final karmaB = int.tryParse(b.karma ?? '0') ?? 0;
+          final skillRatingA = baseA + karmaA + a.skillGroupTotal;
+          final skillRatingB = baseB + karmaB + b.skillGroupTotal;
+          
+          final totalA = calculateTotalSkillRating(
+            a.name, 
+            skillRatingA, 
+            widget.character.attributes, 
+            isPrioritySkill: a.isPrioritySkill,
+            conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
+          );
+          final totalB = calculateTotalSkillRating(
+            b.name, 
+            skillRatingB, 
+            widget.character.attributes, 
+            isPrioritySkill: b.isPrioritySkill,
+            conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
+          );
+          
+          final result = totalA.compareTo(totalB);
+          // Secondary sort by name if totals are the same
+          return result != 0 ? result : a.name.compareTo(b.name);
+        });
+        break;
+    }
+    
+    if (_sortReversed) {
+      return sortedList.reversed.toList();
+    }
+    
+    return sortedList;
   }
 
   Map<String, List<Skill>> _organizeSkills(List<Skill> skills) {
@@ -123,6 +209,10 @@ class _SkillsCardState extends State<SkillsCard> {
     for (final skill in skills) {
       String key;
       switch (_organization) {
+        case SkillOrganization.none:
+          key = 'Skills'; // Single group for all skills
+          break;
+          
         case SkillOrganization.byAttribute:
           final attributeName = getSkillAttribute(skill.name);
           key = attributeName ?? 'Unknown Attribute';
@@ -135,20 +225,18 @@ class _SkillsCardState extends State<SkillsCard> {
         case SkillOrganization.bySkillGroup:
           key = skill.skillGroupName.isNotEmpty ? skill.skillGroupName : 'No Skill Group';
           break;
-        
+          
         case SkillOrganization.alphabetical:
-        default:
-          key = 'A'; // All skills under alphabetical go here for now
+          // Group by first letter of skill name
+          key = skill.name.isNotEmpty ? skill.name[0].toUpperCase() : 'Other';
           break;
       }
       
       groups.putIfAbsent(key, () => []).add(skill);
     }
     
-    // Sort each group by skill name
-    for (final group in groups.values) {
-      group.sort((a, b) => a.name.compareTo(b.name));
-    }
+    // Don't re-sort each group since we already sorted the entire list
+    // The organization maintains the overall sort order
     
     return groups;
   }
@@ -163,11 +251,117 @@ class _SkillsCardState extends State<SkillsCard> {
   }
 
   Widget _buildFilterControls(BuildContext context) {
+    final screenSize = ResponsiveLayout.getScreenSize(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Use vertical layout for phones or narrow screens
+    if (screenSize == ScreenSize.phone || screenWidth < 600) {
+      // Vertical layout for phone and narrow screens
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButton<SkillOrganization>(
+                  value: _organization,
+                  isExpanded: true, // Ensures dropdown fills available width
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _organization = value;
+                      });
+                    }
+                  },
+                  items: SkillOrganization.values.map((org) {
+                    return DropdownMenuItem<SkillOrganization>(
+                      value: org,
+                      child: Text(
+                        org.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: DropdownButton<SkillFilter>(
+                  value: _filter,
+                  isExpanded: true, // Ensures dropdown fills available width
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _filter = value;
+                      });
+                    }
+                  },
+                  items: SkillFilter.values.map((filter) {
+                    return DropdownMenuItem<SkillFilter>(
+                      value: filter,
+                      child: Text(
+                        filter.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButton<SkillSort>(
+                  value: _sort,
+                  isExpanded: true, // Ensures dropdown fills available width
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _sort = value;
+                      });
+                    }
+                  },
+                  items: SkillSort.values.map((sort) {
+                    return DropdownMenuItem<SkillSort>(
+                      value: sort,
+                      child: Text(
+                        sort.displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _sortReversed = !_sortReversed;
+                  });
+                },
+                icon: Icon(
+                  _sortReversed ? Icons.arrow_upward : Icons.arrow_downward,
+                  color: _sortReversed 
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                tooltip: _sortReversed ? 'Sort Descending' : 'Sort Ascending',
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+    
+    // Horizontal layout for larger screens
     return Row(
       children: [
         Expanded(
+          flex: 2, // Give more space to organization dropdown
           child: DropdownButton<SkillOrganization>(
             value: _organization,
+            isExpanded: true, // Ensures dropdown fills available width
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -178,15 +372,20 @@ class _SkillsCardState extends State<SkillsCard> {
             items: SkillOrganization.values.map((org) {
               return DropdownMenuItem<SkillOrganization>(
                 value: org,
-                child: Text(org.displayName),
+                child: Text(
+                  org.displayName,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 8), // Reduced spacing
         Expanded(
+          flex: 2, // Give more space to filter dropdown
           child: DropdownButton<SkillFilter>(
             value: _filter,
+            isExpanded: true, // Ensures dropdown fills available width
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -197,10 +396,52 @@ class _SkillsCardState extends State<SkillsCard> {
             items: SkillFilter.values.map((filter) {
               return DropdownMenuItem<SkillFilter>(
                 value: filter,
-                child: Text(filter.displayName),
+                child: Text(
+                  filter.displayName,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
           ),
+        ),
+        const SizedBox(width: 8), // Reduced spacing
+        Expanded(
+          flex: 1, // Less space for sort dropdown
+          child: DropdownButton<SkillSort>(
+            value: _sort,
+            isExpanded: true, // Ensures dropdown fills available width
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  _sort = value;
+                });
+              }
+            },
+            items: SkillSort.values.map((sort) {
+              return DropdownMenuItem<SkillSort>(
+                value: sort,
+                child: Text(
+                  sort.displayName,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(width: 4), // Minimal spacing before icon
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _sortReversed = !_sortReversed;
+            });
+          },
+          icon: Icon(
+            _sortReversed ? Icons.arrow_upward : Icons.arrow_downward,
+            color: _sortReversed 
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          tooltip: _sortReversed ? 'Sort Descending' : 'Sort Ascending',
         ),
       ],
     );
@@ -236,44 +477,32 @@ class _SkillsCardState extends State<SkillsCard> {
       ScreenSize.fourK => 4,
     };
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        childAspectRatio: _getAspectRatio(skills, crossAxisCount),
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: skills.length,
-      itemBuilder: (context, index) => _buildSkillItem(context, skills[index]),
-    );
-  }
-
-  double _getAspectRatio(List<Skill> skills, int crossAxisCount) {
-    // Calculate the maximum number of specializations in any skill
-    final maxSpecializations = skills.fold(0, (max, skill) => 
-      skill.specializations.length > max ? skill.specializations.length : max);
-    
-    // Base aspect ratio
-    double baseRatio = crossAxisCount == 1 ? 4.0 : 3.5;
-    
-    // Adjust for specializations
-    if (maxSpecializations > 0) {
-      if (crossAxisCount == 1) {
-        // On phone, we use compact display, so less height adjustment needed
-        baseRatio = 3.5;
-      } else {
-        // On larger screens, reduce aspect ratio for each specialization
-        final adjustment = maxSpecializations * 0.4;
-        baseRatio = baseRatio - adjustment;
-        
-        // Ensure minimum aspect ratio
-        baseRatio = baseRatio < 2.0 ? 2.0 : baseRatio;
-      }
+    // Use a flexible layout that can handle variable heights
+    if (crossAxisCount == 1) {
+      // On phone, use a simple column for better control
+      return Column(
+        children: skills.map((skill) => Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: _buildSkillItem(context, skill),
+        )).toList(),
+      );
+    } else {
+      // For larger screens, use a staggered grid-like layout
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final itemWidth = (constraints.maxWidth - (8.0 * (crossAxisCount - 1))) / crossAxisCount;
+          
+          return Wrap(
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: skills.map((skill) => SizedBox(
+              width: itemWidth,
+              child: _buildSkillItem(context, skill),
+            )).toList(),
+          );
+        },
+      );
     }
-    
-    return baseRatio;
   }
 
   Widget _buildSkillItem(BuildContext context, Skill skill) {
@@ -291,21 +520,22 @@ class _SkillsCardState extends State<SkillsCard> {
       skillRating, 
       widget.character.attributes, 
       isPrioritySkill: skill.isPrioritySkill,
+      conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
     );
     
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: skill.isPrioritySkill 
-            ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
-            : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+            : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: skill.isPrioritySkill ? 2 : 1,
         ),
       ),
-      child: SingleChildScrollView(
+      child: IntrinsicHeight( // Allow card to expand to fit content
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -328,7 +558,7 @@ class _SkillsCardState extends State<SkillsCard> {
                                   ? Theme.of(context).colorScheme.primary
                                   : Theme.of(context).colorScheme.onSurface,
                               ),
-                              maxLines: 1,
+                              maxLines: 2, // Allow skill name to wrap to 2 lines if needed
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -431,7 +661,7 @@ class _SkillsCardState extends State<SkillsCard> {
       
       parts.add('${attributeValue.round() - 1}'); // Attribute - 1
       if (skill.isPrioritySkill) {
-        parts.add('+2'); // Priority bonus
+        parts.add('2'); // Priority bonus
       }
       
       return Text(
@@ -444,17 +674,19 @@ class _SkillsCardState extends State<SkillsCard> {
     
     // Normal skill calculation (skill + attribute + priority)
     final parts = <String>[];
-    parts.add('$skillRating'); // Skill points      // Add attribute bonus
-      final attributeValue = widget.character.attributes
-          .where((attr) => attr.name.toUpperCase() == attributeName)
-          .firstOrNull?.totalValue ?? 0;
+    parts.add('$skillRating'); // Skill points
+    
+    // Add attribute bonus
+    final attributeValue = widget.character.attributes
+        .where((attr) => attr.name.toUpperCase() == attributeName)
+        .firstOrNull?.totalValue ?? 0;
     if (attributeValue > 0) {
       parts.add('${attributeValue.round()}');
     }
     
     // Add priority bonus if applicable
     if (skill.isPrioritySkill) {
-      parts.add('+2');
+      parts.add('2');
     }
     
     return Text(
@@ -504,6 +736,7 @@ class _SkillsCardState extends State<SkillsCard> {
       widget.character.attributes,
       isPrioritySkill: skill.isPrioritySkill,
       hasSpecialization: true,
+      conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
     );
     
     // Show just the first specialization with count if multiple
@@ -515,7 +748,7 @@ class _SkillsCardState extends State<SkillsCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -557,6 +790,7 @@ class _SkillsCardState extends State<SkillsCard> {
       widget.character.attributes,
       isPrioritySkill: skill.isPrioritySkill,
       hasSpecialization: true,
+      conditionMonitorPenalty: widget.character.conditionMonitorPenalty,
     );
     
     return Container(

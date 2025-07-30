@@ -8,8 +8,8 @@ void main() {
 <character>
   <name>Test Character</name>
   <attributes>
-    <attribute name="Body">
-      <name>Body</name>
+    <attribute>
+      <name>BOD</name>
       <metatypemin>1</metatypemin>
       <metatypemax>6</metatypemax>
       <metatypeaugmax>9</metatypeaugmax>
@@ -18,8 +18,8 @@ void main() {
       <metatypecategory>Physical</metatypecategory>
       <totalvalue>5</totalvalue>
     </attribute>
-    <attribute name="Agility">
-      <name>Agility</name>
+    <attribute>
+      <name>AGI</name>
       <metatypemin>1</metatypemin>
       <metatypemax>6</metatypemax>
       <metatypeaugmax>9</metatypeaugmax>
@@ -31,14 +31,14 @@ void main() {
   </attributes>
 </character>''';
 
-      final character = EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+      final character = EnhancedChummerXmlService.parseCharacterXml(xmlContent);
       
       expect(character?.name, equals('Test Character'));
-      expect(character?.attributes.length, equals(2));
+      expect(character?.attributes.length, equals(3)); // Should include Body, Agility, and Essence default attributes
       
       // Test Body attribute
-      final bodyAttribute = character!.attributes.firstWhere((attr) => attr.name == 'Body');
-      expect(bodyAttribute.name, equals('Body'));
+      final bodyAttribute = character!.attributes.firstWhere((attr) => attr.name == 'BOD');
+      expect(bodyAttribute.name, equals('BOD'));
       expect(bodyAttribute.metatypeCategory, equals('Physical'));
       expect(bodyAttribute.totalValue, equals(5));
       expect(bodyAttribute.metatypeMin, equals(1));
@@ -48,8 +48,8 @@ void main() {
       expect(bodyAttribute.karma, equals(2));
       
       // Test Agility attribute
-      final agilityAttribute = character.attributes.firstWhere((attr) => attr.name == 'Agility');
-      expect(agilityAttribute.name, equals('Agility'));
+      final agilityAttribute = character.attributes.firstWhere((attr) => attr.name == 'AGI');
+      expect(agilityAttribute.name, equals('AGI'));
       expect(agilityAttribute.metatypeCategory, equals('Physical'));
       expect(agilityAttribute.totalValue, equals(5));
       expect(agilityAttribute.metatypeMin, equals(1));
@@ -64,17 +64,17 @@ void main() {
 <character>
   <name>Minimal Character</name>
   <attributes>
-    <attribute name="Body">
+    <attribute>
       <name>Body</name>
       <totalvalue>3</totalvalue>
     </attribute>
   </attributes>
 </character>''';
 
-      final character = EnhancedChumerXmlService.parseCharacterXml(xmlContent);
+      final character = EnhancedChummerXmlService.parseCharacterXml(xmlContent);
       
       expect(character?.name, equals('Minimal Character'));
-      expect(character?.attributes.length, equals(1));
+      expect(character?.attributes.length, equals(2)); // Should still have Body and Essence default attributes
       
       final bodyAttribute = character!.attributes.first;
       expect(bodyAttribute.name, equals('Body'));

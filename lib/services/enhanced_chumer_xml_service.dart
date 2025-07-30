@@ -1,10 +1,36 @@
 import 'dart:io';
+import 'package:chummer5x/models/expense_entry.dart';
+import 'package:chummer5x/models/items/cyberware.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
-import '../models/shadowrun_character.dart';
-import '../utils/skill_group_map.dart';
+import 'package:chummer5x/models/shadowrun_character.dart';
+import 'package:chummer5x/utils/skill_group_map.dart';
+import 'package:chummer5x/models/attributes.dart';
+import 'package:chummer5x/models/condition_monitor.dart';
+import 'package:chummer5x/models/spells.dart';
+import 'package:chummer5x/models/spirit.dart';
+import 'package:chummer5x/models/sprite.dart';
+import 'package:chummer5x/models/complex_forms.dart';
+import 'package:chummer5x/models/items/gear.dart';
+import 'package:chummer5x/models/items/weapon.dart';
+import 'package:chummer5x/models/items/armor.dart';
+import 'package:chummer5x/models/items/vehicle.dart';
+import 'package:chummer5x/models/adept_powers.dart';
+import 'package:chummer5x/models/initiation.dart';
+import 'package:chummer5x/models/submersion.dart';
+import 'package:chummer5x/models/critter_factory.dart';
+import 'package:chummer5x/models/metamagic.dart';
+import 'package:chummer5x/models/skills.dart';
+import 'package:chummer5x/models/qualities.dart';
+import 'package:chummer5x/models/calendar.dart';
+import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/models/mugshot.dart';
+import 'package:chummer5x/models/items/location.dart';
+import 'package:chummer5x/models/contact.dart';
 
-class EnhancedChumerXmlService {
+
+class EnhancedChummerXmlService {
   /// Parse a Chummer XML file and return a comprehensive ShadowrunCharacter
   static Future<ShadowrunCharacter?> parseCharacterFile(String filePath) async {
     try {
@@ -28,7 +54,15 @@ class EnhancedChumerXmlService {
       final characterElement = document.findAllElements('character').first;
       
       // Basic character information
-      final name = _getElementText(characterElement, 'alias') ?? _getElementText(characterElement, 'name');
+      //name is usually name, but if its null or empty, use alias
+
+      String name = _getElementText(characterElement, 'name') ?? _getElementText(characterElement, 'alias') ?? 'Unknown';
+      if(name.isEmpty) {
+        name = _getElementText(characterElement, 'alias') ?? 'Unknown';
+      }
+
+
+      final alias = _getElementText(characterElement, 'alias') ?? name;
       final metatype = _getElementText(characterElement, 'metatype');
       final ethnicity = _getElementText(characterElement, 'ethnicity');
       final age = _getElementText(characterElement, 'age');
@@ -47,6 +81,8 @@ class EnhancedChumerXmlService {
       
       // Parse attributes
       final attributes = _parseAttributes(characterElement);
+
+      final qualities = _parseQualities(characterElement);
       
       // Parse skill groups
       final skillGroups = _parseSkillGroups(characterElement);
@@ -61,17 +97,41 @@ class EnhancedChumerXmlService {
       _checkBrokenSkillGroups(skillGroups, skills);
       
       // Calculate and parse limits
-      final limits = _calculateLimits(attributes, characterElement);
+      //final limits = _calculateLimits(attributes, characterElement);
       
       // Parse magic/resonance content
-      final spells = _parseSpells(characterElement);
+      final spells = parseSpells(characterElement);
       final spirits = _parseSpirits(characterElement);
+      final sprites = _parseSprites(characterElement);
       final complexForms = _parseComplexForms(characterElement);
-      final adeptPowers = _parseAdeptPowers(characterElement);
+      final adeptPowers = parseAdeptPowers(characterElement);
+      final initiationGrades = _parseInitiationGrades(characterElement)[0];
+      final submersionGrades = _parseInitiationGrades(characterElement)[1] as List<SubmersionGrade>;
       
       // Parse gear
       final gear = _parseGear(characterElement);
-      
+      final gearLocations = _parseLocations(characterElement, "gearlocations", defaultGearLocationGuid, 'Selected Gear');
+
+      // parse armor
+      final allArmor = _parseArmor(characterElement);
+      final armorLocations = _parseLocations(characterElement, "armorlocations", defaultArmorLocationGuid, 'Selected Armor');
+
+      //parse vehicles
+      final vehicles = _parseVehicles(characterElement);
+      final vehicleLocations = _parseLocations(characterElement, "vehicleLocations", defaultVehicleLocationGuid, 'Selected Vehicle');
+
+      // parse weapons
+      final allWeapons = _parseWeapons(characterElement);
+      final weaponLocations = _parseLocations(characterElement, "weaponLocations", defaultWeaponLocationGuid, 'Selected Weapon');
+
+      //parse cyberware and bioware
+      final allCyberware = _parseCyberware(characterElement);
+      final cyberwareLocations = _parseLocations(characterElement, "cyberwareLocations", defaultCyberwareLocationGuid, 'Cyberware');
+      cyberwareLocations.addAll(_parseLocations(characterElement, "biowareLocations", defaultBiowareLocationGuid, 'Bioware'));
+
+      // Parse contacts
+      final contacts = _parseContacts(characterElement);
+
       // Parse condition monitor
       final conditionMonitor = _parseConditionMonitor(characterElement, calculatedValues);
       
@@ -80,9 +140,24 @@ class EnhancedChumerXmlService {
       final resEnabled = _getElementText(characterElement, 'resenabled')?.toLowerCase() == 'true';  
       final depEnabled = _getElementText(characterElement, 'depenabled')?.toLowerCase() == 'true';
       
+      // Parse character type flags (for Shadowrun 5e: adept, magician, technomancer)
+      final isAdept = _getElementText(characterElement, 'adept')?.toLowerCase() == 'true';
+      final isMagician = _getElementText(characterElement, 'magician')?.toLowerCase() == 'true';
+      final isTechnomancer = _getElementText(characterElement, 'technomancer')?.toLowerCase() == 'true';
+      
+      // Parse calendar and game notes
+      final calendar = _parseCalendar(characterElement);
+      final gameNotes = _parseGameNotes(characterElement);
+      final allExpenseEntries = _parseExpenseEntries(characterElement);
+      final karmaExpenseEntries = allExpenseEntries.where((entry) => entry.type == ExpenseType.karma).toList();
+      final nuyenExpenseEntries = allExpenseEntries.where((entry) => entry.type == ExpenseType.nuyen).toList();
+      
+      // Parse mugshot
+      final mugshot = _parseMugshot(characterElement);
+      
       return ShadowrunCharacter(
         name: name,
-        alias: name, // In Chummer, alias is often the main name
+        alias: alias, // In Chummer, alias is often the main name
         metatype: metatype,
         ethnicity: ethnicity,
         age: age,
@@ -95,18 +170,41 @@ class EnhancedChumerXmlService {
         karma: karma,
         totalKarma: totalKarma,
         attributes: attributes,
+        qualities: qualities,
         skills: skills,
-        limits: limits,
+        //limits: limits,
         spells: spells,
         spirits: spirits,
+        sprites: sprites,
         complexForms: complexForms,
         adeptPowers: adeptPowers,
         gear: gear,
         conditionMonitor: conditionMonitor,
         nuyen: nuyen,
+        calendar: calendar,
+        gameNotes: gameNotes,
         magEnabled: magEnabled,
         resEnabled: resEnabled,
         depEnabled: depEnabled,
+        isAdept: isAdept,
+        isMagician: isMagician,
+        isTechnomancer: isTechnomancer,
+        initiationGrades: initiationGrades,
+        submersionGrades: submersionGrades,
+        karmaExpenseEntries: karmaExpenseEntries,
+        nuyenExpenseEntries: nuyenExpenseEntries,
+        mugshot: mugshot,
+        gearLocations: gearLocations,
+        vehicleLocations: vehicleLocations,
+        weaponLocations: weaponLocations,
+        armorLocations: armorLocations,
+        armor: allArmor,
+        vehicles: vehicles,
+        weapons: allWeapons,
+        cyberware: allCyberware,
+        cyberwareLocations: cyberwareLocations,
+        contacts: contacts
+
       );
     } catch (e) {
       debugPrint('Error parsing XML: $e');
@@ -131,16 +229,16 @@ class EnhancedChumerXmlService {
         final nameFromAttribute = attributeElement.getAttribute('name');
         final nameFromElement = _getElementText(attributeElement, 'name');
         final name = nameFromAttribute ?? nameFromElement;
-        
-        if (name != null) {
+
+        if (name != null && (name != 'Essence' && name != 'ESS')) { // Skip ESS from XML, it will be hard-coded in constructor
           // Parse all the fields from the XML
           final metatypeCategory = _getElementText(attributeElement, 'metatypecategory') ?? '';
-          final totalValue = int.tryParse(_getElementText(attributeElement, 'totalvalue') ?? '0') ?? 0;
-          final metatypeMin = int.tryParse(_getElementText(attributeElement, 'metatypemin') ?? '0') ?? 0;
-          final metatypeMax = int.tryParse(_getElementText(attributeElement, 'metatypemax') ?? '0') ?? 0;
-          final metatypeAugMax = int.tryParse(_getElementText(attributeElement, 'metatypeaugmax') ?? '0') ?? 0;
-          final base = int.tryParse(_getElementText(attributeElement, 'base') ?? '0') ?? 0;
-          final karma = int.tryParse(_getElementText(attributeElement, 'karma') ?? '0') ?? 0;
+          final totalValue = double.tryParse(_getElementText(attributeElement, 'totalvalue') ?? '0') ?? 0.0;
+          final metatypeMin = double.tryParse(_getElementText(attributeElement, 'metatypemin') ?? '0') ?? 0.0;
+          final metatypeMax = double.tryParse(_getElementText(attributeElement, 'metatypemax') ?? '0') ?? 0.0;
+          final metatypeAugMax = double.tryParse(_getElementText(attributeElement, 'metatypeaugmax') ?? '0') ?? 0.0;
+          final base = double.tryParse(_getElementText(attributeElement, 'base') ?? '0') ?? 0.0;
+          final karma = double.tryParse(_getElementText(attributeElement, 'karma') ?? '0') ?? 0.0;
           
           attributes.add(Attribute(
             name: name,
@@ -155,6 +253,8 @@ class EnhancedChumerXmlService {
         }
       }
     }
+    
+    // ESS will be automatically added by the ShadowrunCharacter constructor
     
     return attributes;
   }
@@ -311,42 +411,8 @@ class EnhancedChumerXmlService {
     }
   }
   
-  static Map<String, LimitDetail> _calculateLimits(List<Attribute> attributes, XmlElement characterElement) {
-    final limits = <String, LimitDetail>{};
-    
-    // Calculate basic limits from attributes
-    int getAttributeValue(String name) {
-      return attributes.firstWhere(
-        (attr) => attr.name.toLowerCase() == name.toLowerCase(),
-        orElse: () => const Attribute(
-          name: '', 
-          metatypeCategory: '', 
-          totalValue: 1,
-          metatypeMin: 1,
-          metatypeMax: 6,
-          metatypeAugMax: 9,
-          base: 1,
-          karma: 0,
-        ),
-      ).totalValue;
-    }
-    
-    final physicalLimit = ((getAttributeValue('Strength') * 2) + getAttributeValue('Body') + getAttributeValue('Reaction')) ~/ 3;
-    final mentalLimit = ((getAttributeValue('Logic') * 2) + getAttributeValue('Intuition') + getAttributeValue('Willpower')) ~/ 3;
-    final socialLimit = ((getAttributeValue('Charisma') * 2) + getAttributeValue('Willpower') + getAttributeValue('Essence')) ~/ 3;
-    
-    limits['Physical'] = LimitDetail(total: physicalLimit, modifiers: []);
-    limits['Mental'] = LimitDetail(total: mentalLimit, modifiers: []);
-    limits['Social'] = LimitDetail(total: socialLimit, modifiers: []);
-    limits['Astral'] = LimitDetail(
-      total: mentalLimit > socialLimit ? mentalLimit : socialLimit,
-      modifiers: [],
-    );
-    
-    return limits;
-  }
   
-  static List<Spell> _parseSpells(XmlElement characterElement) {
+  static List<Spell> parseSpells(XmlElement characterElement) {
     final spells = <Spell>[];
     final spellsElement = characterElement.findElements('spells').firstOrNull;
     
@@ -354,15 +420,25 @@ class EnhancedChumerXmlService {
       for (final spellElement in spellsElement.findElements('spell')) {
         final name = _getElementText(spellElement, 'name');
         final category = _getElementText(spellElement, 'category');
+        final range = _getElementText(spellElement, 'range');
+        //final target = _getElementText(spellElement, 'target');
+        final duration = _getElementText(spellElement, 'duration');
+        final drain = _getElementText(spellElement, 'dv');
+        final source = _getElementText(spellElement, 'source');
         final improvementSource = _getElementText(spellElement, 'improvementsource');
         final grade = _getElementText(spellElement, 'grade');
-        
+        final page = _getElementText(spellElement, 'page');
         if (name != null && category != null) {
           spells.add(Spell(
             name: name,
             category: category,
+            range: range ?? '',
+            duration: duration ?? '',
+            drain: drain ?? '',
+            source: source ?? '',
             improvementSource: improvementSource,
             grade: grade,
+            page: page ?? '',
           ));
         }
       }
@@ -379,16 +455,49 @@ class EnhancedChumerXmlService {
       for (final spiritElement in spiritsElement.findElements('spirit')) {
         final name = _getElementText(spiritElement, 'name');
         final type = _getElementText(spiritElement, 'type');
-        
-        if (name != null && type != null && type != 'Sprite') {
-          spirits.add(Spirit(name: name, type: type));
+        final services = int.tryParse(_getElementText(spiritElement, 'services') ?? '0') ?? 0;
+        final bound = _getElementText(spiritElement, 'bound')?.toLowerCase() == 'true';
+        final fettered = _getElementText(spiritElement, 'fettered')?.toLowerCase() == 'true';
+        final force = int.tryParse(_getElementText(spiritElement, 'force') ?? '') ?? 0;
+        final crittername = _getElementText(spiritElement, 'crittername');
+
+        if (name != null && type != null && type == 'Spirit') {
+          final critter = CritterFactory.generateSpirit(name, force, services, bound, fettered, nameOverride: crittername);
+          if(critter is Spirit){
+            spirits.add(critter);
+          }
+        }
+      }
+    } 
+    return spirits;
+  }
+
+  static List<Sprite> _parseSprites(XmlElement characterElement) {
+    final sprites = <Sprite>[];
+    final spiritsElement = characterElement.findElements('spirits').firstOrNull;
+    
+    if (spiritsElement != null) {
+      for (final spiritElement in spiritsElement.findElements('spirit')) {
+        final name = _getElementText(spiritElement, 'name');
+        final type = _getElementText(spiritElement, 'type');
+        final services = int.tryParse(_getElementText(spiritElement, 'services') ?? '0') ?? 0;
+        final bound = _getElementText(spiritElement, 'bound')?.toLowerCase() == 'true';
+        final fettered = _getElementText(spiritElement, 'fettered')?.toLowerCase() == 'true';
+        final force = int.tryParse(_getElementText(spiritElement, 'force') ?? '') ?? 0;
+        final crittername = _getElementText(spiritElement, 'crittername');
+
+        if (name != null && type != null && type == 'Sprite') {
+          final critter = CritterFactory.generateSprite(name, force, services, bound, fettered, nameOverride: crittername);
+          if(critter is Sprite){
+            sprites.add(critter);
+          }
         }
       }
     }
     
-    return spirits;
+    return sprites;
   }
-  
+
   static List<ComplexForm> _parseComplexForms(XmlElement characterElement) {
     final complexForms = <ComplexForm>[];
     final complexFormsElement = characterElement.findElements('complexforms').firstOrNull;
@@ -396,9 +505,21 @@ class EnhancedChumerXmlService {
     if (complexFormsElement != null) {
       for (final formElement in complexFormsElement.findElements('complexform')) {
         final name = _getElementText(formElement, 'name');
-        
+        final target = _getElementText(formElement, 'target');
+        final duration = _getElementText(formElement, 'duration');
+        final fading = _getElementText(formElement, 'fv');
+        final source = _getElementText(formElement, 'source');
+        final page = _getElementText(formElement, 'page');
+        debugPrint('Parsing complex form: $name, Target: $target, Duration: $duration, Fading: $fading, Source: $source, Page: $page');
         if (name != null) {
-          complexForms.add(ComplexForm(name: name));
+          complexForms.add(ComplexForm(
+            name: name,
+            target: target ?? '',
+            duration: duration ?? '',
+            fading: fading ?? '',
+            source: source ?? '',
+            page: page ?? '',
+          ));
         }
       }
     }
@@ -406,21 +527,42 @@ class EnhancedChumerXmlService {
     return complexForms;
   }
   
-  static List<AdeptPower> _parseAdeptPowers(XmlElement characterElement) {
+  static List<AdeptPower> parseAdeptPowers(XmlElement characterElement) {
     final adeptPowers = <AdeptPower>[];
     final powersElement = characterElement.findElements('powers').firstOrNull;
     
     if (powersElement != null) {
       for (final powerElement in powersElement.findElements('power')) {
         final name = _getElementText(powerElement, 'name');
+        // TODO: Parse rating as int instead of String - ratings are always integers
         final rating = _getElementText(powerElement, 'rating');
         final extra = _getElementText(powerElement, 'extra');
+        final source = _getElementText(powerElement, 'source') ?? '';
+        final page = _getElementText(powerElement, 'page') ?? '';
+        final discounted = _getElementText(powerElement, 'discounted')?.toLowerCase() == 'true';
+        final pointsPerLevel = double.tryParse(_getElementText(powerElement, 'pointsperlevel') ?? '') ?? 0.0;
+        final extraPointCost = double.tryParse(_getElementText(powerElement, 'extrapointcost') ?? '') ?? 0.0;
+        final hasLevels = _getElementText(powerElement, 'levels')?.toLowerCase() == 'true';
+        final maxLevels = int.tryParse(_getElementText(powerElement, 'maxlevels') ?? '0') ?? 0;
+        final action = _getElementText(powerElement, 'action');
+        final bonus = _parseBonus(powerElement);
         
         if (name != null) {
           adeptPowers.add(AdeptPower(
             name: name,
             rating: rating,
             extra: extra,
+            source: source,
+            page: page,
+            discounted: discounted,
+            pointsPerLevel: pointsPerLevel,
+            extraPointCost: extraPointCost,
+            hasLevels: hasLevels,
+            maxLevels: maxLevels,
+            action: action,
+            bonus: bonus,
+
+            
           ));
         }
       }
@@ -428,62 +570,117 @@ class EnhancedChumerXmlService {
     
     return adeptPowers;
   }
-  
+
+  static Map<String, String>? _parseBonus(XmlElement powerElement) {
+    final bonusElement = powerElement.getElement('bonus');
+    if (bonusElement == null) return null;
+
+    final Map<String, String> bonusMap = {};
+
+    for (final child in bonusElement.children.whereType<XmlElement>()) {
+      final key = child.name.local.trim();
+      final value = child.innerText.trim();
+      if (key.isNotEmpty && value.isNotEmpty) {
+        bonusMap[key] = value;
+      }
+    }
+
+    return bonusMap.isEmpty ? null : bonusMap;
+  }
+
   static List<Gear> _parseGear(XmlElement characterElement) {
     final allGear = <Gear>[];
+
     
     // Parse regular gear
     final gearsElement = characterElement.findElements('gears').firstOrNull;
     if (gearsElement != null) {
       for (final gearElement in gearsElement.findElements('gear')) {
-        final gear = _parseGearItem(gearElement);
-        if (gear != null) allGear.add(gear);
+        final gear = Gear.fromXml(gearElement);
+        allGear.add(gear);
       }
-    }
-    
-    // Parse weapons as gear
-    final weaponsElement = characterElement.findElements('weapons').firstOrNull;
-    if (weaponsElement != null) {
-      for (final weaponElement in weaponsElement.findElements('weapon')) {
-        final gear = _parseGearItem(weaponElement);
-        if (gear != null) allGear.add(gear);
-      }
-    }
-    
+    }   
+    return allGear;
+  }
+
+  static List<Armor> _parseArmor(XmlElement characterElement) {
+    final allArmor = <Armor>[];
     // Parse armor as gear
     final armorsElement = characterElement.findElements('armors').firstOrNull;
     if (armorsElement != null) {
       for (final armorElement in armorsElement.findElements('armor')) {
-        final gear = _parseGearItem(armorElement);
-        if (gear != null) allGear.add(gear);
+        final gear = Armor.fromXml(armorElement);
+        allArmor.add(gear);
+      }
+    }
+    return allArmor;
+  }
+  static List<Vehicle> _parseVehicles(XmlElement characterElement) {
+    final allVehicles = <Vehicle>[];
+    final vehiclesElement = characterElement.findElements('vehicles').firstOrNull;
+    
+    if (vehiclesElement != null) {
+      for (final vehicleElement in vehiclesElement.findElements('vehicle')) {
+        final vehicle = Vehicle.fromXml(vehicleElement);
+        allVehicles.add(vehicle);
       }
     }
     
-    return allGear;
+    return allVehicles;
   }
-  
-  static Gear? _parseGearItem(XmlElement gearElement) {
-    final name = _getElementText(gearElement, 'name');
-    final category = _getElementText(gearElement, 'category');
-    final rating = _getElementText(gearElement, 'rating');
-    final equipped = _getElementText(gearElement, 'equipped') == 'True';
-    final quantity = _getElementText(gearElement, 'quantity');
-    final source = _getElementText(gearElement, 'source') ?? '';
-    final guid = _getElementText(gearElement, 'guid');
+
+  static List<Weapon> _parseWeapons(XmlElement characterElement) {
+    final allWeapons = <Weapon>[];
+    final weaponsElement = characterElement.findElements('weapons').firstOrNull;
     
-    if (name != null) {
-      return Gear(
-        guid: guid,
-        name: name,
-        category: category,
-        rating: rating,
-        equipped: equipped,
-        quantity: quantity,
-        source: source,
-      );
+    if (weaponsElement != null) {
+      for (final weaponElement in weaponsElement.findElements('weapon')) {
+        final weapon = Weapon.fromXml(weaponElement);
+        allWeapons.add(weapon);
+      }
     }
     
-    return null;
+    return allWeapons;
+  }
+
+
+
+  static Map<String, Location> _parseLocations(XmlElement characterElement, String locationType, String defaultLocationGuid, String defaultName) {
+    final locations = <String, Location>{};
+    final locationsElement = characterElement.findElements(locationType).firstOrNull;
+    
+    //create default location if no locations are found
+    if (locationsElement == null || locationsElement.children.isEmpty) {
+      locations[defaultName] = Location(
+        name: defaultName,
+        guid: defaultLocationGuid,
+        notes: '',
+        notesColor: '',
+        sortOrder: 0
+      );
+    }
+    if (locationsElement != null) {
+      for (final locationElement in locationsElement.findElements('location')) {
+        final guid = _getElementText(locationElement, 'guid');
+        final name = _getElementText(locationElement, 'name');
+        final description = _getElementText(locationElement, 'notes');
+        final type = _getElementText(locationElement, 'type');
+        final notesColor = _getElementText(locationElement, 'notesColor');
+        final sortOrder = int.tryParse(_getElementText(locationElement, 'sortorder') ?? '0') ?? 0;
+
+        if (name != null && description != null && type != null) {
+          locations[name] = Location(
+            name: name,
+            guid: guid ?? defaultLocationGuid,
+            notes: description,
+            notesColor: notesColor ?? '',
+            sortOrder: sortOrder,
+          );
+        }
+      }
+    }
+    
+    return locations;
   }
   
   static ConditionMonitor _parseConditionMonitor(XmlElement characterElement, Map<String, dynamic> calculatedValues) {
@@ -505,5 +702,295 @@ class EnhancedChumerXmlService {
       calculatedValues[element.name.local] = element.innerText;
     }
     return calculatedValues;
+  }
+
+  static List<Quality> _parseQualities(XmlElement characterElement) {
+    final qualities = <Quality>[];
+    final qualitiesElement = characterElement.findElements('qualities').firstOrNull;
+    
+    if (qualitiesElement != null) {
+      for (final qualityElement in qualitiesElement.findElements('quality')) {
+        final name = _getElementText(qualityElement, 'name');
+        final source = _getElementText(qualityElement, 'source') ?? '';
+        final page = _getElementText(qualityElement, 'page') ?? '';
+        final karmaCost = int.tryParse(_getElementText(qualityElement, 'bp') ?? '0') ?? 0;
+        final qualityTypeStr = _getElementText(qualityElement, 'qualitytype')?.toLowerCase() ?? '';
+        final qualityType = qualityTypeStr == 'positive' ? QualityType.positive : QualityType.negative;
+
+        if (name != null) {
+          qualities.add(Quality(
+            name: name,
+            source: source,
+            page: page,
+            karmaCost: karmaCost,
+            qualityType: qualityType,
+          ));
+        }
+      }
+    }
+    
+    return qualities;
+  }
+
+  static List<List<InitiationGrade>> _parseInitiationGrades(XmlElement characterElement){
+    debugPrint('Parsing initiation grades...');
+    final initiationGrades = <InitiationGrade>[];
+    final submersionGrades = <SubmersionGrade>[];
+
+    final gradesElement = characterElement.findElements('initiationgrades').firstOrNull;
+    
+    if (gradesElement != null) {
+
+      for (final gradeElement in gradesElement.findElements('initiationgrade')) {
+        debugPrint('Parsing grade element: $gradeElement');
+        bool isResEnabled = _getElementText(gradeElement, 'res') == 'True';
+        
+        final grade = int.tryParse(_getElementText(gradeElement, 'grade') ?? '0') ?? 0;
+        final ordeal = _getElementText(gradeElement, 'ordeal')?.toLowerCase() == 'true';
+        final group = _getElementText(gradeElement,"group")?.toLowerCase() == 'true';
+        final schooling = _getElementText(gradeElement, 'schooling')?.toLowerCase() == 'true';
+
+        if(isResEnabled){
+          debugPrint('Adding to submersion grades: $grade');
+          submersionGrades.add(SubmersionGrade(
+            grade: grade,
+            ordeal: ordeal,
+            group: group,
+            schooling: schooling,
+            metamagics: <Metamagic>[],
+          ));
+        }
+        else{
+          debugPrint('Adding to initiation grades: $grade');
+          initiationGrades.add(InitiationGrade(
+            grade: grade,
+            ordeal: ordeal,
+            group: group,
+            schooling: schooling,
+            metamagics: <Metamagic>[],
+          ));
+        }
+      }
+      final metamagics = _parseMetamagics(characterElement);
+
+        //go through all the returned metamagics; if their improvementSouce is 'Echo',
+        //we'll handle it with the SubmersionGrades; if not, we'll handle it with the Initiation Grades
+        for (Metamagic metamagic in metamagics) {
+          debugPrint('metamagic name: ${metamagic.name}');
+          if (metamagic.improvementSource.toLowerCase() == 'echo') {
+            //find the submersion grade that matches the current grade
+            try{
+              debugPrint('${metamagic.name} is an Echo, adding to the list');
+              final matchingGrade = submersionGrades.where((grade) => grade.grade == metamagic.grade);
+              matchingGrade.firstOrNull?.metamagics.add(metamagic);
+            }
+            catch(e){
+              debugPrint("echo ${metamagic.name} failed to attach to submersion");
+            }
+            
+          } else {
+            try{
+              debugPrint('${metamagic.name} is not an Echo');
+              final matchingGrade = initiationGrades.where((grade) => grade.grade == metamagic.grade);
+              matchingGrade.firstOrNull?.metamagics.add(metamagic);
+            }
+            catch(e) {
+              debugPrint("${metamagic.name} failed to attach to initiation");
+            }
+            
+          }
+        }
+
+    }
+    debugPrint('Total initiation grades: ${initiationGrades.length}, Total submersion grades: ${submersionGrades.length}');
+    return [initiationGrades, submersionGrades];
+  }
+
+  static List<Metamagic> _parseMetamagics(XmlElement characterElement) {
+    final metamagics = <Metamagic>[];
+
+    metamagics.addAll(_parseMetamagicType(characterElement, 'metamagic'));
+    //run the same logic for Arts, Enchantments, Enhancements, and Rituals, and put them into the same list
+    metamagics.addAll(_parseMetamagicType(characterElement, 'art'));
+
+
+    final enchantmentsElement = characterElement.findElements('spells').firstOrNull;
+    debugPrint('Parsing enchantments...');
+    if (enchantmentsElement != null) {
+      debugPrint('Found enchantments element, processing spells...');
+      for (final enchantmentElement in enchantmentsElement.findElements('spell')) {
+        final category = _getElementText(enchantmentElement, 'category');
+        debugPrint('Processing enchantment: ${_getElementText(enchantmentElement, 'name')} with category $category');
+        if (category == null && category?.toLowerCase() != 'enchantments' && category?.toLowerCase() != 'rituals') {
+          debugPrint('Skipping non-enchantment spell: ${_getElementText(enchantmentElement, 'name')}');
+          continue;
+        }
+        final name = _getElementText(enchantmentElement, 'name');
+        //final descriptor = _getElementText(enchantmentElement, 'descriptors') ?? '';
+        final trueName = '$category: $name';
+        final source = _getElementText(enchantmentElement, 'source') ?? '';
+        final page = _getElementText(enchantmentElement, 'page') ?? '';
+        final improvementSource = _getElementText(enchantmentElement, 'improvementsource') ?? '';
+        final grade = _getElementText(enchantmentElement, 'grade');
+        debugPrint('name: $name, source: $source, page: $page, improvement source: $improvementSource, grade: $grade');
+        if (name != null) {
+          metamagics.add(Metamagic(
+            name: trueName,
+            source: source,
+            page: page,
+            improvementSource: improvementSource,
+            grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+          ));
+        }
+      }
+    }
+
+
+    final enhancementsElement = characterElement.findElements('enhancements').firstOrNull;
+    if (enhancementsElement != null) {
+      for (final enhancementElement in enhancementsElement.findElements('enhancement')) {
+        final name = _getElementText(enhancementElement, 'name');
+        final source = _getElementText(enhancementElement, 'source') ?? '';
+        final page = _getElementText(enhancementElement, 'page') ?? '';
+        final improvementSource = _getElementText(enhancementElement, 'improvementsource') ?? '';
+        final grade = _getElementText(enhancementElement, 'grade');
+        debugPrint('name: $name, source: $source, page: $page, improvement source: $improvementSource, grade: $grade');
+        if (name != null) {
+          metamagics.add(Metamagic(
+            name: name,
+            source: source,
+            page: page,
+            improvementSource: improvementSource,
+            grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+          ));
+        }
+      }
+    }
+
+    return metamagics;
+  }
+  static List<Metamagic> _parseMetamagicType(XmlElement characterElement, String type) {
+    final metamagics = <Metamagic>[];
+    final metamagicsElement = characterElement.findElements('${type}s').firstOrNull;
+    
+    if (metamagicsElement != null) {
+      for (final metamagicElement in metamagicsElement.findElements(type)) {
+        final name = _getElementText(metamagicElement, 'name');
+        final source = _getElementText(metamagicElement, 'source') ?? '';
+        final page = _getElementText(metamagicElement, 'page') ?? '';
+        final improvementSource = _getElementText(metamagicElement, 'improvementsource') ?? '';
+        final grade = _getElementText(metamagicElement, 'grade');
+        
+        if (name != null) {
+          metamagics.add(Metamagic(
+            name: name,
+            source: source,
+            page: page,
+            improvementSource: improvementSource,
+            grade: grade != null ? int.tryParse(grade) ?? 0 : 0,
+          ));
+        }
+      }
+    } 
+    return metamagics;
+  }
+  
+  /// Parse calendar from XML
+  static Calendar? _parseCalendar(XmlElement characterElement) {
+    final calendarElement = characterElement.findElements('calendar').firstOrNull;
+    if (calendarElement == null) return null;
+    
+    final weeks = <CalendarWeek>[];
+    
+    for (final weekElement in calendarElement.findElements('week')) {
+      final guid = _getElementText(weekElement, 'guid') ?? '';
+      final year = int.tryParse(_getElementText(weekElement, 'year') ?? '0') ?? 0;
+      final week = int.tryParse(_getElementText(weekElement, 'week') ?? '0') ?? 0;
+      final notes = _getElementText(weekElement, 'notes');
+      final notesColor = _getElementText(weekElement, 'notesColor');
+      
+      weeks.add(CalendarWeek(
+        guid: guid,
+        year: year,
+        week: week,
+        notes: notes?.trim().isEmpty == true ? null : notes,
+        notesColor: notesColor,
+      ));
+    }
+    
+    return Calendar(weeks: weeks);
+  }
+  
+  /// Parse game notes from XML
+  static GameNotes? _parseGameNotes(XmlElement characterElement) {
+    final gameNotesElement = characterElement.findElements('gamenotes').firstOrNull;
+    if (gameNotesElement == null) return null;
+    
+    final rtfContent = gameNotesElement.innerText;
+    if (rtfContent.trim().isEmpty) return null;
+    
+    return GameNotes.fromRtf(rtfContent);
+  }
+  static List<ExpenseEntry> _parseExpenseEntries(XmlElement characterElement) {
+    debugPrint('Parsing expense entries...');
+    final entries = <ExpenseEntry>[];
+    final expenseEntriesElement = characterElement.findElements('expenses').firstOrNull;
+
+    if (expenseEntriesElement != null) {
+      for (final entryElement in expenseEntriesElement.findElements('expense')) {
+          var exp = ExpenseEntry.fromXml(entryElement);
+          entries.add(exp);
+          debugPrint('Parsed expense entry: ${exp.toString()}');
+
+      }
+    }
+    return entries;
+  }
+
+  /// Parse mugshot from XML - extracts first mugshot from \<mugshots\> element
+  static Mugshot? _parseMugshot(XmlElement characterElement) {
+    try {
+      final mugshotsElement = characterElement.findElements('mugshots').firstOrNull;
+      if (mugshotsElement == null) {
+        return null;
+      }
+
+      final mugshotElements = mugshotsElement.findElements('mugshot');
+      if (mugshotElements.isEmpty) {
+        return null;
+      }
+
+      // Get the first mugshot element
+      final firstMugshot = mugshotElements.first;
+      final base64Data = firstMugshot.innerText.trim();
+      
+      if (base64Data.isEmpty) {
+        return null;
+      }
+
+      // Create mugshot from base64 data - format detection happens automatically
+      return Mugshot.fromBase64(base64Data);
+    } catch (e) {
+      debugPrint('Error parsing mugshot: $e');
+      return null;
+    }
+  }
+
+  static List<Cyberware> _parseCyberware(XmlElement characterElement) {
+    final cyberwareElements = characterElement.findElements('cyberwares').firstOrNull;
+    if (cyberwareElements == null ) {
+      return [];
+    }
+    final individualCyberwareElements = cyberwareElements.findElements('cyberware');
+    return individualCyberwareElements.map((e) => Cyberware.fromXml(e)).toList();
+  }
+
+  static List<Contact> _parseContacts(XmlElement characterElement) {
+    final contactsElements = characterElement.findElements('contacts').firstOrNull;
+    if (contactsElements == null) {
+      return [];
+    }
+    final individualContactElements = contactsElements.findElements('contact');
+    return individualContactElements.map((e) => Contact.fromXml(e)).toList();
   }
 }

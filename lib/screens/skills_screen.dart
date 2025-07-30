@@ -199,6 +199,7 @@ class SkillsScreen extends StatelessWidget {
                   title: Text(power.name),
                   subtitle: power.extra != null ? Text(power.extra!) : null,
                   trailing: power.rating != null 
+                      // TODO: power.rating should be int, not String - remove toString() when fixed
                       ? Text('Rating ${power.rating}')
                       : null,
                 );
@@ -236,16 +237,14 @@ class SkillsScreen extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  title: Text(item.name?.toString() ?? 'Unknown Item'),
+                  title: Text(item.name.toString()),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (item.category != null)
-                        Text('Category: ${item.category}'),
-                      if (item.rating != null)
-                        Text('Rating: ${item.rating}'),
-                      if (item.quantity != null)
-                        Text('Quantity: ${item.quantity}'),
+                      Text('Category: ${item.category}'),
+                      // TODO: Remove toString() when item.rating becomes int properly
+                      Text('Rating: ${item.rating}'),
+                      Text('Quantity: ${item.qty}'),
                     ],
                   ),
                   trailing: item.equipped 

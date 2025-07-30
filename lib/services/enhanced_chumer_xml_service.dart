@@ -17,6 +17,7 @@ import 'package:chummer5x/models/items/weapon.dart';
 import 'package:chummer5x/models/items/armor.dart';
 import 'package:chummer5x/models/items/vehicle.dart';
 import 'package:chummer5x/models/adept_powers.dart';
+import 'package:chummer5x/models/martial_arts.dart';
 import 'package:chummer5x/models/initiation.dart';
 import 'package:chummer5x/models/submersion.dart';
 import 'package:chummer5x/models/critter_factory.dart';
@@ -105,6 +106,7 @@ class EnhancedChummerXmlService {
       final sprites = _parseSprites(characterElement);
       final complexForms = _parseComplexForms(characterElement);
       final adeptPowers = parseAdeptPowers(characterElement);
+      final martialArts = _parseMartialArts(characterElement);
       final initiationGrades = _parseInitiationGrades(characterElement)[0];
       final submersionGrades = _parseInitiationGrades(characterElement)[1] as List<SubmersionGrade>;
       
@@ -178,6 +180,7 @@ class EnhancedChummerXmlService {
         sprites: sprites,
         complexForms: complexForms,
         adeptPowers: adeptPowers,
+        martialArts: martialArts,
         gear: gear,
         conditionMonitor: conditionMonitor,
         nuyen: nuyen,
@@ -569,6 +572,61 @@ class EnhancedChummerXmlService {
     }
     
     return adeptPowers;
+  }
+
+  static List<MartialArt> _parseMartialArts(XmlElement characterElement) {
+    final martialArts = <MartialArt>[];
+    
+    final martialArtsElements = characterElement.findElements('martialarts');
+    for (final element in martialArtsElements) {
+      final martialArtElements = element.findElements('martialart');
+      
+      for (final martialArtElement in martialArtElements) {
+        try {
+          // Create a map from the XML element for easier parsing
+          final martialArtData = <String, dynamic>{};
+          
+          // Parse basic martial art info
+          for (final child in martialArtElement.children.whereType<XmlElement>()) {
+            final key = child.name.local.trim();
+            final value = child.innerText.trim();
+            
+            if (key == 'martialarttechniques') {
+              // Handle techniques separately
+              martialArtData[key] = _parseMartialArtTechniques(child);
+            } else {
+              martialArtData[key] = value;
+            }
+          }
+          
+          martialArts.add(MartialArt.fromXml(martialArtData));
+        } catch (e) {
+          debugPrint('Error parsing martial art: $e');
+        }
+      }
+    }
+    
+    return martialArts;
+  }
+
+  static Map<String, dynamic> _parseMartialArtTechniques(XmlElement techniquesElement) {
+    final techniquesList = <Map<String, dynamic>>[];
+    
+    final techniqueElements = techniquesElement.findElements('martialarttechnique');
+    
+    for (final techniqueElement in techniqueElements) {
+      final techniqueData = <String, dynamic>{};
+      
+      for (final child in techniqueElement.children.whereType<XmlElement>()) {
+        final key = child.name.local.trim();
+        final value = child.innerText.trim();
+        techniqueData[key] = value;
+      }
+      
+      techniquesList.add(techniqueData);
+    }
+    
+    return {'martialarttechnique': techniquesList};
   }
 
   static Map<String, String>? _parseBonus(XmlElement powerElement) {

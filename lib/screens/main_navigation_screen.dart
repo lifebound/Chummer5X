@@ -18,6 +18,7 @@ import '../widgets/profile_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:chummer5x/models/spells.dart';
 import 'package:chummer5x/models/complex_forms.dart';
+import 'package:chummer5x/models/martial_arts.dart';
 import 'package:chummer5x/models/adept_powers.dart';
 import 'package:chummer5x/models/qualities.dart';
 import 'package:chummer5x/models/initiation.dart';
@@ -43,6 +44,7 @@ enum NavigationSection {
   spells,
   spirits,
   adeptPowers,
+  martialArts,
   complexForms,
   sprites,
   initiationGrades,
@@ -120,15 +122,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildCharacterContent(BuildContext context) {
-    // For Notes and Gear sections, use minimal constraints to maximize space usage
-    if (_currentSection == NavigationSection.notes || _currentSection == NavigationSection.gear || _currentSection == NavigationSection.vehiclesAndDrones || _currentSection == NavigationSection.cyberwareBioware) {
+    // For Notes, Gear, and Martial Arts sections, use minimal constraints and top alignment to maximize space usage
+    if (_currentSection == NavigationSection.notes || 
+        _currentSection == NavigationSection.gear || 
+        _currentSection == NavigationSection.vehiclesAndDrones || 
+        _currentSection == NavigationSection.cyberwareBioware ||
+        _currentSection == NavigationSection.martialArts) {
       return Padding(
-        padding: const EdgeInsets.all(8.0), // Minimal padding for tabbed sections
+        padding: const EdgeInsets.all(8.0), // Minimal padding for full-height sections
         child: _buildCurrentView(context),
       );
     }
 
-    // For other sections, use standard responsive layout
+    // For other sections, use standard responsive layout with center alignment
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -293,6 +299,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 NavigationSection.adeptPowers,
                 Icons.flash_on,
                 'Adept Powers',
+              ),
+            if (_currentCharacter!.shouldShowMartialArtsTab)
+              _buildNavigationTile(
+                context,
+                NavigationSection.martialArts,
+                Icons.sports_martial_arts,
+                'Martial Arts',
               ),
             if (_currentCharacter!.shouldShowComplexFormsTab)
               _buildNavigationTile(
@@ -609,6 +622,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return _buildSpiritsView(context);
       case NavigationSection.adeptPowers:
         return _buildAdeptPowersView(context);
+      case NavigationSection.martialArts:
+        return _buildMartialArtsView(context);
       case NavigationSection.complexForms:
         return _buildComplexFormsView(context);
       case NavigationSection.sprites:
@@ -827,6 +842,196 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       singularLabel: 'adept power',
       emptyMessage: 'No adept powers known',
       itemBuilder: _buildAdeptPowersCard,
+    );
+  }
+
+  Widget _buildMartialArtsView(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Martial Arts',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          if (_currentCharacter!.martialArts.isEmpty)
+            SizedBox(
+              height: 200, // Fixed height for the empty state
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.sports_martial_arts,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No martial arts known',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            ..._currentCharacter!.martialArts.map((martialArt) => 
+              _buildMartialArtCard(context, martialArt),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMartialArtCard(BuildContext context, MartialArt martialArt) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: ExpansionTile(
+        leading: Icon(
+          Icons.sports_martial_arts,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        title: Text(
+          martialArt.name,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        subtitle: Row(
+          children: [
+            if (martialArt.cost > 0) ...[
+              _buildMartialArtChip(context, 'Cost', '${martialArt.cost} Karma'),
+              const SizedBox(width: 8),
+            ],
+            if (martialArt.source.isNotEmpty)
+              _buildMartialArtChip(context, 'Source', '${martialArt.source}${martialArt.page.isNotEmpty ? ' p${martialArt.page}' : ''}'),
+          ],
+        ),
+        children: [
+          if (martialArt.techniques.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Techniques:',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            ...martialArt.techniques.map((technique) => 
+              _buildTechniqueListItem(context, technique)
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (martialArt.notes.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Text(
+                  martialArt.notes,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTechniqueListItem(BuildContext context, MartialArtTechnique technique) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.auto_fix_high,
+            size: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  technique.name,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (technique.source.isNotEmpty || technique.page.isNotEmpty)
+                  Text(
+                    '${technique.source}${technique.page.isNotEmpty ? ' p${technique.page}' : ''}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                if (technique.notes.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    technique.notes,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMartialArtChip(BuildContext context, String label, String value) {
+    return Chip(
+      label: Text(
+        '$label: $value',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      labelStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onPrimaryContainer,
+        fontSize: 12,
+      ),
     );
   }
 

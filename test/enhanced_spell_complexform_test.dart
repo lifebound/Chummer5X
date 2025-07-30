@@ -15,7 +15,7 @@ void main() {
           duration: 'Instant',
           drain: 'Force - 3',
           source: 'SR5 283',
-          page : '283',
+          page: '283',
           category: 'Combat',
         );
 

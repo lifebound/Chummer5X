@@ -64,7 +64,7 @@ void main() {
       });
       test('should parse spell from XML data', () {
         const xmlData = '''<?xml version="1.0" encoding="utf-8"?>
-          "<character>
+          <character>
           <spells>
             <spell>
               <sourceid>37b3d6ac-624a-42d4-bd6e-a12142dc5725</sourceid>

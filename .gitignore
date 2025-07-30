@@ -11,6 +11,7 @@
 migrate_working_dir/
 RESPONSIVE_DESIGN.md
 generate_coverage.sh
+.github/copilot-instructions.md
 
 # IntelliJ related
 *.iml

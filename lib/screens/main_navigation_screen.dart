@@ -3,7 +3,6 @@ import 'package:chummer5x/models/items/armor.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 import 'package:chummer5x/models/items/vehicle.dart';
 import 'package:chummer5x/models/items/cyberware.dart';
-import 'package:chummer5x/models/items/location.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -28,6 +27,7 @@ import 'package:chummer5x/models/critter_base.dart';
 import 'package:chummer5x/models/spirit.dart';
 import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/screens/contacts_screen.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
 import 'package:chummer5x/widgets/shadowrun_item_location_tree_view.dart';
@@ -1272,25 +1272,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Cyberware/Bioware',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              Row(
-                children: [
-                  _buildEssenceChip(context, 'Total Essence', (totalEssence - cyberwareEssence - biowareEssence - essenceHoleAmount).toStringAsFixed(2)),
-                  const SizedBox(width: 8),
-                  _buildEssenceChip(context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
-                  const SizedBox(width: 8),
-                  _buildEssenceChip(context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
-                  const SizedBox(width: 8),
-                  _buildEssenceChip(context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
-                ],
-              ),
-            ],
+          // Make the header section responsive
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final shouldWrap = constraints.maxWidth < 800; // Breakpoint for wrapping
+              
+              if (shouldWrap) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Cyberware/Bioware',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEssenceChipsWrap(context, totalEssence.toDouble(), cyberwareEssence, biowareEssence, essenceHoleAmount),
+                  ],
+                );
+              } else {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Cyberware/Bioware',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    _buildEssenceChipsRow(context, totalEssence.toDouble(), cyberwareEssence, biowareEssence, essenceHoleAmount),
+                  ],
+                );
+              }
+            },
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -1304,10 +1315,41 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
+  Widget _buildEssenceChipsRow(BuildContext context, double totalEssence, double cyberwareEssence, double biowareEssence, double essenceHoleAmount) {
+    return Row(
+      children: [
+        _buildEssenceChip(context, 'Total Essence', (totalEssence - cyberwareEssence - biowareEssence - essenceHoleAmount).toStringAsFixed(2)),
+        const SizedBox(width: 8),
+        _buildEssenceChip(context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
+        const SizedBox(width: 8),
+        _buildEssenceChip(context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
+        const SizedBox(width: 8),
+        _buildEssenceChip(context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
+      ],
+    );
+  }
+
+  Widget _buildEssenceChipsWrap(BuildContext context, double totalEssence, double cyberwareEssence, double biowareEssence, double essenceHoleAmount) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _buildEssenceChip(context, 'Total Essence', (totalEssence - cyberwareEssence - biowareEssence - essenceHoleAmount).toStringAsFixed(2)),
+        _buildEssenceChip(context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
+        _buildEssenceChip(context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
+        _buildEssenceChip(context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
+      ],
+    );
+  }
+
 
   Widget _buildEssenceChip(BuildContext context, String label, String value) {
     return Chip(
-      label: Text('$label: $value'),
+      label: Text(
+        '$label: $value',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       labelStyle: TextStyle(
         color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -1322,7 +1364,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     double total = 0.0;
     for (final item in _currentCharacter!.cyberware) {
       if (item.improvementSource == 'Cyberware' && item.name.toLowerCase() != 'essence hole') {
-        total += item.ess;
+        total += item.ess.toDouble();
       }
     }
     return total;
@@ -1334,7 +1376,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     double total = 0.0;
     for (final item in _currentCharacter!.cyberware) {
       if (item.improvementSource == 'Bioware') {
-        total += item.ess;
+        total += item.ess.toDouble();
       }
     }
     return total;
@@ -1346,12 +1388,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     double total = 0.0;
     for (final item in _currentCharacter!.cyberware) {
       if (item.name.toLowerCase().contains('essence hole')) {
-        total += item.ess;
+        total += item.ess.toDouble();
       }
     }
     return total;
   }
-
 
   Widget _buildCombatView(BuildContext context) {
     return Card(
@@ -1376,24 +1417,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildContactsView(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Contacts',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Contacts section coming soon...',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
+    return ContactsScreen(
+      contacts: _currentCharacter?.contacts ?? [],
+      onAddContact: () {
+        // TODO: Implement add contact functionality
+        if (kDebugMode) {
+          print('Add contact requested');
+        }
+      },
+      onEditContact: (contact) {
+        // TODO: Implement edit contact functionality
+        if (kDebugMode) {
+          print('Edit contact requested: ${contact.name}');
+        }
+      },
+      onDeleteContact: (contact) {
+        // TODO: Implement delete contact functionality
+        if (kDebugMode) {
+          print('Delete contact requested: ${contact.name}');
+        }
+      },
     );
   }
 

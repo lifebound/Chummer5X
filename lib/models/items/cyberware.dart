@@ -150,8 +150,9 @@ class Cyberware extends ShadowrunItem {
       }
       return names;
     }
-
-    final improvementSource = getText(xmlElement, 'improvementsource') ?? 'Cyberware'; // Default to Cyberware
+    try
+    {
+      final improvementSource = getText(xmlElement, 'improvementsource') ?? 'Cyberware'; // Default to Cyberware
 
     
     //get the value of improvementSource. if its 'cyberware', set locationGuid to defaultCyberwareLocationGuid. if its 'bioware', set locationGuid to defaultBiowareLocationGuid.
@@ -250,6 +251,13 @@ class Cyberware extends ShadowrunItem {
       sortOrder: getInt(xmlElement, 'sortorder'),
       locationGuid: locationGuid,
     );
+    }
+    catch (e)
+    {
+      debugPrint('Error occurred while parsing: ${getText(xmlElement, 'name')}');
+      rethrow;
+    }
+    
   }
 
   @override
@@ -306,6 +314,8 @@ class Cyberware extends ShadowrunItem {
   }
 
   static String _calculateAvailability(Grade gradeType, int rating, String availText) {
+    debugPrint('📊 Calculating availability - Grade: ${gradeType.name}, Rating: $rating, AvailText: "$availText"');
+    
     // availability has a few options on how it can be formatted, so we need to handle that.
     //it can be a simple number (eg: "10"), it can a number and a restriction indicator (eg: "10R"),
     // or it can be a formulaa like "Rating + 2" or "Rating - 1".
@@ -314,38 +324,69 @@ class Cyberware extends ShadowrunItem {
     //first check if we're using FixedValues, which is a special case.
     //we need that value to continue parsing the availability.
     if(availText.contains(RegExp(r'FixedValues\('))) {
+      debugPrint('  - Found FixedValues pattern');
       // Parse the fixed values and return the value corresponding to the rating
       availText = _parseFixedValue(availText, rating).toString();
+      debugPrint('  - Resolved FixedValues to: $availText');
     }
 
     String avail;
+    String availRestriction = '';
 
-      var context = ContextModel()
+    var context = ContextModel()
         ..bindVariableName('Rating', Number(rating)); // Bind the variable name "Rating" to the rating value
-    if (availText.contains(RegExp(r'[+-/*\\/]'))) {
+    
+    // Check if we have a formula enclosed in parentheses with trailing restriction
+    final parenthesesMatch = RegExp(r'^\(([^)]+)\)([a-zA-Z]*)$').firstMatch(availText);
+    if (parenthesesMatch != null) {
+      debugPrint('  - Found parentheses pattern');
+      final formulaInside = parenthesesMatch.group(1)!;
+      availRestriction = parenthesesMatch.group(2) ?? '';
+      debugPrint('  - Formula inside parentheses: "$formulaInside"');
+      debugPrint('  - Restriction after parentheses: "$availRestriction"');
+      
+      // Parse the formula inside the parentheses
+      final expression = GrammarParser().parse(formulaInside.replaceAll(' ', ''));
+      final evaluator = RealEvaluator(context);
+      avail = evaluator.evaluate(expression).toString();
+      debugPrint('  - Formula result: $avail');
+    } else if (availText.contains(RegExp(r'[+-/*\\/]'))) {
+      debugPrint('  - Found formula pattern, parsing expression');
       // Parse the formula, e.g., "Rating + 2"
       final expression = GrammarParser().parse(availText.replaceAll(' ', '')); // Remove spaces for parsing
 
       
       final evaluator = RealEvaluator(context);
       avail = evaluator.evaluate(expression).toString(); // Evaluate the expression
+      debugPrint('  - Formula result: $avail');
     } else {
       avail = availText; // Directly use the text if no formula
+      debugPrint('  - Using direct value: $avail');
     }
     // now we need to split the availability into a number and a restriction indicator if it has one.
-    final availParts = avail.split(RegExp(r'(?<=[0-9])(?=[a-zA-Z])'));
-    final availNumber = availParts[0];
-    final availRestriction = availParts.length > 1 ? availParts[1] : '';
+    // But only if we didn't already extract the restriction from parentheses
+    if (availRestriction.isEmpty) {
+      final availParts = avail.split(RegExp(r'(?<=[0-9])(?=[a-zA-Z])'));
+      final availNumber = availParts[0];
+      availRestriction = availParts.length > 1 ? availParts[1] : '';
+      avail = availNumber; // Use just the numeric part
+      debugPrint('  - Split availability - Number: $availNumber, Restriction: $availRestriction');
+    } else {
+      debugPrint('  - Using restriction from parentheses - Number: $avail, Restriction: $availRestriction');
+    }
 
     // the cyberware grade availability is a string, so we need to use that with math_expressions to modify the availNumber
     final gradeAvail = gradeType.avail;
+    debugPrint('  - Grade availability modifier: $gradeAvail');
     String finalAvail;
-    final availExpression = GrammarParser().parse('$availNumber + $gradeAvail');
+    final availExpression = GrammarParser().parse('$avail + $gradeAvail');
     final availEvaluator = RealEvaluator(context);
     final availResult = availEvaluator.evaluate(availExpression);
     finalAvail = availResult.toInt().toString();
 
-    return finalAvail + availRestriction;
+    final result = finalAvail + availRestriction;
+    debugPrint('  - Final availability: $result');
+    return result;
   }
   static double _calculateEssence(Grade gradeType, int rating, String essenceText) {
 

@@ -647,6 +647,7 @@ class EnhancedChummerXmlService {
   }
 
   static List<Gear> _parseGear(XmlElement characterElement) {
+    debugPrint('Parsing gear...');
     final allGear = <Gear>[];
 
     
@@ -657,11 +658,13 @@ class EnhancedChummerXmlService {
         final gear = Gear.fromXml(gearElement);
         allGear.add(gear);
       }
-    }   
+    } 
+    debugPrint('Parsed ${allGear.length} gear items.');  
     return allGear;
   }
 
   static List<Armor> _parseArmor(XmlElement characterElement) {
+    debugPrint('Parsing armor...');
     final allArmor = <Armor>[];
     // Parse armor as gear
     final armorsElement = characterElement.findElements('armors').firstOrNull;
@@ -671,9 +674,11 @@ class EnhancedChummerXmlService {
         allArmor.add(gear);
       }
     }
+    debugPrint('Parsed ${allArmor.length} armor items.');
     return allArmor;
   }
   static List<Vehicle> _parseVehicles(XmlElement characterElement) {
+    debugPrint('Parsing vehicles...');
     final allVehicles = <Vehicle>[];
     final vehiclesElement = characterElement.findElements('vehicles').firstOrNull;
     
@@ -683,11 +688,12 @@ class EnhancedChummerXmlService {
         allVehicles.add(vehicle);
       }
     }
-    
+    debugPrint('Parsed ${allVehicles.length} vehicle items.');
     return allVehicles;
   }
 
   static List<Weapon> _parseWeapons(XmlElement characterElement) {
+    debugPrint('Parsing weapons...');
     final allWeapons = <Weapon>[];
     final weaponsElement = characterElement.findElements('weapons').firstOrNull;
     
@@ -697,13 +703,14 @@ class EnhancedChummerXmlService {
         allWeapons.add(weapon);
       }
     }
-    
+    debugPrint('Parsed ${allWeapons.length} weapon items.');
     return allWeapons;
   }
 
 
 
   static Map<String, Location> _parseLocations(XmlElement characterElement, String locationType, String defaultLocationGuid, String defaultName) {
+    debugPrint('Parsing locations of type: $locationType');
     final locations = <String, Location>{};
     final locationsElement = characterElement.findElements(locationType).firstOrNull;
     
@@ -737,21 +744,23 @@ class EnhancedChummerXmlService {
         }
       }
     }
-    
+    debugPrint('Parsed ${locations.length} locations of type $locationType');
     return locations;
   }
   
   static ConditionMonitor _parseConditionMonitor(XmlElement characterElement, Map<String, dynamic> calculatedValues) {
+    debugPrint('Parsing condition monitor...');
     // Create a map with all the root-level character data
     final rootData = <String, dynamic>{};
     for (final element in characterElement.children.whereType<XmlElement>()) {
       rootData[element.name.local] = element.innerText;
     }
-    
+    debugPrint('exiting CM parse');
     return ConditionMonitor.fromXml(rootData, calculatedValues);
   }
 
   static Map<String, dynamic> _parseCalculatedValues(XmlElement characterElement) {
+    debugPrint('Parsing calculated values...');
     final calculatedValuesElement = characterElement.findElements('calculatedvalues').firstOrNull;
     if (calculatedValuesElement == null) return {};
     
@@ -759,10 +768,12 @@ class EnhancedChummerXmlService {
     for (final element in calculatedValuesElement.children.whereType<XmlElement>()) {
       calculatedValues[element.name.local] = element.innerText;
     }
+    debugPrint('Parsed ${calculatedValues.length} calculated values.');
     return calculatedValues;
   }
 
   static List<Quality> _parseQualities(XmlElement characterElement) {
+    debugPrint('Parsing qualities...');
     final qualities = <Quality>[];
     final qualitiesElement = characterElement.findElements('qualities').firstOrNull;
     
@@ -786,7 +797,7 @@ class EnhancedChummerXmlService {
         }
       }
     }
-    
+    debugPrint('Parsed ${qualities.length} qualities.');
     return qualities;
   }
 
@@ -865,6 +876,7 @@ class EnhancedChummerXmlService {
   }
 
   static List<Metamagic> _parseMetamagics(XmlElement characterElement) {
+    debugPrint('Parsing metamagics...');
     final metamagics = <Metamagic>[];
 
     metamagics.addAll(_parseMetamagicType(characterElement, 'metamagic'));
@@ -924,10 +936,11 @@ class EnhancedChummerXmlService {
         }
       }
     }
-
+    debugPrint('Parsed ${metamagics.length} metamagics.');
     return metamagics;
   }
   static List<Metamagic> _parseMetamagicType(XmlElement characterElement, String type) {
+    debugPrint('Parsing metamagics of type: $type');
     final metamagics = <Metamagic>[];
     final metamagicsElement = characterElement.findElements('${type}s').firstOrNull;
     
@@ -950,11 +963,13 @@ class EnhancedChummerXmlService {
         }
       }
     } 
+    debugPrint('Parsed ${metamagics.length} metamagics of type $type.');
     return metamagics;
   }
   
   /// Parse calendar from XML
   static Calendar? _parseCalendar(XmlElement characterElement) {
+    debugPrint('Parsing calendar...');
     final calendarElement = characterElement.findElements('calendar').firstOrNull;
     if (calendarElement == null) return null;
     
@@ -975,18 +990,20 @@ class EnhancedChummerXmlService {
         notesColor: notesColor,
       ));
     }
-    
+    debugPrint('Parsed ${weeks.length} calendar weeks.');
     return Calendar(weeks: weeks);
   }
   
   /// Parse game notes from XML
   static GameNotes? _parseGameNotes(XmlElement characterElement) {
+    debugPrint('Parsing game notes...');
     final gameNotesElement = characterElement.findElements('gamenotes').firstOrNull;
     if (gameNotesElement == null) return null;
     
     final rtfContent = gameNotesElement.innerText;
     if (rtfContent.trim().isEmpty) return null;
     
+    debugPrint('Game notes RTF content: $rtfContent');
     return GameNotes.fromRtf(rtfContent);
   }
   static List<ExpenseEntry> _parseExpenseEntries(XmlElement characterElement) {
@@ -1002,19 +1019,23 @@ class EnhancedChummerXmlService {
 
       }
     }
+    debugPrint('Parsed ${entries.length} expense entries.');
     return entries;
   }
 
   /// Parse mugshot from XML - extracts first mugshot from \<mugshots\> element
   static Mugshot? _parseMugshot(XmlElement characterElement) {
+    debugPrint('Parsing mugshot...');
     try {
       final mugshotsElement = characterElement.findElements('mugshots').firstOrNull;
       if (mugshotsElement == null) {
+        debugPrint('No mugshots element found.');
         return null;
       }
 
       final mugshotElements = mugshotsElement.findElements('mugshot');
       if (mugshotElements.isEmpty) {
+        debugPrint('No mugshot elements found.');
         return null;
       }
 
@@ -1023,9 +1044,10 @@ class EnhancedChummerXmlService {
       final base64Data = firstMugshot.innerText.trim();
       
       if (base64Data.isEmpty) {
+        debugPrint('No base64 data found for mugshot.');
         return null;
       }
-
+      debugPrint('Found mugshot base64 data: ${base64Data.substring(0, 20)}...'); // Log first 20 chars for brevity
       // Create mugshot from base64 data - format detection happens automatically
       return Mugshot.fromBase64(base64Data);
     } catch (e) {
@@ -1035,20 +1057,26 @@ class EnhancedChummerXmlService {
   }
 
   static List<Cyberware> _parseCyberware(XmlElement characterElement) {
+    debugPrint('Parsing cyberware...');
     final cyberwareElements = characterElement.findElements('cyberwares').firstOrNull;
     if (cyberwareElements == null ) {
+      debugPrint('No cyberware elements found.');
       return [];
     }
     final individualCyberwareElements = cyberwareElements.findElements('cyberware');
+    debugPrint('Parsed ${individualCyberwareElements.length} cyberware entries.');
     return individualCyberwareElements.map((e) => Cyberware.fromXml(e)).toList();
   }
 
   static List<Contact> _parseContacts(XmlElement characterElement) {
+    debugPrint('Parsing contacts...');
     final contactsElements = characterElement.findElements('contacts').firstOrNull;
     if (contactsElements == null) {
+      debugPrint('No contacts elements found.');
       return [];
     }
     final individualContactElements = contactsElements.findElements('contact');
+    debugPrint('Parsed ${individualContactElements.length} contact entries.');
     return individualContactElements.map((e) => Contact.fromXml(e)).toList();
   }
 }

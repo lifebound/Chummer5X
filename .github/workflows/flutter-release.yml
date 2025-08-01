@@ -24,7 +24,6 @@ jobs:
           prefix: "release/prod/"
           fallback: 0.0.1+0
 
-
       - name: Calculate semver
         id: semantic_release_info
         uses: cycjimmy/semantic-release-action@v3.2.0
@@ -75,13 +74,18 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.32.6
-      - run: flutter pub get
-      - run: flutter build apk --release
-      - uses: actions/upload-artifact@v4
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Android APK Release
+        run: flutter build apk --release
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -90,14 +94,24 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.32.6
-      - run: flutter pub get
-      - run: flutter build linux
-      - run: zip -r linux.zip build/linux
-      - uses: actions/upload-artifact@v4
+      - name: Install Linux Dependencies
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Linux Release
+        run: flutter build linux --release
+      - name: Zip Linux Artifact
+        run: zip -r linux-snapshot.zip build/linux/x64/release/bundle
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: linux-release
           path: linux.zip
@@ -106,14 +120,22 @@ jobs:
     needs: release
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.32.6
-      - run: flutter pub get
-      - run: flutter build windows
-      - run: Compress-Archive -Path build/windows -DestinationPath windows.zip
-      - uses: actions/upload-artifact@v4
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+      - name: Build Windows Release
+        run: flutter build windows --release
+      - name: Zip Windows Artifact
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath windows-snapshot.zip
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: windows-release
           path: windows.zip
@@ -121,7 +143,6 @@ jobs:
   build-macos:
     needs: release
     runs-on: macos-13
-
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
@@ -148,7 +169,6 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-
           path: dist
 
       - name: Upload to GitHub Release

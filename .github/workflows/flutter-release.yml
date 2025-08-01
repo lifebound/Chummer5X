@@ -24,6 +24,7 @@ jobs:
           prefix: "release/prod/"
           fallback: 0.0.1+0
 
+
       - name: Calculate semver
         id: semantic_release_info
         uses: cycjimmy/semantic-release-action@v3.2.0
@@ -120,6 +121,7 @@ jobs:
   build-macos:
     needs: release
     runs-on: macos-13
+
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
@@ -146,6 +148,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
+
           path: dist
 
       - name: Upload to GitHub Release

@@ -1,11 +1,11 @@
 ---
-# File: .github/workflows/snapshot-ci.yml
+# File: .github/workflows/flutter-snapshot-ci.yml
 name: Snapshot CI
 
 on:
   push:
     branches:
-      - development # Trigger on pushes to the development branch
+      - develop # Trigger on pushes to the development branch
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   schedule:
@@ -31,11 +31,13 @@ jobs:
         run: flutter pub get
       - name: Build Web Release
         run: flutter build web
+      - name: Zip Web Artifact
+        run: zip -r web.zip build/web/
       - name: Upload Web Artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-snapshot
-          path: build/web/
+          path: web.zip
           retention-days: 1 # Keep artifacts for a short period
 
   build-android:
@@ -75,11 +77,13 @@ jobs:
         run: flutter pub get
       - name: Build Linux Release
         run: flutter build linux
+      - name: Zip Linux Artifact
+        run: zip -r linux.zip build/linux/x64/release/bundle
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-snapshot
-          path: build/linux/x64/release/bundle/
+          path: linux.zip
           retention-days: 1
 
   build-windows:
@@ -107,7 +111,7 @@ jobs:
   build-macos:
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
          flutter-version: 3.32.6
@@ -120,11 +124,23 @@ jobs:
           path: macos.zip
   
   upload-artifacts:
+    if: github.event_name == 'push'
     needs: [build-web, build-android, build-linux, build-windows, build-macos]
     name: Upload Snapshot Artifacts
     runs-on: ubuntu-latest
     steps:
-      - uses: softprops/action-gh-release@v1
+      - name: Delete existing snapshot tag and release (if any)
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        with:
+          tag_name: snapshot-latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download Snapshot Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist
+      - name: Upload to GitHub Snapshot Release
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: snapshot-latest
           name: "Daily Snapshot Build (${{ github.sha }})"
@@ -146,9 +162,9 @@ jobs:
             Please test thoroughly and report any issues.
           prerelease: true
           files: |
-            web-snapshot.zip
-            linux-snapshot.zip
-            windows-snapshot.zip
-            android-snapshot.apk
-            macos-snapshot.zip
+            dist/web-snapshot/web.zip
+            dist/linux-snapshot/linux.zip
+            dist/windows-snapshot/windows.zip
+            dist/android-snapshot/app-release.apk
+            dist/macos-snapshot/macos.zip
 

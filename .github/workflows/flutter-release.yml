@@ -1,4 +1,4 @@
-# File: .github/workflows/release.yml
+# File: .github/workflows/flutter-release.yml
 name: Release Production Build
 
 on:
@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_pubspec_version: ${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }}
+      release_notes: ${{ steps.semantic_release_info.outputs.new_release_notes }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -90,6 +91,7 @@ jobs:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
 
+
   build-linux:
     needs: release
     runs-on: ubuntu-latest
@@ -109,7 +111,7 @@ jobs:
       - name: Build Linux Release
         run: flutter build linux --release
       - name: Zip Linux Artifact
-        run: zip -r linux-snapshot.zip build/linux/x64/release/bundle
+        run: zip -r linux.zip build/linux/x64/release/bundle
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -133,7 +135,7 @@ jobs:
       - name: Build Windows Release
         run: flutter build windows --release
       - name: Zip Windows Artifact
-        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath windows-snapshot.zip
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath windows.zip
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:

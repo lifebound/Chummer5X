@@ -113,7 +113,7 @@ jobs:
          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build macos
-      - run: zip -r macos.zip build/macos/Build/Products/Release/Runner.app
+      - run: zip -r macos.zip build/macos/Build/Products/Release/chummer5x.app
       - uses: actions/upload-artifact@v4
         with:
           name: macos-snapshot

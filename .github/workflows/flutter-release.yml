@@ -65,7 +65,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build web --release
       - run: zip -r web.zip build/web
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: web-release
           path: web.zip
@@ -80,7 +80,7 @@ jobs:
           flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build apk --release
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -96,7 +96,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build linux
       - run: zip -r linux.zip build/linux
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-release
           path: linux.zip
@@ -112,7 +112,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build windows
       - run: Compress-Archive -Path build/windows -DestinationPath windows.zip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-release
           path: windows.zip

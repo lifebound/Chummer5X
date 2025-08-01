@@ -24,11 +24,12 @@ jobs:
           prefix: "release/prod/"
           fallback: 0.0.1+0
 
+
       - name: Calculate semver
         id: semantic_release_info
         uses: cycjimmy/semantic-release-action@v3.2.0
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_AUTOMATOR_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
         with:
           semantic_version: 19
 
@@ -52,7 +53,7 @@ jobs:
         with:
           tag: "release/prod/${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }}"
           message: "Production release ${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }}"
-          github_token: ${{ secrets.RELEASE_AUTOMATOR_PAT }}
+          github_token: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
 
   build-web:
     needs: release
@@ -61,11 +62,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build web --release
       - run: zip -r web.zip build/web
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: web-release
           path: web.zip
@@ -77,10 +78,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build apk --release
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -92,11 +93,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build linux
       - run: zip -r linux.zip build/linux
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-release
           path: linux.zip
@@ -108,11 +109,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build windows
       - run: Compress-Archive -Path build/windows -DestinationPath windows.zip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-release
           path: windows.zip
@@ -120,15 +121,16 @@ jobs:
   build-macos:
     needs: release
     runs-on: macos-13
+
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
+          flutter-version: 3.32.6
       - run: flutter pub get
       - run: flutter build macos --release
       - run: zip -r macos.zip build/macos/Build/Products/Release/Runner.app
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: macos-release
           path: macos.zip
@@ -144,8 +146,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
+
           path: dist
 
       - name: Upload to GitHub Release

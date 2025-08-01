@@ -28,7 +28,7 @@ jobs:
         id: semantic_release_info
         uses: cycjimmy/semantic-release-action@v3.2.0
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_AUTOMATOR_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
         with:
           semantic_version: 19
 
@@ -52,7 +52,7 @@ jobs:
         with:
           tag: "release/prod/${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }}"
           message: "Production release ${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }}"
-          github_token: ${{ secrets.RELEASE_AUTOMATOR_PAT }}
+          github_token: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
 
   build-web:
     needs: release

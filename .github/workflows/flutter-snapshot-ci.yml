@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - develop # Trigger on pushes to the development branch
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
   schedule:
     # Runs daily at 00:00 UTC (adjust as needed)
     - cron: '0 0 * * *'
@@ -134,7 +132,7 @@ jobs:
         with:
           tag_name: snapshot-latest
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
       - name: Download Snapshot Artifacts
         uses: actions/download-artifact@v4
         with:

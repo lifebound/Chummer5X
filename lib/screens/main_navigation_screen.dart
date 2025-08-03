@@ -899,41 +899,41 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       ),
       child: ExpansionTile(
-        leading: Icon(
-          Icons.sports_martial_arts,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        title: Text(
-          martialArt.name,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        subtitle: Row(
-          children: [
-            if (martialArt.cost > 0) ...[
-              _buildMartialArtChip(context, 'Cost', '${martialArt.cost} Karma'),
-              const SizedBox(width: 8),
-            ],
-            if (martialArt.source.isNotEmpty)
-              _buildMartialArtChip(context, 'Source', '${martialArt.source}${martialArt.page.isNotEmpty ? ' p${martialArt.page}' : ''}'),
-          ],
-        ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (martialArt.techniques.isNotEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Techniques:',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+          Text(
+            'Martial Arts',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          if (_currentCharacter!.martialArts.isEmpty)
+            SizedBox(
+              height: 200, // Fixed height for the empty state
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            )
+          else
+            ..._currentCharacter!.martialArts.map((martialArt) => 
+              _buildMartialArtCard(context, martialArt),
             ),
+        ],
+      ),
+    );
             ...martialArt.techniques.map((technique) => 
               _buildTechniqueListItem(context, technique)
             ),

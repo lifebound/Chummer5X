@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xml/xml.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 
 void main() {
@@ -450,6 +451,58 @@ void main() {
         expect(weapon.wirelessOn, true, reason: 'wirelessOn should be parsed as true');
         expect(weapon.stolen, true, reason: 'stolen should be parsed as true');
         expect(weapon.discountedCost, true, reason: 'discountedCost should be parsed as true');
+      });
+
+      test('XmlElement.parseList parses multiple Weapon items from <weapons>', () {
+        // Arrange
+        final xmlString = '''
+          <root>
+            <weapons>
+              <weapon>
+                <name>Weapon One</name>
+                <category>Pistol</category>
+                <type>Ranged</type>
+                <damage>5P</damage>
+                <ap>0</ap>
+                <mode>SA</mode>
+                <ammo>10(c)</ammo>
+                <firingmode>SA</firingmode>
+                <accuracy>5</accuracy>
+                <source>Core</source>
+                <page>420</page>
+                <avail>4R</avail>
+              </weapon>
+              <weapon>
+                <name>Weapon Two</name>
+                <category>SMG</category>
+                <type>Ranged</type>
+                <damage>7P</damage>
+                <ap>-1</ap>
+                <mode>BF</mode>
+                <ammo>30(c)</ammo>
+                <firingmode>BF</firingmode>
+                <accuracy>6</accuracy>
+                <source>Core</source>
+                <page>421</page>
+                <avail>5R</avail>
+              </weapon>
+            </weapons>
+          </root>
+        ''';
+        final document = XmlDocument.parse(xmlString);
+        final root = document.rootElement;
+
+        // Act
+        final weapons = root.parseList<Weapon>(
+          collectionTagName: 'weapons',
+          itemTagName: 'weapon',
+          fromXml: Weapon.fromXml,
+        );
+
+        // Assert
+        expect(weapons, hasLength(2), reason: 'Should parse two Weapon items from <weapons>');
+        expect(weapons[0].name, 'Weapon One', reason: 'First weapon name should be Weapon One');
+        expect(weapons[1].name, 'Weapon Two', reason: 'Second weapon name should be Weapon Two');
       });
 
       test('should parse numeric values correctly with invalid input', () {

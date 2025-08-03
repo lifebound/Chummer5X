@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/armor_mod.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 
 void main() {
   group('ArmorMod', () {
@@ -85,6 +86,48 @@ void main() {
       expect(armorMod.discountedCost, true);
       expect(armorMod.sortOrder, 10);
       expect(armorMod.wirelessOn, true);
+    });
+
+    test('XmlElement.parseList parses multiple ArmorMod items from <armormods>',
+        () {
+      // Arrange
+      final xmlString = '''
+        <root>
+          <armormods>
+            <armormod>
+              <name>Mod One</name>
+              <category>Electronics</category>
+              <armorcapacity>2</armorcapacity>
+              <source>Core</source>
+              <page>123</page>
+            </armormod>
+            <armormod>
+              <name>Mod Two</name>
+              <category>Physical</category>
+              <armorcapacity>3</armorcapacity>
+              <source>Core</source>
+              <page>124</page>
+            </armormod>
+          </armormods>
+        </root>
+      ''';
+      final document = XmlDocument.parse(xmlString);
+      final root = document.rootElement;
+
+      // Act
+      final mods = root.parseList<ArmorMod>(
+        collectionTagName: 'armormods',
+        itemTagName: 'armormod',
+        fromXml: ArmorMod.fromXml,
+      );
+
+      // Assert
+      expect(mods, hasLength(2),
+          reason: 'Should parse two ArmorMod items from <armormods>');
+      expect(mods[0].name, 'Mod One',
+          reason: 'First mod name should be Mod One');
+      expect(mods[1].name, 'Mod Two',
+          reason: 'Second mod name should be Mod Two');
     });
 
     group('fromXml', () {

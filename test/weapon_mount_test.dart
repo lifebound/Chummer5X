@@ -54,7 +54,7 @@ void main() {
       expect(weaponMount.discountedCost, false);
       expect(weaponMount.sortOrder, 0);
       expect(weaponMount.stolen, false);
-      
+
       // Check optional defaults
       expect(weaponMount.limit, null);
       expect(weaponMount.extra, null);
@@ -181,7 +181,9 @@ void main() {
         expect(weaponMount.notesColor, null);
       });
 
-      test('XmlElement.parseList parses multiple Weapon items from <weapons> in WeaponMount', () {
+      test(
+          'XmlElement.parseList parses multiple Weapon items from <weapons> in WeaponMount',
+          () {
         // Arrange
         final xmlString = '''
           <weaponmount>
@@ -227,9 +229,12 @@ void main() {
         );
 
         // Assert
-        expect(weapons, hasLength(2), reason: 'Should parse two Weapon items from <weapons>');
-        expect(weapons[0].name, 'Mount Weapon One', reason: 'First weapon name should be Mount Weapon One');
-        expect(weapons[1].name, 'Mount Weapon Two', reason: 'Second weapon name should be Mount Weapon Two');
+        expect(weapons, hasLength(2),
+            reason: 'Should parse two Weapon items from <weapons>');
+        expect(weapons[0].name, 'Mount Weapon One',
+            reason: 'First weapon name should be Mount Weapon One');
+        expect(weapons[1].name, 'Mount Weapon Two',
+            reason: 'Second weapon name should be Mount Weapon Two');
       });
 
       test('should parse complete XML correctly', () {
@@ -340,7 +345,8 @@ void main() {
         expect(weaponMount.weapons, hasLength(1));
         expect(weaponMount.weapons!.first.name, 'Mounted Rifle');
         expect(weaponMount.weaponMountOptions, hasLength(1));
-        expect(weaponMount.weaponMountOptions.first.name, 'Gyroscopic Stabilization');
+        expect(weaponMount.weaponMountOptions.first.name,
+            'Gyroscopic Stabilization');
         expect(weaponMount.mods, hasLength(1));
         expect(weaponMount.mods.first.name, 'Reinforced Mount');
         expect(weaponMount.notes, 'Advanced mount system');
@@ -368,7 +374,7 @@ void main() {
         expect(weaponMount.category, '');
         expect(weaponMount.slots, '');
         expect(weaponMount.avail, '');
-        expect(weaponMount.cost,0.0);
+        expect(weaponMount.cost, 0.0);
         expect(weaponMount.freeCost, false);
         expect(weaponMount.markup, '0');
         expect(weaponMount.source, '');

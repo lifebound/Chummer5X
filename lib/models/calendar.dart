@@ -1,3 +1,6 @@
+import 'package:chummer5x/utils/xml_element_extensions.dart';
+import 'package:xml/xml.dart';
+
 class CalendarWeek {
   final String guid;
   final int year;
@@ -13,15 +16,15 @@ class CalendarWeek {
     this.notesColor,
   });
 
-  factory CalendarWeek.fromXml(Map<String, dynamic> xmlData) {
+  factory CalendarWeek.fromXml(XmlElement xmlData) {
     return CalendarWeek(
-      guid: xmlData['guid'] ?? '',
-      year: int.tryParse(xmlData['year']?.toString() ?? '0') ?? 0,
-      week: int.tryParse(xmlData['week']?.toString() ?? '0') ?? 0,
-      notes: xmlData['notes']?.toString().trim().isEmpty == true 
-          ? null 
-          : xmlData['notes']?.toString(),
-      notesColor: xmlData['notesColor']?.toString(),
+      guid: xmlData.findElements('guid').first.innerText,
+      year: int.tryParse(xmlData.findElements('year').first.innerText) ?? 0,
+      week: int.tryParse(xmlData.findElements('week').first.innerText) ?? 0,
+      notes: xmlData.findElements('notes').first.innerText.trim().isEmpty
+          ? null
+          : xmlData.findElements('notes').first.innerText,
+      notesColor: xmlData.findElements('notesColor').first.innerText,
     );
   }
 
@@ -86,9 +89,15 @@ class Calendar {
     this.weeks = const [],
   });
 
-  factory Calendar.fromXml(List<Map<String, dynamic>> xmlWeeks) {
+  factory Calendar.fromXml(XmlElement xmlData) {
+    final weeks = xmlData.parseList<CalendarWeek>(
+      collectionTagName: 'calendar',
+      itemTagName: 'week',
+      fromXml: (e) => CalendarWeek.fromXml(e),
+    );
+
     return Calendar(
-      weeks: xmlWeeks.map((weekData) => CalendarWeek.fromXml(weekData)).toList(),
+      weeks: weeks,
     );
   }
 
@@ -96,7 +105,8 @@ class Calendar {
     final weeksList = json['weeks'] as List<dynamic>? ?? [];
     return Calendar(
       weeks: weeksList
-          .map((weekJson) => CalendarWeek.fromJson(weekJson as Map<String, dynamic>))
+          .map((weekJson) =>
+              CalendarWeek.fromJson(weekJson as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -120,7 +130,7 @@ $weekXml
   }
 
   /// Get weeks that have content (notes)
-  List<CalendarWeek> get weeksWithContent => 
+  List<CalendarWeek> get weeksWithContent =>
       weeks.where((week) => week.hasContent).toList();
 
   /// Get weeks sorted by year and week number

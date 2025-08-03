@@ -1081,31 +1081,32 @@ class EnhancedChummerXmlService {
   /// Parse calendar from XML
   static Calendar? _parseCalendar(XmlElement characterElement) {
     debugPrint('Parsing calendar...');
-    final calendarElement =
-        characterElement.findElements('calendar').firstOrNull;
-    if (calendarElement == null) return null;
+    // final calendarElement =
+    //     characterElement.findElements('calendar').firstOrNull;
+    // if (calendarElement == null) return null;
 
-    final weeks = <CalendarWeek>[];
+    // final weeks = <CalendarWeek>[];
 
-    for (final weekElement in calendarElement.findElements('week')) {
-      final guid = _getElementText(weekElement, 'guid') ?? '';
-      final year =
-          int.tryParse(_getElementText(weekElement, 'year') ?? '0') ?? 0;
-      final week =
-          int.tryParse(_getElementText(weekElement, 'week') ?? '0') ?? 0;
-      final notes = _getElementText(weekElement, 'notes');
-      final notesColor = _getElementText(weekElement, 'notesColor');
+    // for (final weekElement in calendarElement.findElements('week')) {
+    //   final guid = _getElementText(weekElement, 'guid') ?? '';
+    //   final year =
+    //       int.tryParse(_getElementText(weekElement, 'year') ?? '0') ?? 0;
+    //   final week =
+    //       int.tryParse(_getElementText(weekElement, 'week') ?? '0') ?? 0;
+    //   final notes = _getElementText(weekElement, 'notes');
+    //   final notesColor = _getElementText(weekElement, 'notesColor');
 
-      weeks.add(CalendarWeek(
-        guid: guid,
-        year: year,
-        week: week,
-        notes: notes?.trim().isEmpty == true ? null : notes,
-        notesColor: notesColor,
-      ));
-    }
-    debugPrint('Parsed ${weeks.length} calendar weeks.');
-    return Calendar(weeks: weeks);
+    //   weeks.add(CalendarWeek(
+    //     guid: guid,
+    //     year: year,
+    //     week: week,
+    //     notes: notes?.trim().isEmpty == true ? null : notes,
+    //     notesColor: notesColor,
+    //   ));
+    // }
+    // debugPrint('Parsed ${weeks.length} calendar weeks.');
+    // return Calendar(weeks: weeks);
+    return Calendar.fromXml(characterElement);
   }
 
   /// Parse game notes from XML

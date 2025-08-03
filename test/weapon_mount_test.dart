@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xml/xml.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
+import 'package:chummer5x/models/items/weapon.dart';
 import 'package:chummer5x/models/items/weapon_mount.dart';
 
 void main() {
@@ -177,6 +179,57 @@ void main() {
         expect(weaponMount.extra, null);
         expect(weaponMount.notes, null);
         expect(weaponMount.notesColor, null);
+      });
+
+      test('XmlElement.parseList parses multiple Weapon items from <weapons> in WeaponMount', () {
+        // Arrange
+        final xmlString = '''
+          <weaponmount>
+            <weapons>
+              <weapon>
+                <name>Mount Weapon One</name>
+                <category>Heavy</category>
+                <type>Ranged</type>
+                <damage>8P</damage>
+                <ap>-1</ap>
+                <mode>SA/BF</mode>
+                <ammo>20(c)</ammo>
+                <firingmode>BF</firingmode>
+                <accuracy>5</accuracy>
+                <source>Core</source>
+                <page>428</page>
+                <avail>6F</avail>
+              </weapon>
+              <weapon>
+                <name>Mount Weapon Two</name>
+                <category>Light</category>
+                <type>Ranged</type>
+                <damage>6P</damage>
+                <ap>0</ap>
+                <mode>SA</mode>
+                <ammo>10(c)</ammo>
+                <firingmode>SA</firingmode>
+                <accuracy>4</accuracy>
+                <source>Core</source>
+                <page>429</page>
+                <avail>4R</avail>
+              </weapon>
+            </weapons>
+          </weaponmount>
+        ''';
+        final xmlElement = XmlDocument.parse(xmlString).rootElement;
+
+        // Act
+        final weapons = xmlElement.parseList<Weapon>(
+          collectionTagName: 'weapons',
+          itemTagName: 'weapon',
+          fromXml: Weapon.fromXml,
+        );
+
+        // Assert
+        expect(weapons, hasLength(2), reason: 'Should parse two Weapon items from <weapons>');
+        expect(weapons[0].name, 'Mount Weapon One', reason: 'First weapon name should be Mount Weapon One');
+        expect(weapons[1].name, 'Mount Weapon Two', reason: 'Second weapon name should be Mount Weapon Two');
       });
 
       test('should parse complete XML correctly', () {

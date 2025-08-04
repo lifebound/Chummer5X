@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:chummer5x/services/enhanced_chumer_xml_service.dart';
 import 'package:xml/xml.dart';
@@ -104,9 +107,50 @@ void main() {
         expect(spell.source, equals('SR5'));
         expect(spell.category, equals('Health'));
         expect(spell.hasCompleteInfo, isTrue);
+
       });
     });
-    
+    test('should parse correctly with xmlElement.parseList', () {
+      const xmlData = '''<?xml version="1.0" encoding="utf-8"?>
+        <character>
+          <spells>
+            <spell>
+              <sourceid>37b3d6ac-624a-42d4-bd6e-a12142dc5725</sourceid>
+              <guid>263bfdeb-75ef-4f0f-874d-5a1f92dca45b</guid>
+              <name>Increase Reflexes</name>
+              <descriptors>Essence</descriptors>
+              <category>Health</category>
+              <type>P</type>
+              <range>T</range>
+              <damage>0</damage>
+              <duration>S</duration>
+              <dv>F</dv>
+              <limited>False</limited>
+              <extended>False</extended>
+              <customextended>False</customextended>
+              <alchemical>False</alchemical>
+              <source>SR5</source>
+              <page>288</page>
+              <extra />
+              <notes />
+              <notesColor>Chocolate</notesColor>
+              <freebonus>False</freebonus>
+              <barehandedadept>False</barehandedadept>
+              <improvementsource>Spell</improvementsource>
+              <grade>0</grade>
+            </spell>
+          </spells>
+        </character>''';
+      final xmlElement = XmlDocument.parse(xmlData).rootElement;
+      final listParse = xmlElement.parseList(collectionTagName: 'spells', itemTagName: 'spell', fromXml: (e) => Spell.fromXml(e));
+      expect(listParse.first.name, equals('Increase Reflexes'));
+      expect(listParse.first.range, equals('T'));
+      expect(listParse.first.duration, equals('S'));
+      expect(listParse.first.drain, equals('F'));
+      expect(listParse.first.source, equals('SR5'));
+      expect(listParse.first.category, equals('Health'));
+      expect(listParse.first.hasCompleteInfo, isTrue);
+    });
     group('Complex Form Model Tests', () {
       test('should create complex form with all required fields', () {
         const complexForm = ComplexForm(
@@ -140,7 +184,7 @@ void main() {
         expect(complexForm.description, equals('Issues commands to devices'));
       });
 
-      test('should parse complex form from JSON/XML data', () {
+      test('should parse complex form from JSON data', () {
         final jsonData = {
           'name': 'Pulse Storm',
           'target': 'Persona',
@@ -156,6 +200,46 @@ void main() {
         expect(complexForm.duration, equals('Instant'));
         expect(complexForm.fading, equals('Level + 1'));
         expect(complexForm.source, equals('SR5 255'));
+      });
+      test('should parse complex form from XML data', () {
+        final xmlData = '''
+          <complexform>
+            <name>Pulse Storm</name>
+            <target>Persona</target>
+            <duration>Instant</duration>
+            <fv>Level + 1</fv>
+            <source>SR5 255</source>
+          </complexform>
+        ''';
+
+        final complexForm = ComplexForm.fromXml(XmlDocument.parse(xmlData).rootElement);
+
+        expect(complexForm.name, equals('Pulse Storm'));
+        expect(complexForm.target, equals('Persona'));
+        expect(complexForm.duration, equals('Instant'));
+        expect(complexForm.fading, equals('Level + 1'));
+        expect(complexForm.source, equals('SR5 255'));
+      });
+      test('should parse from xmlElement.parseList', () {
+        const xmlData = '''<?xml version="1.0" encoding="utf-8"?>
+          <character>
+            <complexforms>
+              <complexform>
+                <name>Pulse Storm</name>
+                <target>Persona</target>
+                <duration>Instant</duration>
+                <fv>Level + 1</fv>
+                <source>SR5 255</source>
+              </complexform>
+            </complexforms>
+          </character>''';
+        final xmlElement = XmlDocument.parse(xmlData).rootElement;
+        final listParse = xmlElement.parseList(collectionTagName: 'complexforms', itemTagName: 'complexform', fromXml: (e) => ComplexForm.fromXml(e));
+        expect(listParse.first.name, equals('Pulse Storm'));
+        expect(listParse.first.target, equals('Persona'));
+        expect(listParse.first.duration, equals('Instant'));
+        expect(listParse.first.fading, equals('Level + 1'));
+        expect(listParse.first.source, equals('SR5 255'));
       });
     });
     group('Adept Powers Model Tests', () {
@@ -345,7 +429,7 @@ void main() {
               <bonus>
                 <detectionspellresist>Rating</detectionspellresist>
               </bonus>
-              <adeptwayrequires></adeptwayrequires>
+              <adeptwayrequires />
               <enhancements />
               <notes />
               <notesColor>Chocolate</notesColor>
@@ -371,7 +455,33 @@ void main() {
         expect(cloak.bonus!.containsKey('detectionspellresist'), isTrue);
         expect(cloak.bonus!['detectionspellresist'], equals('Rating'));
       });
+      test('should parse xmlElement.parseList for adept powers', () {
+      const xmlData = '''<?xml version="1.0" encoding="utf-8"?>
+        <character>
+          <powers>
+            <power>
+              <name>Cloak</name>
+              <rating>2</rating>
+              <extra />
+              <source>SG</source>
+              <page>169</page>
+              <bonus>
+                <detectionspellresist>Rating</detectionspellresist>
+              </bonus>
+            </power>
+          </powers>
+        </character>''';
+      final xmlElement = XmlDocument.parse(xmlData).rootElement;
+      final listParse = xmlElement.parseList(collectionTagName: 'powers', itemTagName: 'power', fromXml: (e) => AdeptPower.fromXml(e));
+      expect(listParse.first.name, equals('Cloak'));
+      expect(listParse.first.rating, equals('2'));
+      expect(listParse.first.source, equals('SG'));
+      expect(listParse.first.page, equals('169'));
+      expect(listParse.first.bonus!['detectionspellresist'], equals('Rating'));
     });
+
+    });
+    
     group('Model Compatibility Tests', () {
       test('should maintain backwards compatibility for existing spell data', () {
         // Test that existing simple spell data still works

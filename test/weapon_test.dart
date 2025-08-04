@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xml/xml.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 
 void main() {
@@ -34,7 +35,7 @@ void main() {
       expect(weapon.firingMode, 'SA');
       expect(weapon.accuracy, '5');
       expect(weapon.avail, '5R');
-      
+
       // Check defaults
       expect(weapon.reach, 0);
       expect(weapon.rc, 0);
@@ -315,56 +316,99 @@ void main() {
         final weapon = Weapon.fromXml(xmlElement);
 
         // Assert
-        expect(weapon.sourceId, 'test-source', reason: 'sourceId should be parsed correctly');
-        expect(weapon.locationGuid, 'Holster', reason: 'locationGuid should be parsed correctly');
-        expect(weapon.name, 'Advanced Weapon', reason: 'name should be parsed correctly');
-        expect(weapon.category, 'Assault Rifles', reason: 'category should be parsed correctly');
-        expect(weapon.type, 'Ranged', reason: 'type should be parsed correctly');
-        expect(weapon.spec, 'Assault Rifle', reason: 'spec should be parsed correctly');
-        expect(weapon.spec2, 'Military', reason: 'spec2 should be parsed correctly');
+        expect(weapon.sourceId, 'test-source',
+            reason: 'sourceId should be parsed correctly');
+        expect(weapon.locationGuid, 'Holster',
+            reason: 'locationGuid should be parsed correctly');
+        expect(weapon.name, 'Advanced Weapon',
+            reason: 'name should be parsed correctly');
+        expect(weapon.category, 'Assault Rifles',
+            reason: 'category should be parsed correctly');
+        expect(weapon.type, 'Ranged',
+            reason: 'type should be parsed correctly');
+        expect(weapon.spec, 'Assault Rifle',
+            reason: 'spec should be parsed correctly');
+        expect(weapon.spec2, 'Military',
+            reason: 'spec2 should be parsed correctly');
         expect(weapon.reach, 1, reason: 'reach should be parsed correctly');
-        expect(weapon.damage, '10P', reason: 'damage should be parsed correctly');
+        expect(weapon.damage, '10P',
+            reason: 'damage should be parsed correctly');
         expect(weapon.ap, '-2', reason: 'ap should be parsed correctly');
-        expect(weapon.mode, 'SA/BF/FA', reason: 'mode should be parsed correctly');
+        expect(weapon.mode, 'SA/BF/FA',
+            reason: 'mode should be parsed correctly');
         expect(weapon.rc, 2, reason: 'rc should be parsed correctly');
         expect(weapon.ammo, '30(c)', reason: 'ammo should be parsed correctly');
-        expect(weapon.cyberware, false, reason: 'cyberware should be parsed correctly');
-        expect(weapon.ammoCategory, 'Standard', reason: 'ammoCategory should be parsed correctly');
-        expect(weapon.ammoSlots, 2, reason: 'ammoSlots should be parsed correctly');
-        expect(weapon.sizeCategory, 'Medium', reason: 'sizeCategory should be parsed correctly');
-        expect(weapon.firingMode, 'FA', reason: 'firingMode should be parsed correctly');
-        expect(weapon.minRating, '1', reason: 'minRating should be parsed correctly');
-        expect(weapon.maxRating, '6', reason: 'maxRating should be parsed correctly');
+        expect(weapon.cyberware, false,
+            reason: 'cyberware should be parsed correctly');
+        expect(weapon.ammoCategory, 'Standard',
+            reason: 'ammoCategory should be parsed correctly');
+        expect(weapon.ammoSlots, 2,
+            reason: 'ammoSlots should be parsed correctly');
+        expect(weapon.sizeCategory, 'Medium',
+            reason: 'sizeCategory should be parsed correctly');
+        expect(weapon.firingMode, 'FA',
+            reason: 'firingMode should be parsed correctly');
+        expect(weapon.minRating, '1',
+            reason: 'minRating should be parsed correctly');
+        expect(weapon.maxRating, '6',
+            reason: 'maxRating should be parsed correctly');
         expect(weapon.rating, 4, reason: 'rating should be parsed correctly');
-        expect(weapon.accuracy, '6', reason: 'accuracy should be parsed correctly');
-        expect(weapon.activeAmmoSlot, 2, reason: 'activeAmmoSlot should be parsed correctly');
-        expect(weapon.conceal, '-2', reason: 'conceal should be parsed correctly');
+        expect(weapon.accuracy, '6',
+            reason: 'accuracy should be parsed correctly');
+        expect(weapon.activeAmmoSlot, 2,
+            reason: 'activeAmmoSlot should be parsed correctly');
+        expect(weapon.conceal, '-2',
+            reason: 'conceal should be parsed correctly');
         expect(weapon.cost, 8500, reason: 'cost should be parsed correctly');
-        expect(weapon.weight, '4.5', reason: 'weight should be parsed correctly');
-        expect(weapon.useSkill, 'Automatics', reason: 'useSkill should be parsed correctly');
-        expect(weapon.useSkillSpec, 'Assault Rifles', reason: 'useSkillSpec should be parsed correctly');
-        expect(weapon.range, '150/350/550/750', reason: 'range should be parsed correctly');
-        expect(weapon.alternateRange, '75/175/350/550', reason: 'alternateRange should be parsed correctly');
-        expect(weapon.rangeMultiply, 2, reason: 'rangeMultiply should be parsed correctly');
-        expect(weapon.allowAccessory, true, reason: 'allowAccessory should be parsed correctly');
-        expect(weapon.included, true, reason: 'included should be parsed correctly');
-        expect(weapon.parentId, 'parent-123', reason: 'parentId should be parsed correctly');
-        expect(weapon.mount, 'External', reason: 'mount should be parsed correctly');
-        expect(weapon.extraMount, 'Barrel', reason: 'extraMount should be parsed correctly');
-        expect(weapon.location, 'Holster', reason: 'location should be parsed correctly');
-        expect(weapon.weaponType, 'Firearm', reason: 'weaponType should be parsed correctly');
-        expect(weapon.source, 'Run & Gun', reason: 'source should be parsed correctly');
+        expect(weapon.weight, '4.5',
+            reason: 'weight should be parsed correctly');
+        expect(weapon.useSkill, 'Automatics',
+            reason: 'useSkill should be parsed correctly');
+        expect(weapon.useSkillSpec, 'Assault Rifles',
+            reason: 'useSkillSpec should be parsed correctly');
+        expect(weapon.range, '150/350/550/750',
+            reason: 'range should be parsed correctly');
+        expect(weapon.alternateRange, '75/175/350/550',
+            reason: 'alternateRange should be parsed correctly');
+        expect(weapon.rangeMultiply, 2,
+            reason: 'rangeMultiply should be parsed correctly');
+        expect(weapon.allowAccessory, true,
+            reason: 'allowAccessory should be parsed correctly');
+        expect(weapon.included, true,
+            reason: 'included should be parsed correctly');
+        expect(weapon.parentId, 'parent-123',
+            reason: 'parentId should be parsed correctly');
+        expect(weapon.mount, 'External',
+            reason: 'mount should be parsed correctly');
+        expect(weapon.extraMount, 'Barrel',
+            reason: 'extraMount should be parsed correctly');
+        expect(weapon.location, 'Holster',
+            reason: 'location should be parsed correctly');
+        expect(weapon.weaponType, 'Firearm',
+            reason: 'weaponType should be parsed correctly');
+        expect(weapon.source, 'Run & Gun',
+            reason: 'source should be parsed correctly');
         expect(weapon.page, '123', reason: 'page should be parsed correctly');
-        expect(weapon.equipped, true, reason: 'equipped should be parsed correctly');
-        expect(weapon.active, true, reason: 'active should be parsed correctly');
-        expect(weapon.homeNode, true, reason: 'homeNode should be parsed correctly');
-        expect(weapon.wirelessOn, true, reason: 'wirelessOn should be parsed correctly');
-        expect(weapon.stolen, true, reason: 'stolen should be parsed correctly');
-        expect(weapon.deviceRating, '3', reason: 'deviceRating should be parsed correctly');
-        expect(weapon.notes, 'Test weapon', reason: 'notes should be parsed correctly');
-        expect(weapon.notesColor, 'blue', reason: 'notesColor should be parsed correctly');
-        expect(weapon.discountedCost, true, reason: 'discountedCost should be parsed correctly');
-        expect(weapon.sortOrder, 5, reason: 'sortOrder should be parsed correctly');
+        expect(weapon.equipped, true,
+            reason: 'equipped should be parsed correctly');
+        expect(weapon.active, true,
+            reason: 'active should be parsed correctly');
+        expect(weapon.homeNode, true,
+            reason: 'homeNode should be parsed correctly');
+        expect(weapon.wirelessOn, true,
+            reason: 'wirelessOn should be parsed correctly');
+        expect(weapon.stolen, true,
+            reason: 'stolen should be parsed correctly');
+        expect(weapon.deviceRating, '3',
+            reason: 'deviceRating should be parsed correctly');
+        expect(weapon.notes, 'Test weapon',
+            reason: 'notes should be parsed correctly');
+        expect(weapon.notesColor, 'blue',
+            reason: 'notesColor should be parsed correctly');
+        expect(weapon.discountedCost, true,
+            reason: 'discountedCost should be parsed correctly');
+        expect(weapon.sortOrder, 5,
+            reason: 'sortOrder should be parsed correctly');
       });
 
       test('should handle missing XML elements gracefully', () {
@@ -435,21 +479,90 @@ void main() {
         final weapon = Weapon.fromXml(xmlElement);
 
         // Assert
-        expect(weapon.cyberware, true, reason: 'cyberware should be parsed as true');
-        expect(weapon.allowSingleShot, false, reason: 'allowSingleShot should be parsed as false');
-        expect(weapon.allowShortBurst, false, reason: 'allowShortBurst should be parsed as false');
-        expect(weapon.allowLongBurst, false, reason: 'allowLongBurst should be parsed as false');
-        expect(weapon.allowFullBurst, false, reason: 'allowFullBurst should be parsed as false');
-        expect(weapon.allowSuppressive, false, reason: 'allowSuppressive should be parsed as false');
-        expect(weapon.allowAccessory, true, reason: 'allowAccessory should be parsed as true');
-        expect(weapon.included, true, reason: 'included should be parsed as true');
-        expect(weapon.requireAmmo, false, reason: 'requireAmmo should be parsed as false');
-        expect(weapon.equipped, true, reason: 'equipped should be parsed as true');
+        expect(weapon.cyberware, true,
+            reason: 'cyberware should be parsed as true');
+        expect(weapon.allowSingleShot, false,
+            reason: 'allowSingleShot should be parsed as false');
+        expect(weapon.allowShortBurst, false,
+            reason: 'allowShortBurst should be parsed as false');
+        expect(weapon.allowLongBurst, false,
+            reason: 'allowLongBurst should be parsed as false');
+        expect(weapon.allowFullBurst, false,
+            reason: 'allowFullBurst should be parsed as false');
+        expect(weapon.allowSuppressive, false,
+            reason: 'allowSuppressive should be parsed as false');
+        expect(weapon.allowAccessory, true,
+            reason: 'allowAccessory should be parsed as true');
+        expect(weapon.included, true,
+            reason: 'included should be parsed as true');
+        expect(weapon.requireAmmo, false,
+            reason: 'requireAmmo should be parsed as false');
+        expect(weapon.equipped, true,
+            reason: 'equipped should be parsed as true');
         expect(weapon.active, true, reason: 'active should be parsed as true');
-        expect(weapon.homeNode, true, reason: 'homeNode should be parsed as true');
-        expect(weapon.wirelessOn, true, reason: 'wirelessOn should be parsed as true');
+        expect(weapon.homeNode, true,
+            reason: 'homeNode should be parsed as true');
+        expect(weapon.wirelessOn, true,
+            reason: 'wirelessOn should be parsed as true');
         expect(weapon.stolen, true, reason: 'stolen should be parsed as true');
-        expect(weapon.discountedCost, true, reason: 'discountedCost should be parsed as true');
+        expect(weapon.discountedCost, true,
+            reason: 'discountedCost should be parsed as true');
+      });
+
+      test('XmlElement.parseList parses multiple Weapon items from <weapons>',
+          () {
+        // Arrange
+        final xmlString = '''
+          <root>
+            <weapons>
+              <weapon>
+                <name>Weapon One</name>
+                <category>Pistol</category>
+                <type>Ranged</type>
+                <damage>5P</damage>
+                <ap>0</ap>
+                <mode>SA</mode>
+                <ammo>10(c)</ammo>
+                <firingmode>SA</firingmode>
+                <accuracy>5</accuracy>
+                <source>Core</source>
+                <page>420</page>
+                <avail>4R</avail>
+              </weapon>
+              <weapon>
+                <name>Weapon Two</name>
+                <category>SMG</category>
+                <type>Ranged</type>
+                <damage>7P</damage>
+                <ap>-1</ap>
+                <mode>BF</mode>
+                <ammo>30(c)</ammo>
+                <firingmode>BF</firingmode>
+                <accuracy>6</accuracy>
+                <source>Core</source>
+                <page>421</page>
+                <avail>5R</avail>
+              </weapon>
+            </weapons>
+          </root>
+        ''';
+        final document = XmlDocument.parse(xmlString);
+        final root = document.rootElement;
+
+        // Act
+        final weapons = root.parseList<Weapon>(
+          collectionTagName: 'weapons',
+          itemTagName: 'weapon',
+          fromXml: Weapon.fromXml,
+        );
+
+        // Assert
+        expect(weapons, hasLength(2),
+            reason: 'Should parse two Weapon items from <weapons>');
+        expect(weapons[0].name, 'Weapon One',
+            reason: 'First weapon name should be Weapon One');
+        expect(weapons[1].name, 'Weapon Two',
+            reason: 'Second weapon name should be Weapon Two');
       });
 
       test('should parse numeric values correctly with invalid input', () {

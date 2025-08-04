@@ -1,3 +1,6 @@
+import 'package:chummer5x/utils/xml_element_extensions.dart';
+import 'package:xml/xml.dart';
+
 class AdeptPower {
   final String name;
   // TODO: This should be int? instead of String? - rating is always an integer
@@ -57,6 +60,40 @@ class AdeptPower {
       discounted: json['discounted'] == true,
       description: json['description'],
     );
+  }
+  factory AdeptPower.fromXml(XmlElement xml) {
+    //debugPrint('Parsing AdeptPower from XML: ${xml.toString()}');
+    return AdeptPower(
+      name: xml.getElementText('name') ?? '',
+      rating: xml.getElementText('rating'),
+      extra: xml.getElementText('extra'),
+      source: xml.getElementText('source') ?? '',
+      page: xml.getElementText('page') ?? '',
+      bonus: _parseBonus(xml),
+      pointsPerLevel: xml.getDouble('pointsperlevel'),
+      extraPointCost: xml.getDouble('extrapointcost'),
+      hasLevels: xml.getBool('levels'),
+      maxLevels: xml.getInt('maxlevels'),
+      action: xml.getElementText('action'),
+      discounted: xml.getBool('discounted'),
+      description: xml.getElementText('description'),
+    );
+  }
+  static Map<String, String>? _parseBonus(XmlElement powerElement) {
+    final bonusElement = powerElement.getElement('bonus');
+    if (bonusElement == null) return null;
+
+    final Map<String, String> bonusMap = {};
+
+    for (final child in bonusElement.children.whereType<XmlElement>()) {
+      final key = child.name.local.trim();
+      final value = child.innerText.trim();
+      if (key.isNotEmpty && value.isNotEmpty) {
+        bonusMap[key] = value;
+      }
+    }
+
+    return bonusMap.isEmpty ? null : bonusMap;
   }
 
   String get displayName => name;

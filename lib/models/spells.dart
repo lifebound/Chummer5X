@@ -1,3 +1,6 @@
+import 'package:chummer5x/utils/xml_element_extensions.dart';
+import 'package:xml/xml.dart';
+
 class Spell {
   final String name;
   final String category;
@@ -35,7 +38,19 @@ class Spell {
     improvementSource: json['improvementsource'],
     grade: json['grade'],
   );
-
+  factory Spell.fromXml(XmlElement xml) => Spell(
+    name: xml.getElementText('name') ?? '',
+    category: xml.getElementText('category') ?? '',
+    range: xml.getElementText('range') ?? '',
+    duration: xml.getElementText('duration') ?? '',
+    drain: xml.getElementText('dv') ?? '',
+    source: xml.getElementText('source') ?? '',
+    page: xml.getElementText('page') ?? '',
+    description: xml.getElementText('description') ?? '',
+    improvementSource: xml.getElementText('improvementsource'),
+    grade: xml.getElementText('grade'),
+  );
+  
   // Utility getters
   String get displayName => name;
   bool get hasCompleteInfo => 

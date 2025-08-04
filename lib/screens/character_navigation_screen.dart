@@ -96,7 +96,7 @@
 //                   Text(
 //                     '"${widget.character.alias}"',
 //                     style: TextStyle(
-//                       color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
+//                       color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
 //                       fontSize: 14,
 //                       fontStyle: FontStyle.italic,
 //                     ),
@@ -178,7 +178,7 @@
 //         ),
 //       ),
 //       selected: isSelected,
-//       selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+//       selectedTileColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
 //       onTap: () {
 //         setState(() {
 //           _currentSection = section;
@@ -444,10 +444,10 @@
 //     return Container(
 //       padding: const EdgeInsets.all(12.0),
 //       decoration: BoxDecoration(
-//         color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+//         color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
 //         borderRadius: BorderRadius.circular(8),
 //         border: Border.all(
-//           color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+//           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
 //         ),
 //       ),
 //       child: Column(
@@ -466,7 +466,7 @@
 //               Container(
 //                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
 //                 decoration: BoxDecoration(
-//                   color: _getStatusColor(status).withOpacity(0.2),
+//                   color: _getStatusColor(status).withValues(alpha: 0.2),
 //                   borderRadius: BorderRadius.circular(4),
 //                 ),
 //                 child: Text(

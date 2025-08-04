@@ -68,7 +68,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<ShadowrunCharacter> _characters = [];
   ShadowrunCharacter? _currentCharacter;
   NavigationSection _currentSection = NavigationSection.overview;
-  
+
   // Chart toggle states for Karma & Nuyen tab
   bool _showKarmaChart = false;
   bool _showNuyenChart = false;
@@ -89,7 +89,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: GestureDetector(
                 onTap: () {
                   // Get the position of the avatar for desktop modal positioning
-                  final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+                  final RenderBox? renderBox =
+                      context.findRenderObject() as RenderBox?;
                   final position = renderBox?.localToGlobal(Offset.zero);
                   ProfileMenu.show(
                     context,
@@ -123,13 +124,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildCharacterContent(BuildContext context) {
     // For Notes, Gear, and Martial Arts sections, use minimal constraints and top alignment to maximize space usage
-    if (_currentSection == NavigationSection.notes || 
-        _currentSection == NavigationSection.gear || 
-        _currentSection == NavigationSection.vehiclesAndDrones || 
+    if (_currentSection == NavigationSection.notes ||
+        _currentSection == NavigationSection.gear ||
+        _currentSection == NavigationSection.vehiclesAndDrones ||
         _currentSection == NavigationSection.cyberwareBioware ||
         _currentSection == NavigationSection.martialArts) {
       return Padding(
-        padding: const EdgeInsets.all(8.0), // Minimal padding for full-height sections
+        padding: const EdgeInsets.all(
+            8.0), // Minimal padding for full-height sections
         child: _buildCurrentView(context),
       );
     }
@@ -475,69 +477,71 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   void _loadCharacterFile() async {
     try {
-      
       FilePickerResult? result;
-    
+
       result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['bin','chum5', 'xml'],
-        allowMultiple: false,
-        withData: true
-      );
+          type: FileType.custom,
+          allowedExtensions: ['bin', 'chum5', 'xml'],
+          allowMultiple: false,
+          withData: true);
 
       if (result != null && result.files.single.bytes != null) {
-      // On web, filePath might be null or a temporary blob URL.
-      // We primarily care about the bytes and fileName here.
-      // final filePath = result.files.single.path; // Keep this if you need path for non-web, but be aware it's null on web
-      final fileName = result.files.single.name;
-      final Uint8List bytes = result.files.single.bytes!;
+        // On web, filePath might be null or a temporary blob URL.
+        // We primarily care about the bytes and fileName here.
+        // final filePath = result.files.single.path; // Keep this if you need path for non-web, but be aware it's null on web
+        final fileName = result.files.single.name;
+        final Uint8List bytes = result.files.single.bytes!;
 
-      // --- Platform-specific extension validation ---
-      // This part now correctly uses kIsWeb
-      if (!kIsWeb) { // Only run this block if NOT on web
-        // For mobile and desktop, we can validate the extension based on fileName
-        final extension = fileName.toLowerCase().split('.').last;
-        if (extension != 'chum5' && extension != 'xml') {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Please select a .chum5 or .xml file.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-          return;
-        }
-      }
-      // On web, the `allowedExtensions` in `pickFiles` already handles this client-side
-      // to a good extent. If you need stricter server-side validation, you'd do it
-      // after the file is processed. If you need a fallback client-side validation
-      // for web beyond what `allowedExtensions` provides, you can do:
-      else { // This is for kIsWeb == true
-         final extension = fileName.toLowerCase().split('.').last;
-         if (extension != 'chum5' && extension != 'xml') {
+        // --- Platform-specific extension validation ---
+        // This part now correctly uses kIsWeb
+        if (!kIsWeb) {
+          // Only run this block if NOT on web
+          // For mobile and desktop, we can validate the extension based on fileName
+          final extension = fileName.toLowerCase().split('.').last;
+          if (extension != 'chum5' && extension != 'xml') {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Please select a .chum5 or .xml file.'),
-                backgroundColor: Colors.red,
-              ),
-            );
+                const SnackBar(
+                  content: Text('Please select a .chum5 or .xml file.'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+            return;
           }
-          return;
         }
-      }
-        
+        // On web, the `allowedExtensions` in `pickFiles` already handles this client-side
+        // to a good extent. If you need stricter server-side validation, you'd do it
+        // after the file is processed. If you need a fallback client-side validation
+        // for web beyond what `allowedExtensions` provides, you can do:
+        else {
+          // This is for kIsWeb == true
+          final extension = fileName.toLowerCase().split('.').last;
+          if (extension != 'chum5' && extension != 'xml') {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please select a .chum5 or .xml file.'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+            return;
+          }
+        }
+
         final String xmlContent = utf8.decode(bytes);
         String cleanXmlContent = xmlContent;
         if (cleanXmlContent.startsWith('\uFEFF')) {
           cleanXmlContent = cleanXmlContent.substring(1);
           debugPrint('Explicit BOM \\uFEFF stripped after UTF-8 decode.');
         } else {
-          debugPrint('No \\uFEFF BOM found at the beginning of content after UTF-8 decode.');
+          debugPrint(
+              'No \\uFEFF BOM found at the beginning of content after UTF-8 decode.');
         }
         // Use MutableXmlService to parse and cache the XML for modification
-        final character = _xmlService.parseAndCacheCharacterXml(cleanXmlContent);
+        final character =
+            _xmlService.parseAndCacheCharacterXml(cleanXmlContent);
 
         if (character != null) {
           setState(() {
@@ -657,7 +661,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         _buildConditionMonitorCard(),
         SizedBox(height: spacing),
         AttributesCard(character: _currentCharacter!),
-        SizedBox(height: spacing), 
+        SizedBox(height: spacing),
         _buildDerivedAttributesCard(),
       ],
     );
@@ -705,8 +709,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     )
                   else
                     ...positiveQualities
-                        .map((quality) => _buildQualityCard(context, quality))
-                        ,
+                        .map((quality) => _buildQualityCard(context, quality)),
                 ],
               ),
             ),
@@ -741,8 +744,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     )
                   else
                     ...negativeQualities
-                        .map((quality) => _buildQualityCard(context, quality))
-                        ,
+                        .map((quality) => _buildQualityCard(context, quality)),
                 ],
               ),
             ),
@@ -872,16 +874,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Text(
                       'No martial arts known',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                     ),
                   ],
                 ),
               ),
             )
           else
-            ..._currentCharacter!.martialArts.map((martialArt) => 
-              _buildMartialArtCard(context, martialArt),
+            ..._currentCharacter!.martialArts.map(
+              (martialArt) => _buildMartialArtCard(context, martialArt),
             ),
         ],
       ),
@@ -892,7 +894,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -906,9 +911,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         title: Text(
           martialArt.name,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
         ),
         subtitle: Row(
           children: [
@@ -917,7 +922,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               const SizedBox(width: 8),
             ],
             if (martialArt.source.isNotEmpty)
-              _buildMartialArtChip(context, 'Source', '${martialArt.source}${martialArt.page.isNotEmpty ? ' p${martialArt.page}' : ''}'),
+              _buildMartialArtChip(context, 'Source',
+                  '${martialArt.source}${martialArt.page.isNotEmpty ? ' p${martialArt.page}' : ''}'),
           ],
         ),
         children: [
@@ -929,14 +935,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 child: Text(
                   'Techniques:',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
             ),
-            ...martialArt.techniques.map((technique) => 
-              _buildTechniqueListItem(context, technique)
-            ),
+            ...martialArt.techniques.map(
+                (technique) => _buildTechniqueListItem(context, technique)),
             const SizedBox(height: 8),
           ],
           if (martialArt.notes.isNotEmpty)
@@ -949,14 +954,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.2),
                   ),
                 ),
                 child: Text(
                   martialArt.notes,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
               ),
             ),
@@ -965,7 +973,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildTechniqueListItem(BuildContext context, MartialArtTechnique technique) {
+  Widget _buildTechniqueListItem(
+      BuildContext context, MartialArtTechnique technique) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       padding: const EdgeInsets.all(12),
@@ -992,24 +1001,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Text(
                   technique.name,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 if (technique.source.isNotEmpty || technique.page.isNotEmpty)
                   Text(
                     '${technique.source}${technique.page.isNotEmpty ? ' p${technique.page}' : ''}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   ),
                 if (technique.notes.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     technique.notes,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontStyle: FontStyle.italic,
-                    ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
                   ),
                 ],
               ],
@@ -1020,7 +1029,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildMartialArtChip(BuildContext context, String label, String value) {
+  Widget _buildMartialArtChip(
+      BuildContext context, String label, String value) {
     return Chip(
       label: Text(
         '$label: $value',
@@ -1049,7 +1059,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -1291,7 +1304,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -1391,13 +1407,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         child: Column(
           children: [
             Container(
-              constraints: const BoxConstraints(maxWidth: 800), // Center tabs with max width
+              constraints: const BoxConstraints(
+                  maxWidth: 800), // Center tabs with max width
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TabBar(
-                isScrollable: false, // Don't scroll since we have fewer tabs now
+                isScrollable:
+                    false, // Don't scroll since we have fewer tabs now
                 tabs: const [
                   Tab(
                     icon: Icon(Icons.inventory),
@@ -1425,7 +1443,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Expanded(
               child: Center(
                 child: Container(
-                  constraints: const BoxConstraints(maxWidth: 1200), // Center content with max width
+                  constraints: const BoxConstraints(
+                      maxWidth: 1200), // Center content with max width
                   child: TabBarView(
                     children: [
                       _buildGearTabContent(context),
@@ -1480,8 +1499,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           // Make the header section responsive
           LayoutBuilder(
             builder: (context, constraints) {
-              final shouldWrap = constraints.maxWidth < 800; // Breakpoint for wrapping
-              
+              final shouldWrap =
+                  constraints.maxWidth < 800; // Breakpoint for wrapping
+
               if (shouldWrap) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1491,7 +1511,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
-                    _buildEssenceChipsWrap(context, totalEssence.toDouble(), cyberwareEssence, biowareEssence, essenceHoleAmount),
+                    _buildEssenceChipsWrap(context, totalEssence.toDouble(),
+                        cyberwareEssence, biowareEssence, essenceHoleAmount),
                   ],
                 );
               } else {
@@ -1502,7 +1523,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       'Cyberware/Bioware',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    _buildEssenceChipsRow(context, totalEssence.toDouble(), cyberwareEssence, biowareEssence, essenceHoleAmount),
+                    _buildEssenceChipsRow(context, totalEssence.toDouble(),
+                        cyberwareEssence, biowareEssence, essenceHoleAmount),
                   ],
                 );
               }
@@ -1512,7 +1534,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Expanded(
             child: ShadowrunItemLocationTreeView<Cyberware>(
               allLocations: _currentCharacter?.cyberwareLocations ?? {},
-              allItems: _currentCharacter?.cyberware ?? [], // Don't assign locations, use original items
+              allItems: _currentCharacter?.cyberware ??
+                  [], // Don't assign locations, use original items
             ),
           ),
         ],
@@ -1520,33 +1543,62 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildEssenceChipsRow(BuildContext context, double totalEssence, double cyberwareEssence, double biowareEssence, double essenceHoleAmount) {
+  Widget _buildEssenceChipsRow(
+      BuildContext context,
+      double totalEssence,
+      double cyberwareEssence,
+      double biowareEssence,
+      double essenceHoleAmount) {
     return Row(
       children: [
-        _buildEssenceChip(context, 'Total Essence', (totalEssence - cyberwareEssence - biowareEssence - essenceHoleAmount).toStringAsFixed(2)),
+        _buildEssenceChip(
+            context,
+            'Total Essence',
+            (totalEssence -
+                    cyberwareEssence -
+                    biowareEssence -
+                    essenceHoleAmount)
+                .toStringAsFixed(2)),
         const SizedBox(width: 8),
-        _buildEssenceChip(context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
+        _buildEssenceChip(
+            context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
         const SizedBox(width: 8),
-        _buildEssenceChip(context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
+        _buildEssenceChip(
+            context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
         const SizedBox(width: 8),
-        _buildEssenceChip(context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
+        _buildEssenceChip(
+            context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
       ],
     );
   }
 
-  Widget _buildEssenceChipsWrap(BuildContext context, double totalEssence, double cyberwareEssence, double biowareEssence, double essenceHoleAmount) {
+  Widget _buildEssenceChipsWrap(
+      BuildContext context,
+      double totalEssence,
+      double cyberwareEssence,
+      double biowareEssence,
+      double essenceHoleAmount) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
-        _buildEssenceChip(context, 'Total Essence', (totalEssence - cyberwareEssence - biowareEssence - essenceHoleAmount).toStringAsFixed(2)),
-        _buildEssenceChip(context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
-        _buildEssenceChip(context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
-        _buildEssenceChip(context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
+        _buildEssenceChip(
+            context,
+            'Total Essence',
+            (totalEssence -
+                    cyberwareEssence -
+                    biowareEssence -
+                    essenceHoleAmount)
+                .toStringAsFixed(2)),
+        _buildEssenceChip(
+            context, 'Cyberware Essence', cyberwareEssence.toStringAsFixed(2)),
+        _buildEssenceChip(
+            context, 'Bioware Essence', biowareEssence.toStringAsFixed(2)),
+        _buildEssenceChip(
+            context, 'Essence Hole', essenceHoleAmount.toStringAsFixed(2)),
       ],
     );
   }
-
 
   Widget _buildEssenceChip(BuildContext context, String label, String value) {
     return Chip(
@@ -1565,10 +1617,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   double _calculateCyberwareEssence() {
     if (_currentCharacter?.cyberware == null) return 0.0;
-    
+
     double total = 0.0;
     for (final item in _currentCharacter!.cyberware) {
-      if (item.improvementSource == 'Cyberware' && item.name.toLowerCase() != 'essence hole') {
+      if (item.improvementSource == 'Cyberware' &&
+          item.name.toLowerCase() != 'essence hole') {
         total += item.ess.toDouble();
       }
     }
@@ -1577,7 +1630,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   double _calculateBiowareEssence() {
     if (_currentCharacter?.cyberware == null) return 0.0;
-    
+
     double total = 0.0;
     for (final item in _currentCharacter!.cyberware) {
       if (item.improvementSource == 'Bioware') {
@@ -1589,7 +1642,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   double _calculateEssenceHoleAmount() {
     if (_currentCharacter?.cyberware == null) return 0.0;
-    
+
     double total = 0.0;
     for (final item in _currentCharacter!.cyberware) {
       if (item.name.toLowerCase().contains('essence hole')) {
@@ -1730,8 +1783,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             )
           else
             ...sortedGrades
-                .map((grade) => _buildInitiationGradeItem(context, grade))
-                ,
+                .map((grade) => _buildInitiationGradeItem(context, grade)),
         ],
       ),
     );
@@ -1781,8 +1833,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             )
           else
             ...sortedGrades
-                .map((grade) => _buildSubmersionGradeItem(context, grade))
-                ,
+                .map((grade) => _buildSubmersionGradeItem(context, grade)),
         ],
       ),
     );
@@ -1794,7 +1845,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -1824,12 +1878,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           if (grade.metamagics.isNotEmpty) ...[
             const SizedBox(height: 12),
             // Build a metamagic item for each item in the list
-            ...grade.metamagics
-                .map((metamagic) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: _buildMetamagicItem(context, metamagic),
-                    ))
-                ,
+            ...grade.metamagics.map((metamagic) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: _buildMetamagicItem(context, metamagic),
+                )),
           ],
         ],
       ),
@@ -1843,7 +1895,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -1872,12 +1927,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           if (grade.metamagics.isNotEmpty) ...[
             const SizedBox(height: 12),
             // Build a metamagic item for each item in the list
-            ...grade.metamagics
-                .map((metamagic) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: _buildMetamagicItem(context, metamagic),
-                    ))
-                ,
+            ...grade.metamagics.map((metamagic) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: _buildMetamagicItem(context, metamagic),
+                )),
           ],
         ],
       ),
@@ -1909,7 +1962,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .primaryContainer
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
@@ -1970,15 +2026,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     children: [
                       Text(
                         'Condition Monitors',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                       ),
                       const SizedBox(height: 8),
                       // CM Penalty indicator
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: cmPenalty < 0
                               ? Colors.red.shade100
@@ -2011,15 +2070,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       Flexible(
                         child: Text(
                           'Condition Monitors',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
                         ),
                       ),
                       // CM Penalty indicator
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: cmPenalty < 0
                               ? Colors.red.shade100
@@ -2090,14 +2152,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isNearDeath
               ? Colors.red.shade800
               : isInOverflow
                   ? Colors.red.shade600
-                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  : Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.2),
           width: isNearDeath ? 2 : 1,
         ),
       ),
@@ -2408,9 +2476,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
               )
             else
-              ...critters
-                  .map((critter) => itemBuilder(context, critter))
-                  ,
+              ...critters.map((critter) => itemBuilder(context, critter)),
           ],
         ),
       ),
@@ -2459,7 +2525,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -2847,7 +2916,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
@@ -2881,8 +2953,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.7),
+        color: Theme.of(context)
+            .colorScheme
+            .secondaryContainer
+            .withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -2918,8 +2992,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isDefaulting
-            ? Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3)
-            : Theme.of(context).colorScheme.tertiaryContainer.withValues(alpha: 0.7),
+            ? Theme.of(context)
+                .colorScheme
+                .errorContainer
+                .withValues(alpha: 0.3)
+            : Theme.of(context)
+                .colorScheme
+                .tertiaryContainer
+                .withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isDefaulting
@@ -2946,7 +3026,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             decoration: BoxDecoration(
               color: isDefaulting
                   ? Theme.of(context).colorScheme.error.withValues(alpha: 0.2)
-                  : Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
+                  : Theme.of(context)
+                      .colorScheme
+                      .tertiary
+                      .withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(
@@ -3145,11 +3228,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                color: Theme.of(context)
+                    .colorScheme
+                    .outline
+                    .withValues(alpha: 0.2),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .shadow
+                      .withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -3404,10 +3493,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildKarmaNuyenTabContent(BuildContext context) {
     final allKarmaEntries = _currentCharacter?.karmaExpenseEntries ?? [];
     final allNuyenEntries = _currentCharacter?.nuyenExpenseEntries ?? [];
-    
+
     // Filter out entries with zero amounts. Sort by date descending.
-    final karmaEntries = allKarmaEntries.where((entry) => entry.amount != 0).toList()..sort((a, b) => b.date.compareTo(a.date));
-    final nuyenEntries = allNuyenEntries.where((entry) => entry.amount != 0).toList()..sort((a, b) => b.date.compareTo(a.date));
+    final karmaEntries = allKarmaEntries
+        .where((entry) => entry.amount != 0)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+    final nuyenEntries = allNuyenEntries
+        .where((entry) => entry.amount != 0)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(8.0),
@@ -3425,18 +3520,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Text(
                 'Karma & Nuyen Management',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Entry form
           _buildExpenseEntryForm(context),
-          
+
           const SizedBox(height: 24),
-          
+
           // Ledger sections - responsive layout
           LayoutBuilder(
             builder: (context, constraints) {
@@ -3459,7 +3554,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       child: _buildKarmaLedgerSection(context, karmaEntries),
                     ),
                     const SizedBox(width: 16),
-                    // Nuyen section  
+                    // Nuyen section
                     Expanded(
                       child: _buildNuyenLedgerSection(context, nuyenEntries),
                     ),
@@ -3478,11 +3573,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final karmaController = TextEditingController();
     final nuyenController = TextEditingController();
     final reasonController = TextEditingController();
-    
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -3494,11 +3592,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Text(
             'Add New Entry',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 16),
-          
+
           // Responsive form layout
           LayoutBuilder(
             builder: (context, constraints) {
@@ -3509,31 +3607,35 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     // Karma field
                     TextField(
                       controller: karmaController,
-                      keyboardType: const TextInputType.numberWithOptions(signed: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(signed: true),
                       decoration: InputDecoration(
                         labelText: 'Karma',
                         hintText: 'e.g., -5, +10',
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.psychology),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Nuyen field
                     TextField(
                       controller: nuyenController,
-                      keyboardType: const TextInputType.numberWithOptions(signed: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(signed: true),
                       decoration: InputDecoration(
                         labelText: 'Nuyen',
                         hintText: 'e.g., -1000, +5000',
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.attach_money),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Reason field
                     TextField(
                       controller: reasonController,
@@ -3542,20 +3644,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         hintText: 'Reason for expense/income',
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.description),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Submit button - full width on mobile
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () => _submitExpenseEntry(context, karmaController, nuyenController, reasonController),
+                        onPressed: () => _submitExpenseEntry(context,
+                            karmaController, nuyenController, reasonController),
                         icon: const Icon(Icons.add),
                         label: const Text('Add Entry'),
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                         ),
                       ),
                     ),
@@ -3569,34 +3674,38 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Expanded(
                       child: TextField(
                         controller: karmaController,
-                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        keyboardType:
+                            const TextInputType.numberWithOptions(signed: true),
                         decoration: InputDecoration(
                           labelText: 'Karma',
                           hintText: 'e.g., -5, +10',
                           border: const OutlineInputBorder(),
                           prefixIcon: const Icon(Icons.psychology),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Nuyen field
                     Expanded(
                       child: TextField(
                         controller: nuyenController,
-                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        keyboardType:
+                            const TextInputType.numberWithOptions(signed: true),
                         decoration: InputDecoration(
                           labelText: 'Nuyen',
                           hintText: 'e.g., -1000, +5000',
                           border: const OutlineInputBorder(),
                           prefixIcon: const Icon(Icons.attach_money),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Reason field
                     Expanded(
                       flex: 2,
@@ -3607,19 +3716,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           hintText: 'Reason for expense/income',
                           border: const OutlineInputBorder(),
                           prefixIcon: const Icon(Icons.description),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Submit button
                     ElevatedButton.icon(
-                      onPressed: () => _submitExpenseEntry(context, karmaController, nuyenController, reasonController),
+                      onPressed: () => _submitExpenseEntry(context,
+                          karmaController, nuyenController, reasonController),
                       icon: const Icon(Icons.add),
                       label: const Text('Add Entry'),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                       ),
                     ),
                   ],
@@ -3631,8 +3743,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
   }
-  
-  Widget _buildKarmaLedgerSection(BuildContext context, List<ExpenseEntry> karmaEntries) {
+
+  Widget _buildKarmaLedgerSection(
+      BuildContext context, List<ExpenseEntry> karmaEntries) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -3648,7 +3761,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+              color: Theme.of(context)
+                  .colorScheme
+                  .primaryContainer
+                  .withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -3670,9 +3786,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           const SizedBox(width: 8),
                           Text(
                             'Karma Ledger',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ],
                       ),
@@ -3708,9 +3827,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       const SizedBox(width: 8),
                       Text(
                         'Karma Ledger',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const Spacer(),
                       Row(
@@ -3737,12 +3857,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               },
             ),
           ),
-          
+
           // Content area
           Container(
             height: 400, // Fixed height for consistent layout
             padding: const EdgeInsets.all(16.0),
-            child: _showKarmaChart 
+            child: _showKarmaChart
                 ? _buildKarmaChart(context, karmaEntries)
                 : _buildKarmaTable(context, karmaEntries),
           ),
@@ -3751,7 +3871,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildNuyenLedgerSection(BuildContext context, List<ExpenseEntry> nuyenEntries) {
+  Widget _buildNuyenLedgerSection(
+      BuildContext context, List<ExpenseEntry> nuyenEntries) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -3767,7 +3888,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer
+                  .withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -3789,9 +3913,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           const SizedBox(width: 8),
                           Text(
                             'Nuyen Ledger',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ],
                       ),
@@ -3827,9 +3954,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       const SizedBox(width: 8),
                       Text(
                         'Nuyen Ledger',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const Spacer(),
                       Row(
@@ -3856,12 +3984,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               },
             ),
           ),
-          
+
           // Content area
           Container(
             height: 400, // Fixed height for consistent layout
             padding: const EdgeInsets.all(16.0),
-            child: _showNuyenChart 
+            child: _showNuyenChart
                 ? _buildNuyenChart(context, nuyenEntries)
                 : _buildNuyenTable(context, nuyenEntries),
           ),
@@ -3870,10 +3998,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildKarmaTable(BuildContext context, List<ExpenseEntry> karmaEntries) {
+  Widget _buildKarmaTable(
+      BuildContext context, List<ExpenseEntry> karmaEntries) {
     // Filter out zero amounts for display
-    final filteredEntries = karmaEntries.where((entry) => entry.amount != 0).toList();
-    
+    final filteredEntries =
+        karmaEntries.where((entry) => entry.amount != 0).toList();
+
     if (filteredEntries.isEmpty) {
       return Center(
         child: Column(
@@ -3882,21 +4012,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Icon(
               Icons.psychology_outlined,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
               'No Karma Entries',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
             const SizedBox(height: 4),
             Text(
               'Add your first karma entry above',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withValues(alpha: 0.7),
+                  ),
             ),
           ],
         ),
@@ -3909,19 +4045,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
             children: [
-              const Expanded(flex: 2, child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Expanded(flex: 2, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Expanded(flex: 3, child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(
+                  flex: 2,
+                  child: Text('Date',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(
+                  flex: 2,
+                  child: Text('Amount',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(
+                  flex: 3,
+                  child: Text('Reason',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Table content
         Expanded(
           child: ListView.builder(
@@ -3936,10 +4084,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildNuyenTable(BuildContext context, List<ExpenseEntry> nuyenEntries) {
+  Widget _buildNuyenTable(
+      BuildContext context, List<ExpenseEntry> nuyenEntries) {
     // Filter out zero amounts for display
-    final filteredEntries = nuyenEntries.where((entry) => entry.amount != 0).toList();
-    
+    final filteredEntries =
+        nuyenEntries.where((entry) => entry.amount != 0).toList();
+
     if (filteredEntries.isEmpty) {
       return Center(
         child: Column(
@@ -3948,21 +4098,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Icon(
               Icons.attach_money_outlined,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
               'No Nuyen Entries',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
             const SizedBox(height: 4),
             Text(
               'Add your first nuyen entry above',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withValues(alpha: 0.7),
+                  ),
             ),
           ],
         ),
@@ -3975,19 +4131,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
             children: [
-              const Expanded(flex: 2, child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Expanded(flex: 2, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Expanded(flex: 3, child: Text('Reason', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(
+                  flex: 2,
+                  child: Text('Date',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(
+                  flex: 2,
+                  child: Text('Amount',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              const Expanded(
+                  flex: 3,
+                  child: Text('Reason',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Table content
         Expanded(
           child: ListView.builder(
@@ -4002,14 +4170,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildKarmaEntryRow(BuildContext context, ExpenseEntry entry, int index) {
+  Widget _buildKarmaEntryRow(
+      BuildContext context, ExpenseEntry entry, int index) {
     // Format date with locale-aware formatting
     final dateFormat = DateFormat.yMd();
     final formattedDate = dateFormat.format(entry.date);
-    
+
     // Format karma amounts with locale-aware number formatting
     final numberFormat = NumberFormat.decimalPattern();
-    final amount = entry.amount is double && entry.amount != (entry.amount as double).round()
+    final amount = entry.amount is double &&
+            entry.amount != (entry.amount as double).round()
         ? numberFormat.format(entry.amount) // Show with appropriate decimals
         : numberFormat.format(entry.amount.round()); // Show as integer
     final reason = entry.reason;
@@ -4018,26 +4188,41 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       decoration: BoxDecoration(
-        color: index.isEven 
+        color: index.isEven
             ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            : Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text(formattedDate, style: Theme.of(context).textTheme.bodySmall)),
-          Expanded(flex: 2, child: Text(amount, style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis, softWrap: false)),
-          Expanded(flex: 3, child: Text(reason, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(
+              flex: 2,
+              child: Text(formattedDate,
+                  style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(
+              flex: 2,
+              child: Text(amount,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false)),
+          Expanded(
+              flex: 3,
+              child:
+                  Text(reason, style: Theme.of(context).textTheme.bodySmall)),
         ],
       ),
     );
   }
 
-  Widget _buildNuyenEntryRow(BuildContext context, ExpenseEntry entry, int index) {
+  Widget _buildNuyenEntryRow(
+      BuildContext context, ExpenseEntry entry, int index) {
     // Format date with locale-aware formatting
     final dateFormat = DateFormat.yMd();
     final formattedDate = dateFormat.format(entry.date);
-    
+
     // Format nuyen amounts with locale-aware currency formatting
     final currencyFormat = NumberFormat.currency(symbol: '¥', decimalDigits: 2);
     final amount = currencyFormat.format(entry.amount);
@@ -4047,24 +4232,39 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       decoration: BoxDecoration(
-        color: index.isEven 
+        color: index.isEven
             ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            : Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text(formattedDate, style: Theme.of(context).textTheme.bodySmall)),
-          Expanded(flex: 2, child: Text(amount, style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis, softWrap: false)),
-          Expanded(flex: 3, child: Text(reason, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(
+              flex: 2,
+              child: Text(formattedDate,
+                  style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(
+              flex: 2,
+              child: Text(amount,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false)),
+          Expanded(
+              flex: 3,
+              child:
+                  Text(reason, style: Theme.of(context).textTheme.bodySmall)),
         ],
       ),
     );
   }
 
-  Widget _buildKarmaChart(BuildContext context, List<ExpenseEntry> karmaEntries) {
+  Widget _buildKarmaChart(
+      BuildContext context, List<ExpenseEntry> karmaEntries) {
     final numberFormat = NumberFormat.decimalPattern();
-    
+
     return _buildExpenseChart(
       context,
       karmaEntries,
@@ -4073,7 +4273,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       primaryColor: Theme.of(context).colorScheme.primary,
       secondaryColor: Theme.of(context).colorScheme.primaryContainer,
       formatAmount: (amount) => numberFormat.format(amount),
-      formatTooltipAmount: (amount) => '${numberFormat.format(amount.round())} karma',
+      formatTooltipAmount: (amount) =>
+          '${numberFormat.format(amount.round())} karma',
       formatLeftAxisLabel: (value) => Text(
         value.toInt().toString(),
         style: TextStyle(
@@ -4084,9 +4285,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildNuyenChart(BuildContext context, List<ExpenseEntry> nuyenEntries) {
+  Widget _buildNuyenChart(
+      BuildContext context, List<ExpenseEntry> nuyenEntries) {
     final currencyFormat = NumberFormat.currency(symbol: '¥', decimalDigits: 2);
-    
+
     return _buildExpenseChart(
       context,
       nuyenEntries,
@@ -4115,7 +4317,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       },
     );
   }
-  Widget _buildExpenseChart(BuildContext context, List<ExpenseEntry> entries, {
+
+  Widget _buildExpenseChart(
+    BuildContext context,
+    List<ExpenseEntry> entries, {
     required String title,
     required Color titleColor,
     required Color primaryColor,
@@ -4125,7 +4330,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     required Widget Function(num) formatLeftAxisLabel,
   }) {
     // Filter out zero amounts for chart display
-    final filteredEntries = entries.where((entry) => entry.amount != 0).toList();
+    final filteredEntries =
+        entries.where((entry) => entry.amount != 0).toList();
 
     if (filteredEntries.isEmpty) {
       return Center(
@@ -4141,15 +4347,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               'No $title Data',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: primaryColor,
-              ),
+                    color: primaryColor,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'Add ${title.toLowerCase()} entries to see the chart',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withValues(alpha: 0.7),
+                  ),
             ),
           ],
         ),
@@ -4159,11 +4368,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Sort all filtered entries chronologically first
     final sortedEntries = List<ExpenseEntry>.from(filteredEntries)
       ..sort((a, b) => a.date.compareTo(b.date));
-    
+
     // Find the date range (first entry to last entry)
-    final firstDate = DateTime(sortedEntries.first.date.year, sortedEntries.first.date.month, sortedEntries.first.date.day);
-    final lastDate = DateTime(sortedEntries.last.date.year, sortedEntries.last.date.month, sortedEntries.last.date.day);
-    
+    final firstDate = DateTime(sortedEntries.first.date.year,
+        sortedEntries.first.date.month, sortedEntries.first.date.day);
+    final lastDate = DateTime(sortedEntries.last.date.year,
+        sortedEntries.last.date.month, sortedEntries.last.date.day);
+
     // Generate all calendar days in the range (continuous timeline)
     final allDays = <DateTime>[];
     var currentDate = firstDate;
@@ -4171,31 +4382,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       allDays.add(currentDate);
       currentDate = currentDate.add(const Duration(days: 1));
     }
-    
+
     // Group entries by calendar day
     final Map<DateTime, List<ExpenseEntry>> entriesByDay = {};
     for (final entry in sortedEntries) {
-      final dayKey = DateTime(entry.date.year, entry.date.month, entry.date.day);
+      final dayKey =
+          DateTime(entry.date.year, entry.date.month, entry.date.day);
       entriesByDay.putIfAbsent(dayKey, () => []).add(entry);
     }
-    
+
     // Create chart data with individual entries stacked for same dates
     final chartData = <FlSpot>[];
-    final entryToSpotMapping = <ExpenseEntry, FlSpot>{}; // Track which entry corresponds to which spot
+    final entryToSpotMapping =
+        <ExpenseEntry, FlSpot>{}; // Track which entry corresponds to which spot
     num runningTotal = 0;
-    
+
     for (int dayIndex = 0; dayIndex < allDays.length; dayIndex++) {
       final day = allDays[dayIndex];
       final entriesForDay = entriesByDay[day];
-      
+
       if (entriesForDay != null) {
         // Add each entry for this day as a separate point
-        for (int entryIndex = 0; entryIndex < entriesForDay.length; entryIndex++) {
+        for (int entryIndex = 0;
+            entryIndex < entriesForDay.length;
+            entryIndex++) {
           final entry = entriesForDay[entryIndex];
           runningTotal += entry.amount;
-          
+
           // Use day index as x-coordinate, add small offset for stacking entries on same day
-          final xPos = dayIndex.toDouble() + (entryIndex * 0.05); // Smaller offset for better visual
+          final xPos = dayIndex.toDouble() +
+              (entryIndex * 0.05); // Smaller offset for better visual
           final spot = FlSpot(xPos, runningTotal.toDouble());
           chartData.add(spot);
           entryToSpotMapping[entry] = spot;
@@ -4204,8 +4420,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     // Find min/max values for better scaling
-    final maxY = chartData.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
-    final minY = chartData.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
+    final maxY =
+        chartData.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
+    final minY =
+        chartData.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
     final padding = (maxY - minY) * 0.1; // 10% padding
 
     return Padding(
@@ -4216,9 +4434,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Text(
             '$title Over Time',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: titleColor,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -4231,13 +4449,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   horizontalInterval: (maxY - minY) / 5,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withValues(alpha: 0.2),
                       strokeWidth: 1,
                     );
                   },
                   getDrawingVerticalLine: (value) {
                     return FlLine(
-                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withValues(alpha: 0.2),
                       strokeWidth: 1,
                     );
                   },
@@ -4256,7 +4480,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             child: Text(
                               '${date.month}/${date.day}',
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                                 fontSize: 10,
                               ),
                             ),
@@ -4275,18 +4501,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       },
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(
                   show: true,
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outline
+                        .withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
                 minX: 0,
-                maxX: allDays.isEmpty ? 0 : (allDays.length - 1).toDouble() + 0.5, // Account for stacking offset
+                maxX: allDays.isEmpty
+                    ? 0
+                    : (allDays.length - 1).toDouble() +
+                        0.5, // Account for stacking offset
                 minY: minY - padding,
                 maxY: maxY + padding,
                 lineBarsData: [
@@ -4319,20 +4553,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       return touchedSpots.map((spot) {
                         // Find the entry that corresponds to this spot
                         final entry = entryToSpotMapping.entries
-                            .where((e) => e.value.x == spot.x && e.value.y == spot.y)
-                            .firstOrNull?.key;
-                        
+                            .where((e) =>
+                                e.value.x == spot.x && e.value.y == spot.y)
+                            .firstOrNull
+                            ?.key;
+
                         if (entry != null) {
                           final date = entry.date;
-                          final runningTotalFormatted = formatTooltipAmount(spot.y);
-                          final entryAmountFormatted = formatAmount(entry.amount);
-                          
+                          final runningTotalFormatted =
+                              formatTooltipAmount(spot.y);
+                          final entryAmountFormatted =
+                              formatAmount(entry.amount);
+
                           // Build tooltip with entry details
-                          String tooltip = '${date.month}/${date.day}/${date.year}\n'
+                          String tooltip =
+                              '${date.month}/${date.day}/${date.year}\n'
                               'Running Total: $runningTotalFormatted\n'
                               'This Entry: ${entry.amount > 0 ? '+' : ''}$entryAmountFormatted\n'
                               '${entry.reason}';
-                          
+
                           return LineTooltipItem(
                             tooltip,
                             TextStyle(
@@ -4354,14 +4593,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-
-  void _submitExpenseEntry(BuildContext context, TextEditingController karmaController, 
-      TextEditingController nuyenController, TextEditingController reasonController) async {
-    
+  void _submitExpenseEntry(
+      BuildContext context,
+      TextEditingController karmaController,
+      TextEditingController nuyenController,
+      TextEditingController reasonController) async {
     final karmaText = karmaController.text.trim();
     final nuyenText = nuyenController.text.trim();
     final reason = reasonController.text.trim();
-    
+
     // Validation
     if (reason.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -4372,7 +4612,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
       return;
     }
-    
+
     if (karmaText.isEmpty && nuyenText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -4382,11 +4622,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
       return;
     }
-    
+
     // Parse amounts
     num? karmaAmount;
     num? nuyenAmount;
-    
+
     if (karmaText.isNotEmpty) {
       karmaAmount = num.tryParse(karmaText);
       if (karmaAmount == null) {
@@ -4399,7 +4639,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return;
       }
     }
-    
+
     if (nuyenText.isNotEmpty) {
       nuyenAmount = num.tryParse(nuyenText);
       if (nuyenAmount == null) {
@@ -4412,7 +4652,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return;
       }
     }
-    
+
     // If both amounts are zero, show warning
     try {
       // Add expense entries to the XML service
@@ -4424,7 +4664,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           date: DateTime.now(),
         );
       }
-      
+
       if (nuyenAmount != null && nuyenAmount != 0) {
         _xmlService.addExpenseEntry(
           type: ExpenseType.nuyen,
@@ -4439,15 +4679,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
       // Show success message
 
-      
       // Clear the form
       karmaController.clear();
       nuyenController.clear();
       reasonController.clear();
-      
     } catch (e) {
       // Show error message
-      if(!context.mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding entry: $e'),
@@ -4477,20 +4715,23 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }
       } else {
         // Export for sharing since we can't save directly
-        final filename = '${_currentCharacter?.name ?? 'character'}_modified.chum5';
-        final exportResult = await _xmlService.exportModifiedXmlForSharing(filename);
+        final filename =
+            '${_currentCharacter?.name ?? 'character'}_modified.chum5';
+        final exportResult =
+            await _xmlService.exportModifiedXmlForSharing(filename);
         if (mounted) {
           if (exportResult != null) {
             // Check if this is a file path or a status message
-            final isFilePath = exportResult.contains('/') || exportResult.contains('\\');
-            final message = isFilePath 
-              ? 'Modified character exported to: $exportResult'
-              : exportResult;
-            
-            final backgroundColor = exportResult.toLowerCase().contains('error') 
-              ? Colors.red 
-              : Colors.blue;
-              
+            final isFilePath =
+                exportResult.contains('/') || exportResult.contains('\\');
+            final message = isFilePath
+                ? 'Modified character exported to: $exportResult'
+                : exportResult;
+
+            final backgroundColor = exportResult.toLowerCase().contains('error')
+                ? Colors.red
+                : Colors.blue;
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(message),
@@ -4524,7 +4765,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     try {
       if (_xmlService.hasLoadedDocument) {
         final modifiedXml = _xmlService.exportModifiedXml();
-        final updatedCharacter = _xmlService.parseAndCacheCharacterXml(modifiedXml);
+        final updatedCharacter =
+            _xmlService.parseAndCacheCharacterXml(modifiedXml);
 
         if (updatedCharacter != null) {
           setState(() {
@@ -4567,7 +4809,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       radius: radius,
       backgroundColor: backgroundColor,
       child: Text(
-        (character?.name?.isNotEmpty == true) ? character!.name![0].toUpperCase() : '?',
+        (character?.name?.isNotEmpty == true)
+            ? character!.name![0].toUpperCase()
+            : '?',
         style: TextStyle(
           fontSize: radius * 0.8, // Scale font size to avatar size
           fontWeight: FontWeight.bold,
@@ -4591,7 +4835,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           const SizedBox(height: 16),
           Expanded(
             //child: GearLocationTreeView(allLocations: _currentCharacter?.gearLocations ?? {}, allGears: _currentCharacter?.gear ?? []),
-            child: ShadowrunItemLocationTreeView<Gear>(allLocations: _currentCharacter?.gearLocations ?? {}, allItems: _currentCharacter?.gear ?? []),
+            child: ShadowrunItemLocationTreeView<Gear>(
+                allLocations: _currentCharacter?.gearLocations ?? {},
+                allItems: _currentCharacter?.gear ?? []),
           ),
         ],
       ),
@@ -4615,12 +4861,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   //           ),
   //         ),
   //       ),
-        
+
   //       // TreeSliver content - this will be scrollable with proper padding
   //       SliverPadding(
   //         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
   //         sliver: GearSliverTreeView(
-  //           allLocations: _currentCharacter?.gearLocations ?? {}, 
+  //           allLocations: _currentCharacter?.gearLocations ?? {},
   //           allGears: _currentCharacter?.gear ?? [],
   //         ),
   //       ),
@@ -4640,7 +4886,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ShadowrunItemLocationTreeView<Armor>(allLocations: _currentCharacter?.armorLocations ?? {}, allItems: _currentCharacter?.armor ?? []),
+            child: ShadowrunItemLocationTreeView<Armor>(
+                allLocations: _currentCharacter?.armorLocations ?? {},
+                allItems: _currentCharacter?.armor ?? []),
           ),
         ],
       ),
@@ -4659,7 +4907,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ShadowrunItemLocationTreeView<Weapon>(allLocations: _currentCharacter?.weaponLocations ?? {}, allItems: _currentCharacter?.weapons ?? [], character: _currentCharacter),
+            child: ShadowrunItemLocationTreeView<Weapon>(
+                allLocations: _currentCharacter?.weaponLocations ?? {},
+                allItems: _currentCharacter?.weapons ?? [],
+                character: _currentCharacter),
           ),
         ],
       ),
@@ -4678,7 +4929,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _buildPlaceholderContent(context, 'Drugs & Toxins', 'medication'),
+            child: _buildPlaceholderContent(
+                context, 'Drugs & Toxins', 'medication'),
           ),
         ],
       ),
@@ -4704,7 +4956,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildPlaceholderContent(BuildContext context, String category, String iconName) {
+  Widget _buildPlaceholderContent(
+      BuildContext context, String category, String iconName) {
     IconData icon;
     switch (iconName) {
       case 'inventory':
@@ -4742,26 +4995,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             Text(
               category,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               'This section will display $category items when the gear parsing is implemented.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
               'Coming Soon!',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
           ],
         ),

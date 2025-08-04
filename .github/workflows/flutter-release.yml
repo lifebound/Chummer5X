@@ -11,7 +11,12 @@ jobs:
       new_pubspec_version: ${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }}
       release_notes: ${{ steps.semantic_release_info.outputs.new_release_notes }}
     steps:
-      - uses: actions/checkout@v3
+
+      - name: Install conventional-changelog-conventionalcommits
+        run: npm install --save-dev conventional-changelog-conventionalcommits
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
         with:
           fetch-depth: 0
 
@@ -46,7 +51,7 @@ jobs:
       - name: Commit version bump
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "chore(release): bump to version ${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }} [skip ci]"
+          commit_message: "build(release): bump to version ${{ steps.get_new_pubspec_version.outputs.next_pubspec_version }} [skip ci]"
 
       - name: Tag release
         uses: rickstaa/action-create-tag@v1
@@ -59,7 +64,8 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.32.6
@@ -146,7 +152,7 @@ jobs:
     needs: release
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.32.6

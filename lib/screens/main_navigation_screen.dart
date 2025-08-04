@@ -848,45 +848,51 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildMartialArtsView(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Fixed header section that's always visible
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+          child: Text(
             'Martial Arts',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 16),
-          if (_currentCharacter!.martialArts.isEmpty)
-            SizedBox(
-              height: 200, // Fixed height for the empty state
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.sports_martial_arts,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No martial arts known',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                    ),
-                  ],
+        ),
+        const SizedBox(height: 16),
+        
+        // Scrollable content area
+        Expanded(
+          child: _currentCharacter!.martialArts.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.sports_martial_arts,
+                        size: 64,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No martial arts known',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: _currentCharacter!.martialArts.length,
+                  itemBuilder: (context, index) {
+                    final martialArt = _currentCharacter!.martialArts[index];
+                    return _buildMartialArtCard(context, martialArt);
+                  },
                 ),
-              ),
-            )
-          else
-            ..._currentCharacter!.martialArts.map(
-              (martialArt) => _buildMartialArtCard(context, martialArt),
-            ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

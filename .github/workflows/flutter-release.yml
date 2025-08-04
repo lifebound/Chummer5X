@@ -19,13 +19,13 @@ jobs:
       - name: Install conventional-changelog-conventionalcommits
         run: npm install --save-dev conventional-changelog-conventionalcommits
 
-      - name: Prepare .releaserc
-        run: mv .releaserc.prod.json .releaserc.json
-      
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      
+      - name: Prepare .releaserc
+        run: mv .releaserc.prod.json .releaserc.json
 
       - name: fetch tags
         run: git fetch --tags origin
@@ -34,7 +34,7 @@ jobs:
         id: get_latest_prod_release
         uses: WyriHaximus/github-action-get-previous-tag@v1
         with:
-          prefix: "release/prod/"
+          prefix: "release"
           fallback: 0.0.1+0
       
       - name: Calculate semver

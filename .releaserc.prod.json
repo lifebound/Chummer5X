@@ -3,7 +3,11 @@
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "@semantic-release/npm"
+    "@semantic-release-pub",
+    {
+      "publishPub": false,
+      "updateBuildNumber": true
+    }
   ],
   "preset": "conventionalcommits"
 }

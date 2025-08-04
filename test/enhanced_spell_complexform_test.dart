@@ -429,7 +429,7 @@ void main() {
               <bonus>
                 <detectionspellresist>Rating</detectionspellresist>
               </bonus>
-              <adeptwayrequires></adeptwayrequires>
+              <adeptwayrequires />
               <enhancements />
               <notes />
               <notesColor>Chocolate</notesColor>
@@ -479,7 +479,7 @@ void main() {
       expect(listParse.first.page, equals('169'));
       expect(listParse.first.bonus!['detectionspellresist'], equals('Rating'));
     });
-      
+
     });
     
     group('Model Compatibility Tests', () {

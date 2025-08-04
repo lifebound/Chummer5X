@@ -72,7 +72,7 @@ class AdeptPower {
       bonus: _parseBonus(xml),
       pointsPerLevel: xml.getDouble('pointsperlevel'),
       extraPointCost: xml.getDouble('extrapointcost'),
-      hasLevels: xml.getBool('haslevels'),
+      hasLevels: xml.getBool('levels'),
       maxLevels: xml.getInt('maxlevels'),
       action: xml.getElementText('action'),
       discounted: xml.getBool('discounted'),

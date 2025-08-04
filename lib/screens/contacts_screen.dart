@@ -141,7 +141,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           Icon(
             Icons.people_outline,
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -152,7 +152,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           Text(
             'Add your first contact to get started',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -275,14 +275,14 @@ class _ContactCardState extends State<ContactCard> {
                         Icon(
                           Icons.location_on,
                           size: 16,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                         const SizedBox(width: 4),
                         Flexible(
                           child: Text(
                             widget.contact.location,
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -307,7 +307,7 @@ class _ContactCardState extends State<ContactCard> {
             ),
             Icon(
               _isExpanded ? Icons.expand_less : Icons.expand_more,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ],
         ),
@@ -320,7 +320,7 @@ class _ContactCardState extends State<ContactCard> {
       width: 32,
       height: 36,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         border: Border.all(color: color),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -380,7 +380,7 @@ class _ContactCardState extends State<ContactCard> {
       return Text(
         'No additional details available',
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           fontStyle: FontStyle.italic,
         ),
       );
@@ -396,7 +396,7 @@ class _ContactCardState extends State<ContactCard> {
   Widget _buildDetailChip(BuildContext context, String label, String value) {
     return Chip(
       label: Text('$label: $value'),
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       labelStyle: Theme.of(context).textTheme.bodySmall,
     );
   }
@@ -406,7 +406,7 @@ class _ContactCardState extends State<ContactCard> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -417,14 +417,14 @@ class _ContactCardState extends State<ContactCard> {
               Icon(
                 Icons.notes,
                 size: 16,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 4),
               Text(
                 'Notes',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],

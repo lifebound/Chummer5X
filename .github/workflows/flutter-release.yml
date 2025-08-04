@@ -12,13 +12,18 @@ jobs:
       release_notes: ${{ steps.semantic_release_info.outputs.new_release_notes }}
     steps:
 
-      - name: Install conventional-changelog-conventionalcommits
-        run: npm install --save-dev conventional-changelog-conventionalcommits
       - name: Checkout Code
         uses: actions/checkout@v4
-
         with:
           fetch-depth: 0
+          
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install conventional-changelog-conventionalcommits
+        run: npm install --save-dev conventional-changelog-conventionalcommits
 
       - name: Prepare .releaserc
         run: mv .releaserc.prod.json .releaserc.json

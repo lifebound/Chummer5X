@@ -30,12 +30,11 @@ jobs:
       - name: fetch tags
         run: git fetch --tags origin
 
-      - name: Get latest prod tag
+      - name: Get latest prod tag (Manual)
         id: get_latest_prod_release
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        with:
-          prefix: "release"
-          fallback: 0.0.1+0
+        run: |
+          TAG=$(git describe --tags --abbrev=0 --match "release/*" || echo "0.0.1+0")
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
       
       - name: Calculate semver
         id: semantic_release_info

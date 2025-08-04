@@ -1,3 +1,6 @@
+import 'package:chummer5x/utils/xml_element_extensions.dart';
+import 'package:xml/xml.dart';
+
 class ComplexForm {
   final String name;
   final String target;
@@ -26,7 +29,15 @@ class ComplexForm {
     description: json['description'] ?? '',
     page: json['page'] ?? '',
   );
-
+  factory ComplexForm.fromXml(XmlElement xml) => ComplexForm(
+    name: xml.getElementText('name') ?? '',
+    target: xml.getElementText('target') ?? '',
+    duration: xml.getElementText('duration') ?? '',
+    fading: xml.getElementText('fv') ?? '',
+    source: xml.getElementText('source') ?? '',
+    description: xml.getElementText('description') ?? '',
+    page: xml.getElementText('page') ?? '',
+  );
   // Utility getters
   String get displayName => name;
   bool get hasCompleteInfo => 

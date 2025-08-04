@@ -467,37 +467,11 @@ class EnhancedChummerXmlService {
   }
 
   static List<Spell> parseSpells(XmlElement characterElement) {
-    final spells = <Spell>[];
-    final spellsElement = characterElement.findElements('spells').firstOrNull;
+    final spells = characterElement.parseList(
+      collectionTagName: 'spells',
+      itemTagName: 'spell',
+      fromXml: (e) => Spell.fromXml(e));
 
-    if (spellsElement != null) {
-      for (final spellElement in spellsElement.findElements('spell')) {
-        final name = _getElementText(spellElement, 'name');
-        final category = _getElementText(spellElement, 'category');
-        final range = _getElementText(spellElement, 'range');
-        //final target = _getElementText(spellElement, 'target');
-        final duration = _getElementText(spellElement, 'duration');
-        final drain = _getElementText(spellElement, 'dv');
-        final source = _getElementText(spellElement, 'source');
-        final improvementSource =
-            _getElementText(spellElement, 'improvementsource');
-        final grade = _getElementText(spellElement, 'grade');
-        final page = _getElementText(spellElement, 'page');
-        if (name != null && category != null) {
-          spells.add(Spell(
-            name: name,
-            category: category,
-            range: range ?? '',
-            duration: duration ?? '',
-            drain: drain ?? '',
-            source: source ?? '',
-            improvementSource: improvementSource,
-            grade: grade,
-            page: page ?? '',
-          ));
-        }
-      }
-    }
 
     return spells;
   }
@@ -568,85 +542,21 @@ class EnhancedChummerXmlService {
   }
 
   static List<ComplexForm> _parseComplexForms(XmlElement characterElement) {
-    final complexForms = <ComplexForm>[];
-    final complexFormsElement =
-        characterElement.findElements('complexforms').firstOrNull;
+    final complexForms = characterElement.parseList(
+      collectionTagName: 'complexforms',
+      itemTagName: 'complexform',
+      fromXml: (e) => ComplexForm.fromXml(e));
 
-    if (complexFormsElement != null) {
-      for (final formElement
-          in complexFormsElement.findElements('complexform')) {
-        final name = _getElementText(formElement, 'name');
-        final target = _getElementText(formElement, 'target');
-        final duration = _getElementText(formElement, 'duration');
-        final fading = _getElementText(formElement, 'fv');
-        final source = _getElementText(formElement, 'source');
-        final page = _getElementText(formElement, 'page');
-        debugPrint(
-            'Parsing complex form: $name, Target: $target, Duration: $duration, Fading: $fading, Source: $source, Page: $page');
-        if (name != null) {
-          complexForms.add(ComplexForm(
-            name: name,
-            target: target ?? '',
-            duration: duration ?? '',
-            fading: fading ?? '',
-            source: source ?? '',
-            page: page ?? '',
-          ));
-        }
-      }
-    }
 
     return complexForms;
   }
 
   static List<AdeptPower> parseAdeptPowers(XmlElement characterElement) {
-    final adeptPowers = <AdeptPower>[];
-    final powersElement = characterElement.findElements('powers').firstOrNull;
-
-    if (powersElement != null) {
-      for (final powerElement in powersElement.findElements('power')) {
-        final name = _getElementText(powerElement, 'name');
-        // TODO: Parse rating as int instead of String - ratings are always integers
-        final rating = _getElementText(powerElement, 'rating');
-        final extra = _getElementText(powerElement, 'extra');
-        final source = _getElementText(powerElement, 'source') ?? '';
-        final page = _getElementText(powerElement, 'page') ?? '';
-        final discounted =
-            _getElementText(powerElement, 'discounted')?.toLowerCase() ==
-                'true';
-        final pointsPerLevel = double.tryParse(
-                _getElementText(powerElement, 'pointsperlevel') ?? '') ??
-            0.0;
-        final extraPointCost = double.tryParse(
-                _getElementText(powerElement, 'extrapointcost') ?? '') ??
-            0.0;
-        final hasLevels =
-            _getElementText(powerElement, 'levels')?.toLowerCase() == 'true';
-        final maxLevels =
-            int.tryParse(_getElementText(powerElement, 'maxlevels') ?? '0') ??
-                0;
-        final action = _getElementText(powerElement, 'action');
-        final bonus = _parseBonus(powerElement);
-
-        if (name != null) {
-          adeptPowers.add(AdeptPower(
-            name: name,
-            rating: rating,
-            extra: extra,
-            source: source,
-            page: page,
-            discounted: discounted,
-            pointsPerLevel: pointsPerLevel,
-            extraPointCost: extraPointCost,
-            hasLevels: hasLevels,
-            maxLevels: maxLevels,
-            action: action,
-            bonus: bonus,
-          ));
-        }
-      }
-    }
-
+    final adeptPowers = characterElement.parseList(
+      collectionTagName: 'powers',
+      itemTagName: 'power',
+      fromXml: (e) => AdeptPower.fromXml(e));
+    
     return adeptPowers;
   }
 
@@ -1081,31 +991,7 @@ class EnhancedChummerXmlService {
   /// Parse calendar from XML
   static Calendar? _parseCalendar(XmlElement characterElement) {
     debugPrint('Parsing calendar...');
-    // final calendarElement =
-    //     characterElement.findElements('calendar').firstOrNull;
-    // if (calendarElement == null) return null;
-
-    // final weeks = <CalendarWeek>[];
-
-    // for (final weekElement in calendarElement.findElements('week')) {
-    //   final guid = _getElementText(weekElement, 'guid') ?? '';
-    //   final year =
-    //       int.tryParse(_getElementText(weekElement, 'year') ?? '0') ?? 0;
-    //   final week =
-    //       int.tryParse(_getElementText(weekElement, 'week') ?? '0') ?? 0;
-    //   final notes = _getElementText(weekElement, 'notes');
-    //   final notesColor = _getElementText(weekElement, 'notesColor');
-
-    //   weeks.add(CalendarWeek(
-    //     guid: guid,
-    //     year: year,
-    //     week: week,
-    //     notes: notes?.trim().isEmpty == true ? null : notes,
-    //     notesColor: notesColor,
-    //   ));
-    // }
-    // debugPrint('Parsed ${weeks.length} calendar weeks.');
-    // return Calendar(weeks: weeks);
+ 
     return Calendar.fromXml(characterElement);
   }
 

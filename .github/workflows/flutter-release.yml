@@ -36,7 +36,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
         with:
+          # This is the key change: specify the plugins it needs.
+          # The action will handle installing them itself.
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
           semantic_version: 19
+
 
       - name: Update pubspec.yaml
         id: get_new_pubspec_version

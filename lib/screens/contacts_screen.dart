@@ -396,7 +396,7 @@ class _ContactCardState extends State<ContactCard> {
   Widget _buildDetailChip(BuildContext context, String label, String value) {
     return Chip(
       label: Text('$label: $value'),
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
       labelStyle: Theme.of(context).textTheme.bodySmall,
     );
   }
@@ -406,7 +406,7 @@ class _ContactCardState extends State<ContactCard> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

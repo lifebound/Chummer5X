@@ -81,7 +81,7 @@ class _ContactsTableScreenState extends State<ContactsTableScreen> {
           Icon(
             Icons.people_outline,
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -92,7 +92,7 @@ class _ContactsTableScreenState extends State<ContactsTableScreen> {
           Text(
             'Add your first contact to get started',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -132,7 +132,7 @@ class _ContactsTableScreenState extends State<ContactsTableScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       ),
       child: Row(
         children: [
@@ -166,7 +166,7 @@ class _ContactsTableScreenState extends State<ContactsTableScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected 
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
               : null,
         ),
         child: Row(
@@ -247,7 +247,7 @@ class _ContactsTableScreenState extends State<ContactsTableScreen> {
       width: 20,
       height: 20,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         border: Border.all(color: color, width: 1),
         borderRadius: BorderRadius.circular(4),
       ),
@@ -314,7 +314,7 @@ class _ContactsTableScreenState extends State<ContactsTableScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(contact.notes),

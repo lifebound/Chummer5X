@@ -19,6 +19,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Prepare .releaserc
+        run: mv .releaserc.prod.json .releaserc.json
 
       - name: Run Semantic Release
         id: semantic

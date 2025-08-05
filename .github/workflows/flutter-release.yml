@@ -20,25 +20,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Run Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
         with:
-          node-version: 20
-
-      - name: Install Semantic Release + Plugins
-        run: |
-          npm install -g semantic-release \
-            @semantic-release/commit-analyzer \
-            @semantic-release/release-notes-generator \
-            semantic-release-pub \
+          branch: main
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            semantic-release-pub
             @semantic-release/github
-
-      - name: Run semantic-release
-        id: set-version
+            @semantic-release/git
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_WORKFLOW_TRIGGER }}
-        run: |
-          semantic-release --config .releaserc.prod.json
           
       - name: Extract Version
         id: extract_version

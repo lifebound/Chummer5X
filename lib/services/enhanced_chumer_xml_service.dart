@@ -30,6 +30,7 @@ import 'package:chummer5x/models/game_notes.dart';
 import 'package:chummer5x/models/mugshot.dart';
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/contact.dart';
+import 'package:chummer5x/models/lifestyle.dart';
 
 class EnhancedChummerXmlService {
   /// Parse a Chummer XML file and return a comprehensive ShadowrunCharacter
@@ -145,6 +146,9 @@ class EnhancedChummerXmlService {
       // Parse contacts
       final contacts = _parseContacts(characterElement);
 
+      // Parse lifestyles
+      final lifestyles = _parseLifestyles(characterElement);
+
       // Parse condition monitor
       final conditionMonitor =
           _parseConditionMonitor(characterElement, calculatedValues);
@@ -233,7 +237,8 @@ class EnhancedChummerXmlService {
           weapons: allWeapons,
           cyberware: allCyberware,
           cyberwareLocations: cyberwareLocations,
-          contacts: contacts);
+          contacts: contacts,
+          lifestyles: lifestyles);
     } catch (e) {
       debugPrint('Error parsing XML: $e');
       return null;
@@ -1090,5 +1095,16 @@ class EnhancedChummerXmlService {
     final individualContactElements = contactsElements.findElements('contact');
     debugPrint('Parsed ${individualContactElements.length} contact entries.');
     return individualContactElements.map((e) => Contact.fromXml(e)).toList();
+  }
+
+  static List<Lifestyle> _parseLifestyles(XmlElement characterElement) {
+    debugPrint('Parsing lifestyles...');
+    final lifestyles = characterElement.parseList<Lifestyle>(
+      collectionTagName: 'lifestyles',
+      itemTagName: 'lifestyle',
+      fromXml: Lifestyle.fromXml,
+    );
+    debugPrint('Parsed ${lifestyles.length} lifestyle entries.');
+    return lifestyles;
   }
 }

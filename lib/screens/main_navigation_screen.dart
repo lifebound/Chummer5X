@@ -28,6 +28,8 @@ import 'package:chummer5x/models/critter_base.dart';
 import 'package:chummer5x/models/spirit.dart';
 import 'package:chummer5x/models/sprite.dart';
 import 'package:chummer5x/models/game_notes.dart';
+import 'package:chummer5x/models/lifestyle.dart';
+import 'package:chummer5x/models/lifestyle_quality.dart';
 import 'package:chummer5x/screens/contacts_screen.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
@@ -4944,24 +4946,555 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildLifestylesTabContent(BuildContext context) {
+    final lifestyles = _currentCharacter?.lifestyles ?? [];
+    
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Lifestyles',
-            style: Theme.of(context).textTheme.headlineSmall,
+          // Header with lifestyle count
+          Row(
+            children: [
+              Text(
+                'Lifestyles',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(width: 12),
+              if (lifestyles.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${lifestyles.length} lifestyle${lifestyles.length == 1 ? '' : 's'}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _buildPlaceholderContent(context, 'Lifestyles', 'home'),
+            child: lifestyles.isEmpty
+                ? _buildEmptyLifestylesState(context)
+                : _buildLifestylesListDetailView(context, lifestyles),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildEmptyLifestylesState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.home_outlined,
+            size: 64,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Lifestyles',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Character has no lifestyle entries',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLifestylesListDetailView(BuildContext context, List<Lifestyle> lifestyles) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWideScreen = constraints.maxWidth >= 800;
+        
+        if (isWideScreen) {
+          return _buildLifestylesListDetailLayout(context, lifestyles);
+        } else {
+          return _buildLifestylesStackedLayout(context, lifestyles);
+        }
+      },
+    );
+  }
+
+  Widget _buildLifestylesListDetailLayout(BuildContext context, List<Lifestyle> lifestyles) {
+    return Row(
+      children: [
+        // Left side: Lifestyle list
+        SizedBox(
+          width: 350,
+          child: _buildLifestylesList(context, lifestyles),
+        ),
+        const SizedBox(width: 16),
+        // Right side: Lifestyle details
+        Expanded(
+          child: _buildLifestyleDetails(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLifestylesStackedLayout(BuildContext context, List<Lifestyle> lifestyles) {
+    // For small screens, show either the list or the details based on selection
+    if (_selectedLifestyleIndex != null) {
+      // Show details with back button
+      return Column(
+        children: [
+          // Back button header
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      _selectedLifestyleIndex = null;
+                    });
+                  },
+                  tooltip: 'Back to list',
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Lifestyle Details',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Details content
+          Expanded(
+            child: _buildLifestyleDetails(context),
+          ),
+        ],
+      );
+    } else {
+      // Show list
+      return _buildLifestylesList(context, lifestyles);
+    }
+  }
+
+  Widget _buildLifestylesList(BuildContext context, List<Lifestyle> lifestyles) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Lifestyle Entries',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView.builder(
+              itemCount: lifestyles.length,
+              itemBuilder: (context, index) {
+                final lifestyle = lifestyles[index];
+                return _buildLifestyleListItem(context, lifestyle, index);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  int? _selectedLifestyleIndex;
+
+  Widget _buildLifestyleListItem(BuildContext context, Lifestyle lifestyle, int index) {
+    final isSelected = _selectedLifestyleIndex == index;
+    
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedLifestyleIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
+              : null,
+          border: Border(
+            bottom: BorderSide(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lifestyle.name,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isSelected 
+                              ? Theme.of(context).colorScheme.primary
+                              : null,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _buildLifestyleChipSmall(
+                        context, 
+                        'Monthly Cost', 
+                        '${lifestyle.totalMonthlyCost}¥',
+                      ),
+                      const SizedBox(width: 8),
+                      _buildLifestyleChipSmall(
+                        context, 
+                        'LP', 
+                        '${lifestyle.totalLifestylePoints}',
+                      ),
+                    ],
+                  ),
+                  if (lifestyle.baseLifestyle.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Base: ${lifestyle.baseLifestyle}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // Show arrow icon on small screens to indicate tappable items
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Check if parent layout is wide enough for side-by-side layout  
+                return MediaQuery.of(context).size.width < 800
+                    ? Icon(
+                        Icons.chevron_right,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      )
+                    : const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLifestyleChipSmall(BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '$label: $value',
+        style: TextStyle(
+          fontSize: 10,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLifestyleDetails(BuildContext context) {
+    if (_selectedLifestyleIndex == null) {
+      return Card(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.home_outlined,
+                size: 48,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Select a Lifestyle',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Choose a lifestyle from the list to view details',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final lifestyles = _currentCharacter?.lifestyles ?? [];
+    if (_selectedLifestyleIndex! >= lifestyles.length) {
+      return const Card(
+        child: Center(
+          child: Text('Lifestyle not found'),
+        ),
+      );
+    }
+
+    final lifestyle = lifestyles[_selectedLifestyleIndex!];
+    return _buildLifestyleDetailCard(context, lifestyle);
+  }
+
+  Widget _buildLifestyleDetailCard(BuildContext context, Lifestyle lifestyle) {
+    return Card(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(
+                  Icons.home,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    lifestyle.name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Cost and LP Summary
+            _buildLifestyleDetailSection(
+              context,
+              'Summary',
+              [
+                _buildLifestyleDetailRow(context, 'Monthly Cost', '${lifestyle.totalMonthlyCost}¥'),
+                _buildLifestyleDetailRow(context, 'Base Cost', '${lifestyle.cost}¥'),
+                _buildLifestyleDetailRow(context, 'Lifestyle Points', '${lifestyle.totalLifestylePoints}'),
+                if (lifestyle.months > 0)
+                  _buildLifestyleDetailRow(context, 'Months Paid', '${lifestyle.months}'),
+              ],
+            ),
+
+            // Lifestyle Details
+            _buildLifestyleDetailSection(
+              context,
+              'Details',
+              [
+                if (lifestyle.baseLifestyle.isNotEmpty)
+                  _buildLifestyleDetailRow(context, 'Base Lifestyle', lifestyle.baseLifestyle),
+                if (lifestyle.type.isNotEmpty)
+                  _buildLifestyleDetailRow(context, 'Type', lifestyle.type),
+                if (lifestyle.multiplier != 100)
+                  _buildLifestyleDetailRow(context, 'Cost Multiplier', '${lifestyle.multiplier}%'),
+                if (lifestyle.percentage != 100.0)
+                  _buildLifestyleDetailRow(context, 'Cost Percentage', '${lifestyle.percentage}%'),
+                if (lifestyle.roommates > 0)
+                  _buildLifestyleDetailRow(context, 'Roommates', '${lifestyle.roommates}'),
+              ],
+            ),
+
+            // Ratings
+            _buildLifestyleDetailSection(
+              context,
+              'Ratings',
+              [
+                _buildLifestyleDetailRow(context, 'Area', '${lifestyle.effectiveArea} (${lifestyle.baseArea} + ${lifestyle.area})'),
+                _buildLifestyleDetailRow(context, 'Comforts', '${lifestyle.effectiveComforts} (${lifestyle.baseComforts} + ${lifestyle.comforts})'),
+                _buildLifestyleDetailRow(context, 'Security', '${lifestyle.effectiveSecurity} (${lifestyle.baseSecurity} + ${lifestyle.security})'),
+              ],
+            ),
+
+            // Location
+            if (lifestyle.city.isNotEmpty || lifestyle.district.isNotEmpty || lifestyle.borough.isNotEmpty)
+              _buildLifestyleDetailSection(
+                context,
+                'Location',
+                [
+                  if (lifestyle.city.isNotEmpty)
+                    _buildLifestyleDetailRow(context, 'City', lifestyle.city),
+                  if (lifestyle.district.isNotEmpty)
+                    _buildLifestyleDetailRow(context, 'District', lifestyle.district),
+                  if (lifestyle.borough.isNotEmpty)
+                    _buildLifestyleDetailRow(context, 'Borough', lifestyle.borough),
+                ],
+              ),
+
+            // Lifestyle Qualities
+            if (lifestyle.lifestyleQualities.isNotEmpty)
+              _buildLifestyleQualitiesSection(context, lifestyle.lifestyleQualities),
+
+            // Notes
+            if (lifestyle.notes.isNotEmpty)
+              _buildLifestyleDetailSection(
+                context,
+                'Notes',
+                [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      lifestyle.notes,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+
+            // Source Information
+            if (lifestyle.source.isNotEmpty)
+              _buildLifestyleDetailSection(
+                context,
+                'Source',
+                [
+                  _buildLifestyleDetailRow(context, 'Source', '${lifestyle.source}${lifestyle.page.isNotEmpty ? ', p${lifestyle.page}' : ''}'),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLifestyleDetailSection(BuildContext context, String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+        ),
+        const SizedBox(height: 8),
+        ...children,
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildLifestyleDetailRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              '$label:',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLifestyleQualitiesSection(BuildContext context, List<LifestyleQuality> qualities) {
+    return _buildLifestyleDetailSection(
+      context,
+      'Lifestyle Qualities',
+      [
+        ...qualities.map((quality) => Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                quality.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  if (quality.cost != 0)
+                    _buildLifestyleChipSmall(context, 'Cost', '${quality.cost}¥'),
+                  if (quality.cost != 0 && quality.lp != 0)
+                    const SizedBox(width: 8),
+                  if (quality.lp != 0)
+                    _buildLifestyleChipSmall(context, 'LP', '${quality.lp}'),
+                  if (quality.free)
+                    const SizedBox(width: 8),
+                  if (quality.free)
+                    _buildLifestyleChipSmall(context, 'Free', 'Yes'),
+                ],
+              ),
+              if (quality.notes.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  quality.notes,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ],
+          ),
+        )),
+      ],
+    );
+  }
   Widget _buildPlaceholderContent(
       BuildContext context, String category, String iconName) {
     IconData icon;

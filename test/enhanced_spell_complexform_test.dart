@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:flutter_test/flutter_test.dart';

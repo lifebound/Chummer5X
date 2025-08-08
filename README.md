@@ -59,13 +59,36 @@ This application supports the following platforms:
 - ✅ **Linux** - Full support
 - ✅ **Web** - Full support
 - ❌ **iOS** - Not supported
-- ⏳ **macOS** - Potential future support (releases only, if there's demand)
+- ⏳ **macOS** - (See below)
 
 ### Note on iOS Support
 
 Unfortunately, I will not be developing for iOS due to Apple's platform limitations. As this is a free, open-source application with no monetization, the costs and requirements associated with iOS development (Xcode requirements, Apple Developer Program fees, etc.) are not feasible for this project. I hope you understand this decision.
 
 If there's sufficient community demand, I may consider adding macOS builds in the future, but these would be release-only builds without active development support.
+
+### macOS notes
+
+MacOS users may encounter entitlement errors when running Chummer5X. This is because the app is not codesigned using an Apple Developer certificate. I'm not willing to pay for an Apple Developer license at this time.
+As such, this app is sandboxed on macOS and includes entitlements to access user-selected files:
+
+- com.apple.security.app-sandbox = true
+- com.apple.security.files.user-selected.read-write = true
+- com.apple.security.files.bookmarks.app-scope = true (optional; for persisted access)
+
+Users can:
+
+- Right-click the app, choose "Open" and confirm on first run, or
+- Remove quarantine attribute on the downloaded app:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Chummer5X.app"
+# or, before unzipping
+yes | xattr -dr com.apple.quarantine ~/Downloads/Chummer5X-macos.zip
+```
+
+
+
 
 ## Getting Started
 
@@ -124,6 +147,7 @@ lib/
     ├── character_info_card.dart       # Character information widget
     └── attributes_card.dart           # Enhanced attributes display widget
 ```
+
 
 ## Contributing
 

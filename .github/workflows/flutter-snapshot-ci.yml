@@ -5,7 +5,7 @@ name: Snapshot CI
 on:
   push:
     branches:
-      - develop # Trigger on pushes to the development branch
+      - main # Trigger on pushes to the main branch
   schedule:
     # Runs daily at 00:00 UTC (adjust as needed)
     - cron: '0 0 * * *'

@@ -1,4 +1,5 @@
 import 'package:chummer5x/models/items/location.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:xml/xml.dart';
 import 'package:flutter/material.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
@@ -164,9 +165,21 @@ class Vehicle extends ShadowrunItem {
       modFirewall: element.getElement('modfirewall')?.innerText,
       modAttributeArray: element.getElement('modattributearray')?.innerText.split(',').map((s) => s.trim()).toList(),
       canSwapAttributes: element.getElement('canswapattributes')?.innerText == 'True',
-      mods: element.getElement('mods')?.findAllElements('mod').map((e) => VehicleMod.fromXmlElement(e)).toList() ?? [],
-      weaponMounts: element.getElement('weaponmounts')?.findAllElements('weaponmount').map((e) => WeaponMount.fromXmlElement(e)).toList() ?? [],
-      gears: element.getElement('gears')?.findAllElements('gear').map((e) => Gear.fromXml(e)).toList() ?? [],
+      mods: element.parseList(
+        collectionTagName: 'mods',
+        itemTagName: 'mod',
+        fromXml: (e) => VehicleMod.fromXml(e),
+      ),
+      weaponMounts: element.parseList(
+        collectionTagName: 'weaponmounts',
+        itemTagName: 'weaponmount',
+        fromXml: (e) => WeaponMount.fromXml(e),
+      ),
+      gears: element.parseList(
+        collectionTagName: 'gears',
+        itemTagName: 'gear',
+        fromXml: (e) => Gear.fromXml(e),
+      ),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:chummer5x/models/items/shadowrun_item.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 
@@ -62,39 +63,43 @@ class VehicleMod extends ShadowrunItem{
  
   });
 
-  factory VehicleMod.fromXmlElement(XmlElement element) {
+  factory VehicleMod.fromXml(XmlElement element) {
     return VehicleMod(
-      sourceId: element.getElement('sourceid')?.innerText ?? '',
-      guid: element.getElement('guid')?.innerText ?? '',
-      name: element.getElement('name')?.innerText ?? '',
-      category: element.getElement('category')?.innerText ?? '',
-      limit: element.getElement('limit')?.innerText,
-      slots: element.getElement('slots')?.innerText ?? '',
-      capacity: element.getElement('capacity')?.innerText,
-      rating: element.getElement('rating')?.innerText ?? '0',
-      maxRating: element.getElement('maxrating')?.innerText ?? '0',
-      ratingLabel: element.getElement('ratinglabel')?.innerText ?? '',
-      conditionMonitor: element.getElement('conditionmonitor')?.innerText ?? '0',
-      avail: element.getElement('avail')?.innerText ?? '',
-      cost: double.tryParse(element.getElement('cost')?.innerText ?? '') ?? 0,
-      markup: element.getElement('markup')?.innerText ?? '0',
-      extra: element.getElement('extra')?.innerText,
-      source: element.getElement('source')?.innerText ?? '',
-      page: element.getElement('page')?.innerText ?? '',
-      included: element.getElement('included')?.innerText == 'True',
-      equipped: element.getElement('equipped')?.innerText == 'True',
-      wirelessOn: element.getElement('wirelesson')?.innerText == 'True',
-      subsystems: element.getElement('subsystems')?.innerText,
-      weaponMountCategories: element.getElement('weaponmountcategories')?.innerText,
-      ammoBonus: element.getElement('ammobonus')?.innerText ?? '0',
-      ammoBonusPercent: element.getElement('ammobonuspercent')?.innerText ?? '0',
-      ammoReplace: element.getElement('ammoreplace')?.innerText,
-      weapons: element.getElement('weapons')?.findAllElements('weapon').map((e) => Weapon.fromXml(e)).toList() ?? [],
-      notes: element.getElement('notes')?.innerText,
-      notesColor: element.getElement('notesColor')?.innerText,
-      discountedCost: element.getElement('discountedcost')?.innerText == 'True',
-      sortOrder:int.tryParse(element.getElement('sortorder')?.innerText ?? '') ?? 0,
-      stolen: element.getElement('stolen')?.innerText == 'True',
+      sourceId: element.getElementText('sourceid') ?? '',
+      guid: element.getElementText('guid') ?? '',
+      name: element.getElementText('name') ?? '',
+      category: element.getElementText('category') ?? '',
+      limit: element.getElementText('limit'),
+      slots: element.getElementText('slots') ?? '',
+      capacity: element.getElementText('capacity'),
+      rating: element.getElementText('rating') ?? '0',
+      maxRating: element.getElementText('maxrating') ?? '0',
+      ratingLabel: element.getElementText('ratinglabel') ?? '',
+      conditionMonitor: element.getElementText('conditionmonitor') ?? '0',
+      avail: element.getElementText('avail') ?? '',
+      cost: double.tryParse(element.getElementText('cost') ?? '') ?? 0,
+      markup: element.getElementText('markup') ?? '0',
+      extra: element.getElementText('extra'),
+      source: element.getElementText('source') ?? '',
+      page: element.getElementText('page') ?? '',
+      included: element.getElementText('included') == 'True',
+      equipped: element.getElementText('equipped') == 'True',
+      wirelessOn: element.getElementText('wirelesson') == 'True',
+      subsystems: element.getElementText('subsystems'),
+      weaponMountCategories: element.getElementText('weaponmountcategories'),
+      ammoBonus: element.getElementText('ammobonus') ?? '0',
+      ammoBonusPercent: element.getElementText('ammobonuspercent') ?? '0',
+      ammoReplace: element.getElementText('ammoreplace'),
+      weapons: element.parseList(
+        collectionTagName: 'weapons',
+        itemTagName: 'weapon',
+        fromXml: (e) => Weapon.fromXml(e),
+      ),
+      notes: element.getElementText('notes'),
+      notesColor: element.getElementText('notesColor'),
+      discountedCost: element.getElementText('discountedcost') == 'True',
+      sortOrder: int.tryParse(element.getElementText('sortorder') ?? '') ?? 0,
+      stolen: element.getElementText('stolen') == 'True',
     );
   }
 

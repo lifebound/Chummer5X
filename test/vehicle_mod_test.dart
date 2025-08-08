@@ -156,7 +156,7 @@ void main() {
       final mods = root.parseList<VehicleMod>(
         collectionTagName: 'vehiclemods',
         itemTagName: 'vehiclemod',
-        fromXml: VehicleMod.fromXmlElement,
+        fromXml: VehicleMod.fromXml,
       );
 
       // Assert
@@ -279,7 +279,7 @@ void main() {
               'Stolen status should match the value provided in constructor');
     });
 
-    group('fromXmlElement', () {
+    group('fromXml', () {
       test('should parse minimal XML correctly', () {
         // Arrange
         final xmlString = '''
@@ -311,7 +311,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
+        final vehicleMod = VehicleMod.fromXml(xmlElement);
 
         // Assert
         expect(vehicleMod.sourceId, 'basic-source',
@@ -432,7 +432,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
+        final vehicleMod = VehicleMod.fromXml(xmlElement);
 
         // Assert
         expect(vehicleMod.sourceId, 'complete-source',
@@ -519,7 +519,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
+        final vehicleMod = VehicleMod.fromXml(xmlElement);
 
         // Assert
         expect(vehicleMod.sourceId, '',
@@ -621,7 +621,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
+        final vehicleMod = VehicleMod.fromXml(xmlElement);
 
         // Assert
         expect(vehicleMod.included, true,
@@ -688,7 +688,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final vehicleMod = VehicleMod.fromXmlElement(xmlElement);
+        final vehicleMod = VehicleMod.fromXml(xmlElement);
 
         // Assert
         expect(vehicleMod.weapons, hasLength(1),

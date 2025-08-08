@@ -120,7 +120,7 @@ void main() {
       expect(weaponMount.stolen, true);
     });
 
-    group('fromXmlElement', () {
+    group('fromXml', () {
       test('should parse minimal XML correctly', () {
         // Arrange
         final xmlString = '''
@@ -151,7 +151,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final weaponMount = WeaponMount.fromXmlElement(xmlElement);
+        final weaponMount = WeaponMount.fromXml(xmlElement);
 
         // Assert
         expect(weaponMount.sourceId, 'basic-source');
@@ -322,7 +322,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final weaponMount = WeaponMount.fromXmlElement(xmlElement);
+        final weaponMount = WeaponMount.fromXml(xmlElement);
 
         // Assert
         expect(weaponMount.sourceId, 'complete-source');
@@ -365,7 +365,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final weaponMount = WeaponMount.fromXmlElement(xmlElement);
+        final weaponMount = WeaponMount.fromXml(xmlElement);
 
         // Assert
         expect(weaponMount.sourceId, '');
@@ -421,7 +421,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final weaponMount = WeaponMount.fromXmlElement(xmlElement);
+        final weaponMount = WeaponMount.fromXml(xmlElement);
 
         // Assert
         expect(weaponMount.freeCost, true);

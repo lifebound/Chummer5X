@@ -246,8 +246,11 @@ class EnhancedChummerXmlService {
   }
 
   static String? _getElementText(XmlElement parent, String elementName) {
-    final element = parent.findElements(elementName).firstOrNull;
-    return element?.innerText;
+    //final element = parent.findElements(elementName).firstOrNull;
+
+    final element = parent.getElementText(elementName);
+
+    return element;
   }
 
   static List<Attribute> _parseAttributes(XmlElement characterElement) {

@@ -52,7 +52,7 @@ void main() {
       expect(option.includedInParent, true);
     });
 
-    group('fromXmlElement', () {
+    group('fromXml', () {
       test('should parse minimal XML correctly', () {
         // Arrange
         final xmlString = '''
@@ -70,7 +70,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.sourceId, 'basic-source');
@@ -100,7 +100,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.sourceId, 'complete-source');
@@ -122,7 +122,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.sourceId, '');
@@ -152,7 +152,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.includedInParent, true);
@@ -175,7 +175,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.includedInParent, false);
@@ -198,7 +198,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.slots, '5');
@@ -221,7 +221,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.avail, '20F');
@@ -244,7 +244,7 @@ void main() {
         final xmlElement = XmlDocument.parse(xmlString).rootElement;
 
         // Act
-        final option = WeaponMountOption.fromXmlElement(xmlElement);
+        final option = WeaponMountOption.fromXml(xmlElement);
 
         // Assert
         expect(option.cost, 'Variable');

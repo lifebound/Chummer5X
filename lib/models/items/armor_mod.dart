@@ -1,4 +1,5 @@
 import 'package:chummer5x/models/items/shadowrun_item.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:xml/xml.dart';
 import 'package:flutter/material.dart';
 
@@ -41,35 +42,35 @@ class ArmorMod extends ShadowrunItem {
   }) : super();
 
   factory ArmorMod.fromXml(XmlElement xmlElement) {
-    final nameText = xmlElement.getElement('name')?.innerText;
-    final categoryText = xmlElement.getElement('category')?.innerText;
-    final sourceText = xmlElement.getElement('source')?.innerText;
-    final pageText = xmlElement.getElement('page')?.innerText;
-    
+    final nameText = xmlElement.getElementText('name');
+    final categoryText = xmlElement.getElementText('category');
+    final sourceText = xmlElement.getElementText('source');
+    final pageText = xmlElement.getElementText('page');
+
     return ArmorMod(
-      sourceId: xmlElement.getElement('sourceid')?.innerText,
+      sourceId: xmlElement.getElementText('sourceid'),
       name: nameText?.isNotEmpty == true ? nameText! : 'Unnamed Armor Mod',
       category: categoryText?.isNotEmpty == true ? categoryText! : 'Unknown',
-      armor: int.tryParse(xmlElement.getElement('armor')?.innerText ?? '0') ?? 0,
-      armorCapacity: xmlElement.getElement('armorcapacity')?.innerText ?? '0',
-      gearCapacity: xmlElement.getElement('gearcapacity')?.innerText,
-      maxRating: int.tryParse(xmlElement.getElement('maxrating')?.innerText ?? '0') ?? 0,
-      rating: int.tryParse(xmlElement.getElement('rating')?.innerText ?? '0') ?? 0,
-      ratingLabel: xmlElement.getElement('ratinglabel')?.innerText ?? 'String_Rating',
-      avail: xmlElement.getElement('avail')?.innerText ?? '-',
-      cost: double.tryParse(xmlElement.getElement('cost')?.innerText ?? '0') ?? 0,
-      weight: xmlElement.getElement('weight')?.innerText,
+      armor: xmlElement.getInt('armor', defaultValue: 0),
+      armorCapacity: xmlElement.getElementText('armorcapacity') ?? '0',
+      gearCapacity: xmlElement.getElementText('gearcapacity'),
+      maxRating: xmlElement.getInt('maxrating', defaultValue: 0),
+      rating: xmlElement.getInt('rating', defaultValue: 0),
+      ratingLabel: xmlElement.getElementText('ratinglabel') ?? 'String_Rating',
+      avail: xmlElement.getElementText('avail') ?? '-',
+      cost: xmlElement.getDouble('cost', defaultValue: 0),
+      weight: xmlElement.getElementText('weight'),
       source: sourceText?.isNotEmpty == true ? sourceText! : 'Unknown',
       page: pageText?.isNotEmpty == true ? pageText! : '0',
-      included: xmlElement.getElement('included')?.innerText == 'True',
-      equipped: xmlElement.getElement('equipped')?.innerText == 'True',
-      extra: xmlElement.getElement('extra')?.innerText,
-      stolen: xmlElement.getElement('stolen')?.innerText == 'True',
-      notes: xmlElement.getElement('notes')?.innerText,
-      notesColor: xmlElement.getElement('notesColor')?.innerText,
-      discountedCost: xmlElement.getElement('discountedcost')?.innerText == 'True',
-      sortOrder: int.tryParse(xmlElement.getElement('sortorder')?.innerText ?? '0') ?? 0,
-      wirelessOn: xmlElement.getElement('wirelesson')?.innerText == 'True',
+      included: xmlElement.getBool('included'),
+      equipped: xmlElement.getBool('equipped'),
+      extra: xmlElement.getElementText('extra'),
+      stolen: xmlElement.getBool('stolen'),
+      notes: xmlElement.getElementText('notes'),
+      notesColor: xmlElement.getElementText('notesColor'),
+      discountedCost: xmlElement.getBool('discountedcost'),
+      sortOrder: xmlElement.getInt('sortorder', defaultValue: 0),
+      wirelessOn: xmlElement.getBool('wirelesson'),
     );
   }
 

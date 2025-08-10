@@ -78,6 +78,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // XML modification service
   final MutableXmlService _xmlService = MutableXmlService();
 
+  // Text controllers for expense entry form
+  final TextEditingController _karmaController = TextEditingController();
+  final TextEditingController _nuyenController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _karmaController.dispose();
+    _nuyenController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -3577,11 +3590,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Widget _buildExpenseEntryForm(BuildContext context) {
-    // Controllers for the form fields
-    final karmaController = TextEditingController();
-    final nuyenController = TextEditingController();
-    final reasonController = TextEditingController();
-
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -3614,7 +3622,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   children: [
                     // Karma field
                     TextField(
-                      controller: karmaController,
+                      controller: _karmaController,
                       keyboardType:
                           const TextInputType.numberWithOptions(signed: true),
                       decoration: InputDecoration(
@@ -3630,7 +3638,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
                     // Nuyen field
                     TextField(
-                      controller: nuyenController,
+                      controller: _nuyenController,
                       keyboardType:
                           const TextInputType.numberWithOptions(signed: true),
                       decoration: InputDecoration(
@@ -3646,7 +3654,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
                     // Reason field
                     TextField(
-                      controller: reasonController,
+                      controller: _reasonController,
                       decoration: InputDecoration(
                         labelText: 'Reason',
                         hintText: 'Reason for expense/income',
@@ -3663,7 +3671,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () => _submitExpenseEntry(context,
-                            karmaController, nuyenController, reasonController),
+                            _karmaController, _nuyenController, _reasonController),
                         icon: const Icon(Icons.add),
                         label: const Text('Add Entry'),
                         style: ElevatedButton.styleFrom(
@@ -3681,7 +3689,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     // Karma field
                     Expanded(
                       child: TextField(
-                        controller: karmaController,
+                        controller: _karmaController,
                         keyboardType:
                             const TextInputType.numberWithOptions(signed: true),
                         decoration: InputDecoration(
@@ -3699,7 +3707,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     // Nuyen field
                     Expanded(
                       child: TextField(
-                        controller: nuyenController,
+                        controller: _nuyenController,
                         keyboardType:
                             const TextInputType.numberWithOptions(signed: true),
                         decoration: InputDecoration(
@@ -3718,7 +3726,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     Expanded(
                       flex: 2,
                       child: TextField(
-                        controller: reasonController,
+                        controller: _reasonController,
                         decoration: InputDecoration(
                           labelText: 'Reason',
                           hintText: 'Reason for expense/income',
@@ -3734,7 +3742,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     // Submit button
                     ElevatedButton.icon(
                       onPressed: () => _submitExpenseEntry(context,
-                          karmaController, nuyenController, reasonController),
+                          _karmaController, _nuyenController, _reasonController),
                       icon: const Icon(Icons.add),
                       label: const Text('Add Entry'),
                       style: ElevatedButton.styleFrom(

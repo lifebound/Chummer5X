@@ -21,7 +21,7 @@ class WeaponMountOption {
     required this.includedInParent,
   });
 
-  factory WeaponMountOption.fromXmlElement(XmlElement element) {
+  factory WeaponMountOption.fromXml(XmlElement element) {
     return WeaponMountOption(
       sourceId: element.getElement('sourceid')?.innerText ?? '',
       guid: element.getElement('guid')?.innerText ?? '',

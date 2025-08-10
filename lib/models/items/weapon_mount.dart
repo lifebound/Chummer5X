@@ -1,4 +1,5 @@
 import 'package:chummer5x/models/items/shadowrun_item.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:xml/xml.dart';
 import 'package:chummer5x/models/items/weapon.dart';
 import 'package:chummer5x/models/items/vehicle_mod.dart';
@@ -52,7 +53,7 @@ class WeaponMount extends ShadowrunItem{
     required super.stolen,
   });
 
-  factory WeaponMount.fromXmlElement(XmlElement element) {
+  factory WeaponMount.fromXml(XmlElement element) {
     return WeaponMount(
       sourceId: element.getElement('sourceid')?.innerText ?? '',
       guid: element.getElement('guid')?.innerText ?? '',
@@ -72,8 +73,12 @@ class WeaponMount extends ShadowrunItem{
       weaponMountCategories: element.getElement('weaponmountcategories')?.innerText ?? '',
       weaponCapacity: element.getElement('weaponcapacity')?.innerText ?? '0',
       weapons: element.getElement('weapons')?.findAllElements('weapon').map((e) => Weapon.fromXml(e)).toList() ?? [],
-      weaponMountOptions: element.getElement('weaponmountoptions')?.findAllElements('weaponmountoption').map((e) => WeaponMountOption.fromXmlElement(e)).toList() ?? [],
-      mods: element.getElement('mods')?.findAllElements('mod').map((e) => VehicleMod.fromXmlElement(e)).toList() ?? [],
+      weaponMountOptions: element.getElement('weaponmountoptions')?.findAllElements('weaponmountoption').map((e) => WeaponMountOption.fromXml(e)).toList() ?? [],
+      mods: element.parseList(
+        collectionTagName: 'mods',
+        itemTagName: 'mod',
+        fromXml: (e) => VehicleMod.fromXml(e),
+      ),
       notes: element.getElement('notes')?.innerText,
       notesColor: element.getElement('notesColor')?.innerText,
       discountedCost: element.getElement('discountedcost')?.innerText == 'True',

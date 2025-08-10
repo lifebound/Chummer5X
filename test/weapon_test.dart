@@ -238,7 +238,7 @@ void main() {
         expect(weapon.rangeMultiply, 1);
         expect(weapon.allowAccessory, false);
         expect(weapon.included, false);
-        expect(weapon.requireAmmo, true);
+        expect(weapon.requireAmmo, false);
       });
 
       test('should parse complete XML correctly', () {

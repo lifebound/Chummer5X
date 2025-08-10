@@ -1,6 +1,7 @@
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
 import 'package:chummer5x/utils/availability_parser.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -74,15 +75,20 @@ class Armor extends ShadowrunItem {
 
   factory Armor.fromXml(XmlElement xmlElement) {
     int armorRating = int.tryParse(xmlElement.getElement('armor')?.innerText ?? '0') ?? 0;
-    
-    final nameText = xmlElement.getElement('name')?.innerText;
-    final categoryText = xmlElement.getElement('category')?.innerText;
-    final sourceText = xmlElement.getElement('source')?.innerText;
-    final pageText = xmlElement.getElement('page')?.innerText;
-    
-    final String rawLocationGuid = xmlElement.getElement('location')?.innerText ?? '';
+
+    final nameText = xmlElement.getElementText('name');
+    final categoryText = xmlElement.getElementText('category');
+    final sourceText = xmlElement.getElementText('source');
+    final pageText = xmlElement.getElementText('page');
+
+    final String rawLocationGuid = xmlElement.getElementText('location') ?? '';
     final String locationGuid = rawLocationGuid.isNotEmpty ? rawLocationGuid : defaultArmorLocationGuid;
 
+    final List<ArmorMod> armorMods = xmlElement.parseList<ArmorMod>(
+      collectionTagName: 'armormods',
+       itemTagName: 'armormod',
+        fromXml: (e) => ArmorMod.fromXml(e)
+        );
 
     return Armor(
       sourceId: xmlElement.getElement('sourceid')?.innerText,
@@ -117,7 +123,7 @@ class Armor extends ShadowrunItem {
       ratingLabel: xmlElement.getElement('ratinglabel')?.innerText ?? 'String_Rating',
       stolen: xmlElement.getElement('stolen')?.innerText == 'True',
       encumbrance: xmlElement.getElement('emcumbrance')?.innerText == 'True',
-      armorMods: xmlElement.findElements('armormods').expand((e) => e.findElements('armormod')).map((modXml) => ArmorMod.fromXml(modXml)).toList(),
+      armorMods: armorMods.isNotEmpty ? armorMods : [],
       location: xmlElement.getElement('location')?.innerText,
       notes: xmlElement.getElement('notes')?.innerText,
       notesColor: xmlElement.getElement('notesColor')?.innerText,

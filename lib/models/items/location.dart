@@ -1,5 +1,6 @@
 // File: models/location.dart
 
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 import 'package:xml/xml.dart';
 
 const String defaultGearLocationGuid = '00000000-0000-0000-0000-000000000001';
@@ -73,13 +74,13 @@ class Location {
     required this.sortOrder,
   });
 
-  factory Location.fromXmlElement(XmlElement element) {
+  factory Location.fromXml(XmlElement element) {
     return Location(
-      guid: element.getElement('guid')?.innerText ?? '',
-      name: element.getElement('name')?.innerText ?? '',
-      notes: element.getElement('notes')?.innerText ?? '',
-      notesColor: element.getElement('notesColor')?.innerText ?? '',
-      sortOrder: int.tryParse(element.getElement('sortorder')?.innerText ?? '') ?? 0,
+      guid: element.getElementText('guid') ?? "<unknown>",
+      name: element.getElementText('name') ?? "",
+      notes: element.getElementText('notes') ?? "",
+      notesColor: element.getElementText('notesColor') ?? "",
+      sortOrder: element.getInt('sortorder', defaultValue: 0),
     );
   }
 }
@@ -89,9 +90,9 @@ class GearLocations {
 
   GearLocations({required this.locations});
 
-  factory GearLocations.fromXmlElement(XmlElement element) {
+  factory GearLocations.fromXml(XmlElement element) {
     final List<Location> loadedLocations = element.findAllElements('location')
-        .map((e) => Location.fromXmlElement(e))
+        .map((e) => Location.fromXml(e))
         .toList();
       loadedLocations.add(defaultGearLocation); // Ensure default location is included
     return GearLocations(locations: loadedLocations);
@@ -102,9 +103,9 @@ class ArmorLocations {
 
   ArmorLocations({required this.locations});
 
-  factory ArmorLocations.fromXmlElement(XmlElement element) {
+  factory ArmorLocations.fromXml(XmlElement element) {
     final List<Location> loadedLocations = element.findAllElements('location')
-        .map((e) => Location.fromXmlElement(e))
+        .map((e) => Location.fromXml(e))
         .toList();
     loadedLocations.add(defaultArmorLocation); // Ensure default location is included
     return ArmorLocations(locations: loadedLocations);
@@ -115,9 +116,9 @@ class WeaponLocations {
 
   WeaponLocations({required this.locations});
 
-  factory WeaponLocations.fromXmlElement(XmlElement element) {
+  factory WeaponLocations.fromXml(XmlElement element) {
     final List<Location> loadedLocations = element.findAllElements('location')
-        .map((e) => Location.fromXmlElement(e))
+        .map((e) => Location.fromXml(e))
         .toList();
     loadedLocations.add(defaultWeaponLocation); // Ensure default location is included
     return WeaponLocations(locations: loadedLocations);
@@ -128,9 +129,9 @@ class VehicleLocations {
 
   VehicleLocations({required this.locations});
 
-  factory VehicleLocations.fromXmlElement(XmlElement element) {
+  factory VehicleLocations.fromXml(XmlElement element) {
     final List<Location> loadedLocations = element.findAllElements('location')
-        .map((e) => Location.fromXmlElement(e))
+        .map((e) => Location.fromXml(e))
         .toList();
     loadedLocations.add(defaultVehicleLocation); // Ensure default location is included
     return VehicleLocations(locations: loadedLocations);

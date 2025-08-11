@@ -34,6 +34,9 @@ import 'package:chummer5x/screens/contacts_screen.dart';
 import 'package:chummer5x/models/calendar.dart';
 import '../models/expense_entry.dart';
 import 'package:chummer5x/widgets/shadowrun_item_location_tree_view.dart';
+import 'package:chummer5x/widgets/expense_entry_form.dart';
+import 'package:chummer5x/widgets/ledger_widget.dart';
+import 'package:chummer5x/widgets/expense_chart.dart';
 import 'package:chummer5x/models/items/gear.dart';
 //this package only used during testing, not in production
 //import 'package:chummer5x/widgets/gear_sliver_tree_view.dart';
@@ -1423,6 +1426,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildGearView(BuildContext context) {
     return DefaultTabController(
+      key: const ValueKey('gear_tab_controller'),
       length: 5, // 5 gear categories
       child: Center(
         child: Column(
@@ -1721,6 +1725,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildNotesView(BuildContext context) {
     return DefaultTabController(
+      key: const ValueKey('notes_tab_controller'),
       length: 3,
       child: Column(
         children: [
@@ -3548,21 +3553,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Entry form
-          _buildExpenseEntryForm(context),
+          // Entry form using our new widget
+          ExpenseEntryForm(
+            onSubmit: _handleExpenseEntryCallback,
+          ),
 
           const SizedBox(height: 24),
 
-          // Ledger sections - responsive layout
+          // Unified ledger sections using our new widget
           LayoutBuilder(
             builder: (context, constraints) {
               // Use column layout on narrow screens (< 800px)
               if (constraints.maxWidth < 800) {
                 return Column(
                   children: [
-                    _buildKarmaLedgerSection(context, karmaEntries),
+                    LedgerWidget(
+                      entries: karmaEntries,
+                      config: LedgerConfiguration.karma(),
+                    ),
                     const SizedBox(height: 16),
-                    _buildNuyenLedgerSection(context, nuyenEntries),
+                    LedgerWidget(
+                      entries: nuyenEntries,
+                      config: LedgerConfiguration.nuyen(),
+                    ),
                   ],
                 );
               } else {
@@ -3572,12 +3585,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   children: [
                     // Karma section
                     Expanded(
-                      child: _buildKarmaLedgerSection(context, karmaEntries),
+                      child: LedgerWidget(
+                        entries: karmaEntries,
+                        config: LedgerConfiguration.karma(),
+                      ),
                     ),
                     const SizedBox(width: 16),
                     // Nuyen section
                     Expanded(
-                      child: _buildNuyenLedgerSection(context, nuyenEntries),
+                      child: LedgerWidget(
+                        entries: nuyenEntries,
+                        config: LedgerConfiguration.nuyen(),
+                      ),
                     ),
                   ],
                 );
@@ -3587,6 +3606,42 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ],
       ),
     );
+  }
+
+  /// Callback for ExpenseEntryForm widget
+  void _handleExpenseEntryCallback({num? karma, num? nuyen, required String reason}) async {
+    try {
+      // Add expense entries to the XML service
+      if (karma != null && karma != 0) {
+        _xmlService.addExpenseEntry(
+          type: ExpenseType.karma,
+          amount: karma,
+          reason: reason,
+          date: DateTime.now(),
+        );
+      }
+
+      if (nuyen != null && nuyen != 0) {
+        _xmlService.addExpenseEntry(
+          type: ExpenseType.nuyen,
+          amount: nuyen,
+          reason: reason,
+          date: DateTime.now(),
+        );
+      }
+
+      // Update the current character with new expense entries by re-parsing
+      await _refreshCharacterData();
+    } catch (e) {
+      // Show error message
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding entry: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Widget _buildExpenseEntryForm(BuildContext context) {

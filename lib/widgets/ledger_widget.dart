@@ -14,6 +14,7 @@ class LedgerConfiguration {
   final String Function(num amount) formatAmount;
   final String emptyStateTitle;
   final String emptyStateSubtitle;
+  final LedgerType type;
 
   const LedgerConfiguration({
     required this.title,
@@ -24,6 +25,7 @@ class LedgerConfiguration {
     required this.formatAmount,
     required this.emptyStateTitle,
     required this.emptyStateSubtitle,
+    required this.type,
   });
 
   static LedgerConfiguration karma() {
@@ -44,6 +46,7 @@ class LedgerConfiguration {
       },
       emptyStateTitle: 'No Karma Entries',
       emptyStateSubtitle: 'Add your first karma entry above',
+      type: LedgerType.karma
     );
   }
 
@@ -63,6 +66,7 @@ class LedgerConfiguration {
       },
       emptyStateTitle: 'No Nuyen Entries',
       emptyStateSubtitle: 'Add your first nuyen entry above',
+      type: LedgerType.nuyen,
     );
   }
 }
@@ -351,15 +355,15 @@ class _LedgerWidgetState extends State<LedgerWidget> {
     // Use the appropriate chart configuration based on the widget config
     ExpenseChartConfiguration chartConfig;
     
-    if (widget.config.title == 'Karma Ledger') {
-      chartConfig = ExpenseChartConfiguration.karma(context);
-    } else if (widget.config.title == 'Nuyen Ledger') {
-      chartConfig = ExpenseChartConfiguration.nuyen(context);
-    } else {
-      // Fallback to a generic configuration
-      chartConfig = ExpenseChartConfiguration.karma(context);
+
+    switch (widget.config.type) {
+      case LedgerType.karma:
+        chartConfig = ExpenseChartConfiguration.karma(context);
+        break;
+      case LedgerType.nuyen:
+        chartConfig = ExpenseChartConfiguration.nuyen(context);
+        break;
     }
-    
     return ExpenseChart(
       entries: entries,
       config: chartConfig,

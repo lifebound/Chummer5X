@@ -92,6 +92,10 @@ abstract class ShadowrunItem {
     throw UnimplementedError('fromXml not implemented for ShadowrunItem');
   }
 
+  /// Abstract method for updating XML element with current item state
+  /// Each subclass should implement this to handle their specific XML structure
+  void updateXmlElement(XmlElement xmlElement);
+
   Icon getIcon(Color? color) {
     // Default icon, can be overridden in subclasses
     return const Icon(Icons.inventory_2_outlined);

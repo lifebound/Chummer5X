@@ -287,4 +287,33 @@ class Gear extends ShadowrunItem {
       ],
     );
   }
+
+  @override
+  void updateXmlElement(XmlElement xmlElement) {
+    // Update equipped status
+    final equippedElement = xmlElement.findElements('equipped').firstOrNull;
+    if (equippedElement != null) {
+      equippedElement.innerText = equipped ? 'True' : 'False';
+    } else {
+      xmlElement.children.add(XmlElement(XmlName('equipped'))..innerText = equipped ? 'True' : 'False');
+    }
+
+    // Update wireless status
+    final wirelessElement = xmlElement.findElements('wirelesson').firstOrNull;
+    if (wirelessElement != null) {
+      wirelessElement.innerText = wirelessOn ? 'True' : 'False';
+    } else {
+      xmlElement.children.add(XmlElement(XmlName('wirelesson'))..innerText = wirelessOn ? 'True' : 'False');
+    }
+
+    // Update active status for commlinks
+    if (category.toLowerCase() == 'commlinks') {
+      final activeElement = xmlElement.findElements('active').firstOrNull;
+      if (activeElement != null) {
+        activeElement.innerText = active ? 'True' : 'False';
+      } else {
+        xmlElement.children.add(XmlElement(XmlName('active'))..innerText = active ? 'True' : 'False');
+      }
+    }
+  }
 }

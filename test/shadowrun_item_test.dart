@@ -50,6 +50,11 @@ class TestShadowrunItem extends ShadowrunItem {
       avail: xmlElement.getElement('avail')?.innerText ?? '0',
     );
   }
+
+  @override
+  void updateXmlElement(XmlElement xmlElement) {
+    // Test implementation - just for satisfying the abstract method
+  }
 }
 
 void main() {

@@ -207,4 +207,11 @@ class WeaponMount extends ShadowrunItem{
     
     return null;
   }
+
+  @override
+  void updateXmlElement(XmlElement xmlElement) {
+    // Basic implementation - weapon mounts don't typically have toggleable properties in the UI
+    // This is just to satisfy the abstract method requirement
+    // If weapon mount toggles are needed in the future, implement them here
+  }
 }

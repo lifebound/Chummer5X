@@ -4,6 +4,7 @@ import 'shadowrun_item.dart'; // Import the base class
 import 'location.dart'; // Import for default location GUIDs
 import 'package:chummer5x/models/items/cyberware_grades.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:chummer5x/utils/xml_element_extensions.dart';
 
 
 class Cyberware extends ShadowrunItem {
@@ -121,23 +122,23 @@ class Cyberware extends ShadowrunItem {
   });
 
   factory Cyberware.fromXml(XmlElement xmlElement) {
-    // Helper to safely get string value from an element
-    String? getText(XmlElement element, String tagName) {
-      return element.findElements(tagName).firstOrNull?.innerText;
-    }
+    // // Helper to safely get string value from an element
+    // String? getText(XmlElement element, String tagName) {
+    //   return element.findElements(tagName).firstOrNull?.innerText;
+    // }
 
-    // Helper to safely get boolean value from an element
-    bool getBool(XmlElement element, String tagName) {
-      return getText(element, tagName)?.toLowerCase() == 'true';
-    }
+    // // Helper to safely get boolean value from an element
+    // bool getBool(XmlElement element, String tagName) {
+    //   return getText(element, tagName)?.toLowerCase() == 'true';
+    // }
 
-    // Helper to safely get int value from an element
-    int getInt(XmlElement element, String tagName, {int defaultValue = 0}) {
-      return int.tryParse(getText(element, tagName) ?? '') ?? defaultValue;
-    }
-    double getDouble(XmlElement element, String tagName, {double defaultValue = 0.0}) {
-      return double.tryParse(getText(element, tagName) ?? '') ?? defaultValue;
-    }
+    // // Helper to safely get int value from an element
+    // int getInt(XmlElement element, String tagName, {int defaultValue = 0}) {
+    //   return int.tryParse(getText(element, tagName) ?? '') ?? defaultValue;
+    // }
+    // double getDouble(XmlElement element, String tagName, {double defaultValue = 0.0}) {
+    //   return double.tryParse(getText(element, tagName) ?? '') ?? defaultValue;
+    // }
 
     // Helper to get list of names from a parent element like <pairinclude>
     List<String> getIncludedNames(XmlElement parentElement, String tagName) {
@@ -152,26 +153,26 @@ class Cyberware extends ShadowrunItem {
     }
     try
     {
-      final improvementSource = getText(xmlElement, 'improvementsource') ?? 'Cyberware'; // Default to Cyberware
+      final improvementSource = xmlElement.getElementText('improvementsource') ?? 'Cyberware'; // Default to Cyberware
 
     
     //get the value of improvementSource. if its 'cyberware', set locationGuid to defaultCyberwareLocationGuid. if its 'bioware', set locationGuid to defaultBiowareLocationGuid.
     String locationGuid;
     Grade cyberwareGrade;
-    final name = getText(xmlElement, 'name')!;
+    final name = xmlElement.getElementText('name')!;
     if (improvementSource == 'Cyberware' && name != 'Essence Hole') {
       locationGuid = defaultCyberwareLocationGuid; // Switch to Cyberware location
-      cyberwareGrade = GradeTypeDetails.fromName(getText(xmlElement, 'grade') ?? 'Standard',isCyberware: true).details;
+      cyberwareGrade = GradeTypeDetails.fromName(xmlElement.getElementText('grade') ?? 'Standard',isCyberware: true).details;
     }
     else{
       locationGuid = defaultBiowareLocationGuid; // Switch to Bioware location
-      cyberwareGrade = GradeTypeDetails.fromName(getText(xmlElement, 'grade') ?? 'Standard',isCyberware: false).details;
+      cyberwareGrade = GradeTypeDetails.fromName(xmlElement.getElementText('grade') ?? 'Standard',isCyberware: false).details;
     }
-    
-    int rating = _calculateTrueRating(cyberwareGrade, getInt(xmlElement, 'rating', defaultValue: 1));
-    String availString = getText(xmlElement, 'avail') ?? '0';
-    String essString = getText(xmlElement, 'ess') ?? '0';
-    String costString = getText(xmlElement, 'cost') ?? '0';
+
+    int rating = _calculateTrueRating(cyberwareGrade, xmlElement.getInt('rating', defaultValue: 1));
+    String availString = xmlElement.getElementText('avail') ?? '0';
+    String essString = xmlElement.getElementText('ess') ?? '0';
+    String costString = xmlElement.getElementText('cost') ?? '0';
 
 
     String avail = _calculateAvailability(cyberwareGrade, rating, availString);
@@ -179,82 +180,82 @@ class Cyberware extends ShadowrunItem {
     double costValue = _calculateCost(cyberwareGrade, rating, costString);
 
     return Cyberware(
-      guid: getText(xmlElement, 'guid'),
-      sourceId: getText(xmlElement, 'sourceid'),
+      guid: xmlElement.getElementText('guid'),
+      sourceId: xmlElement.getElementText('sourceid'),
       name: name,
-      category: getText(xmlElement, 'category')!,
-      limbslot: getText(xmlElement, 'limbslot'),
-      limbslotcount: getInt(xmlElement, 'limbslotcount', defaultValue: 1),
-      inheritattributes: getBool(xmlElement, 'inheritattributes'),
+      category: xmlElement.getElementText('category')!,
+      limbslot: xmlElement.getElementText('limbslot'),
+      limbslotcount: xmlElement.getInt('limbslotcount', defaultValue: 1),
+      inheritattributes: xmlElement.getBool('inheritattributes'),
       ess: essenceValue,
-      capacity: getText(xmlElement, 'capacity')!,
+      capacity: xmlElement.getElementText('capacity')!,
       avail: avail,
       cost: costValue,
-      weight: getText(xmlElement, 'weight'),
-      source: getText(xmlElement, 'source')!,
-      page: getText(xmlElement, 'page')!,
-      parentid: getText(xmlElement, 'parentid'),
-      hasmodularmount: getBool(xmlElement, 'hasmodularmount'),
-      plugsintomodularmount: getBool(xmlElement, 'plugsintomodularmount'),
-      blocksmounts: getText(xmlElement, 'blocksmounts'),
-      forced: getBool(xmlElement, 'forced'),
-      rating: getInt(xmlElement, 'rating'),
-      minagility: getInt(xmlElement, 'minagility', defaultValue: 3),
-      minstrength: getInt(xmlElement, 'minstrength', defaultValue: 3),
-      minrating: getText(xmlElement, 'minrating'),
-      maxrating: getText(xmlElement, 'maxrating'),
-      ratinglabel: getText(xmlElement, 'ratinglabel') ?? 'String_Rating',
-      subsystems: getText(xmlElement, 'subsystems'),
-      wirelessOn: getBool(xmlElement, 'wirelesson'),
-      grade: getText(xmlElement, 'grade') ?? 'Standard',
-      location: getText(xmlElement, 'location'),
-      extra: getText(xmlElement, 'extra'),
-      suite: getBool(xmlElement, 'suite'),
-      stolen: getBool(xmlElement, 'stolen'),
-      essdiscount: getText(xmlElement, 'essdiscount') ?? '0',
-      extraessadditivemultiplier: getText(xmlElement, 'extraessadditivemultiplier') ?? '0',
-      extraessmultiplicativemultiplier: getText(xmlElement, 'extraessmultiplicativemultiplier') ?? '1',
-      forcegrade: getText(xmlElement, 'forcegrade'),
-      matrixCmFilled: getInt(xmlElement, 'matrixcmfilled'),
-      matrixCmBonus: getInt(xmlElement, 'matrixcmbonus'),
-      prototypetranshuman: getBool(xmlElement, 'prototypetranshuman'),
+      weight: xmlElement.getElementText('weight'),
+      source: xmlElement.getElementText('source')!,
+      page: xmlElement.getElementText('page')!,
+      parentid: xmlElement.getElementText('parentid'),
+      hasmodularmount: xmlElement.getBool('hasmodularmount'),
+      plugsintomodularmount: xmlElement.getBool('plugsintomodularmount'),
+      blocksmounts: xmlElement.getElementText('blocksmounts'),
+      forced: xmlElement.getBool('forced'),
+      rating: xmlElement.getInt('rating'),
+      minagility: xmlElement.getInt('minagility', defaultValue: 3),
+      minstrength: xmlElement.getInt('minstrength', defaultValue: 3),
+      minrating: xmlElement.getElementText('minrating'),
+      maxrating: xmlElement.getElementText('maxrating'),
+      ratinglabel: xmlElement.getElementText('ratinglabel') ?? 'String_Rating',
+      subsystems: xmlElement.getElementText('subsystems'),
+      wirelessOn: xmlElement.getBool('wirelesson'),
+      grade: xmlElement.getElementText('grade') ?? 'Standard',
+      location: xmlElement.getElementText('location'),
+      extra: xmlElement.getElementText('extra'),
+      suite: xmlElement.getBool('suite'),
+      stolen: xmlElement.getBool('stolen'),
+      essdiscount: xmlElement.getElementText('essdiscount') ?? '0',
+      extraessadditivemultiplier: xmlElement.getElementText('extraessadditivemultiplier') ?? '0',
+      extraessmultiplicativemultiplier: xmlElement.getElementText('extraessmultiplicativemultiplier') ?? '1',
+      forcegrade: xmlElement.getElementText('forcegrade'),
+      matrixCmFilled: xmlElement.getInt('matrixcmfilled'),
+      matrixCmBonus: xmlElement.getInt('matrixcmbonus'),
+      prototypetranshuman: xmlElement.getBool('prototypetranshuman'),
       bonus: xmlElement.findElements('bonus').firstOrNull,
       pairbonus: xmlElement.findElements('pairbonus').firstOrNull,
       wirelessbonus: xmlElement.findElements('wirelessbonus').firstOrNull,
       wirelesspairbonus: xmlElement.findElements('wirelesspairbonus').firstOrNull,
-      improvementSource: getText(xmlElement, 'improvementsource') ?? 'Cyberware', // Default to Cyberware
+      improvementSource: xmlElement.getElementText('improvementsource') ?? 'Cyberware', // Default to Cyberware
       pairinclude: getIncludedNames(xmlElement, 'pairinclude'),
       wirelesspairinclude: getIncludedNames(xmlElement, 'wirelesspairinclude'),
-      notes: getText(xmlElement, 'notes'),
-      notesColor: getText(xmlElement, 'notesColor'),
-      discountedCost: getBool(xmlElement, 'discountedcost'),
-      addtoparentess: getBool(xmlElement, 'addtoparentess'),
-      addtoparentcapacity: getBool(xmlElement, 'addtoparentcapacity'),
-      isgeneware: getBool(xmlElement, 'isgeneware'),
-      active: getBool(xmlElement, 'active'),
-      homeNode: getBool(xmlElement, 'homenode'),
+      notes: xmlElement.getElementText('notes'),
+      notesColor: xmlElement.getElementText('notesColor'),
+      discountedCost: xmlElement.getBool('discountedcost'),
+      addtoparentess: xmlElement.getBool('addtoparentess'),
+      addtoparentcapacity: xmlElement.getBool('addtoparentcapacity'),
+      isgeneware: xmlElement.getBool('isgeneware'),
+      active: xmlElement.getBool('active'),
+      homeNode: xmlElement.getBool('homenode'),
       deviceRating: cyberwareGrade.deviceRating.toString(),
-      programLimit: getText(xmlElement, 'programlimit'),
-      overclocked: getText(xmlElement, 'overclocked'),
-      canFormPersona: getText(xmlElement, 'canformpersona')?.toLowerCase() == 'true' ? true : (getText(xmlElement, 'canformpersona')?.toLowerCase() == 'false' ? false : null),
-      attack: getText(xmlElement, 'attack'),
-      sleaze: getText(xmlElement, 'sleaze'),
-      dataProcessing: getText(xmlElement, 'dataprocessing'),
-      firewall: getText(xmlElement, 'firewall'),
-      attributeArray: getText(xmlElement, 'attributearray')?.split(','), // Assuming comma separated
-      modAttack: getText(xmlElement, 'modattack'),
-      modSleaze: getText(xmlElement, 'modsleaze'),
-      modDataProcessing: getText(xmlElement, 'moddataprocessing'),
-      modFirewall: getText(xmlElement, 'modfirewall'),
-      modAttributeArray: getText(xmlElement, 'modattributearray')?.split(','), // Assuming comma separated
-      canSwapAttributes: getBool(xmlElement, 'canswapattributes'),
-      sortOrder: getInt(xmlElement, 'sortorder'),
+      programLimit: xmlElement.getElementText('programlimit'),
+      overclocked: xmlElement.getElementText('overclocked'),
+      canFormPersona: xmlElement.getBool('canformpersona'),
+      attack: xmlElement.getElementText('attack'),
+      sleaze: xmlElement.getElementText('sleaze'),
+      dataProcessing: xmlElement.getElementText('dataprocessing'),
+      firewall: xmlElement.getElementText('firewall'),
+      attributeArray: xmlElement.getElementText('attributearray')?.split(','), // Assuming comma separated
+      modAttack: xmlElement.getElementText('modattack'),
+      modSleaze: xmlElement.getElementText('modsleaze'),
+      modDataProcessing: xmlElement.getElementText('moddataprocessing'),
+      modFirewall: xmlElement.getElementText('modfirewall'),
+      modAttributeArray: xmlElement.getElementText('modattributearray')?.split(','), // Assuming comma separated
+      canSwapAttributes: xmlElement.getBool('canswapattributes'),
+      sortOrder: xmlElement.getInt('sortorder'),
       locationGuid: locationGuid,
     );
     }
     catch (e)
     {
-      debugPrint('Error occurred while parsing: ${getText(xmlElement, 'name')}');
+      debugPrint('Error occurred while parsing: ${xmlElement.getElementText('name')}');
       rethrow;
     }
     
@@ -458,5 +459,12 @@ class Cyberware extends ShadowrunItem {
      }
    }
    return 0;
+  }
+
+  @override
+  void updateXmlElement(XmlElement xmlElement) {
+    // Basic implementation - cyberware doesn't typically have toggleable properties in the UI
+    // This is just to satisfy the abstract method requirement
+    // If cyberware toggles are needed in the future, implement them here
   }
 }

@@ -206,4 +206,11 @@ class VehicleMod extends ShadowrunItem{
     
     return null;
   }
+
+  @override
+  void updateXmlElement(XmlElement xmlElement) {
+    // Basic implementation - vehicle mods don't typically have toggleable properties in the UI
+    // This is just to satisfy the abstract method requirement
+    // If vehicle mod toggles are needed in the future, implement them here
+  }
 }

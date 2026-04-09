@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart';
 import '../models/shadowrun_character.dart';
+import '../models/items/shadowrun_item.dart';
+import '../models/items/gear.dart';
+import '../models/items/armor.dart';
+import '../models/items/weapon.dart';
 import 'enhanced_chumer_xml_service.dart';
 import '../utils/platform_file_handler.dart';
 import 'package:chummer5x/models/expense_entry.dart';
@@ -63,6 +67,61 @@ class MutableXmlService extends EnhancedChummerXmlService {
       debugPrint('Error parsing and caching XML content: $e');
       _cachedDocument = null;
       return null;
+    }
+  }
+
+  /// Update any ShadowrunItem in the cached XML document
+  void updateItem(ShadowrunItem item) {
+    if (_cachedDocument == null) {
+      throw StateError('No XML document loaded. Call parseAndCacheCharacterFile first.');
+    }
+
+    try {
+      // Find the character element
+      final characterElement = _cachedDocument!.findElements('character').first;
+      
+      // Determine the item type and find the appropriate collection
+      XmlElement? itemsElement;
+      String itemTagName;
+      String collectionTagName;
+      
+      if (item is Gear) {
+        itemsElement = characterElement.findElements('gears').firstOrNull;
+        itemTagName = 'gear';
+        collectionTagName = 'gears';
+      } else if (item is Armor) {
+        itemsElement = characterElement.findElements('armors').firstOrNull;
+        itemTagName = 'armor';
+        collectionTagName = 'armors';
+      } else if (item is Weapon) {
+        itemsElement = characterElement.findElements('weapons').firstOrNull;
+        itemTagName = 'weapon';
+        collectionTagName = 'weapons';
+      } else {
+        debugPrint('Unknown item type: ${item.runtimeType}');
+        return;
+      }
+
+      if (itemsElement != null) {
+        // Find the specific item by sourceId or guid
+        final itemElement = itemsElement.findElements(itemTagName)
+            .where((element) => 
+                element.getElement('guid')?.innerText == item.sourceId)
+            .firstOrNull;
+
+        if (itemElement != null) {
+          // Use the item's own updateXmlElement method
+          item.updateXmlElement(itemElement);
+          debugPrint('Updated ${item.runtimeType} item: ${item.name}');
+        } else {
+          debugPrint('Could not find ${item.runtimeType} item with sourceId: ${item.sourceId}');
+        }
+      } else {
+        debugPrint('Could not find $collectionTagName element in character XML');
+      }
+    } catch (e) {
+      debugPrint('Error updating ${item.runtimeType} item: $e');
+      rethrow;
     }
   }
 

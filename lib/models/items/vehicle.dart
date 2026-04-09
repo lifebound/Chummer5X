@@ -400,4 +400,11 @@ class Vehicle extends ShadowrunItem {
         return Icon(Icons.directions, color: color);
     }
   }
+
+  @override
+  void updateXmlElement(XmlElement xmlElement) {
+    // Basic implementation - vehicles don't typically have toggleable properties in the UI
+    // This is just to satisfy the abstract method requirement
+    // If vehicle toggles are needed in the future, implement them here
+  }
 }

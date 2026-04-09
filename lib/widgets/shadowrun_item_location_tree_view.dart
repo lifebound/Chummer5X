@@ -2,6 +2,7 @@
 import 'package:chummer5x/models/items/vehicle_mod.dart';
 import 'package:chummer5x/models/items/weapon_accessory.dart';
 import 'package:chummer5x/models/items/weapon_mount.dart';
+import 'package:chummer5x/models/items/armor_mod.dart';
 import 'package:flutter/material.dart';
 import 'package:chummer5x/models/items/location.dart';
 import 'package:chummer5x/models/items/shadowrun_item.dart';
@@ -16,12 +17,14 @@ class ShadowrunItemLocationTreeView<T extends ShadowrunItem>
   final Map<String, Location> allLocations;
   final List<T> allItems; // Generic list of ShadowrunItem
   final ShadowrunCharacter? character; // Add character for attribute access
+  final Function(T updatedItem)? onUpdateItem; // Add callback for item updates
 
   const ShadowrunItemLocationTreeView({
     super.key,
     required this.allLocations,
     required this.allItems,
     this.character, // Optional character parameter
+    this.onUpdateItem, // Optional callback parameter
   });
 
   @override
@@ -367,7 +370,7 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
                 ? const Center(child: Text('Select an item for details'))
                 : ItemDetailsPanel(
                     item: _selectedItemForDetails!,
-                    onUpdateGear: _updateGearState,
+                    onUpdateItem: _updateItemState,
                     character: widget.character),
           ),
         ],
@@ -385,24 +388,240 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
     }
   }
 
-  void _updateGearState(Gear gear,
+  void _updateItemState(ShadowrunItem item,
       {bool? equipped, bool? wireless, bool? active}) {
     setState(() {
-      final index = _items.indexWhere((item) => item.sourceId == gear.sourceId);
-      if (index != -1) {
-        final oldGear = _items[index] as Gear;
-        _items[index] = oldGear.copyWith(
-          equipped: equipped ?? oldGear.equipped,
-          wirelessOn: wireless ?? oldGear.wirelessOn,
-          active: active ?? oldGear.active,
-        ) as T;
+      // First try to find and update the item in the top-level list
+      final topLevelIndex = _items.indexWhere((currentItem) => currentItem.sourceId == item.sourceId);
+      if (topLevelIndex != -1) {
+        _updateItemAtIndex(topLevelIndex, item, equipped: equipped, wireless: wireless, active: active);
+        return;
+      }
 
-        // Also update the selected item if it's the one being changed
-        if (_selectedItemForDetails?.sourceId == gear.sourceId) {
-          _selectedItemForDetails = _items[index];
+      // If not found at top level, search recursively through child items
+      for (int i = 0; i < _items.length; i++) {
+        final updatedItem = _updateItemRecursively(_items[i], item, equipped: equipped, wireless: wireless, active: active);
+        if (updatedItem != null) {
+          _items[i] = updatedItem;
+          // Also update the selected item if it's the one being changed
+          if (_selectedItemForDetails?.sourceId == item.sourceId) {
+            _selectedItemForDetails = _findItemRecursively(_items[i], item.sourceId!);
+          }
+          // Call the parent callback to persist the change to the root item
+          if (widget.onUpdateItem != null) {
+            widget.onUpdateItem!(_items[i]);
+          }
+          return;
         }
       }
     });
+  }
+
+  /// Update an item at a specific top-level index
+  void _updateItemAtIndex(int index, ShadowrunItem item, {bool? equipped, bool? wireless, bool? active}) {
+    final oldItem = _items[index];
+    T updatedItem = _createUpdatedItem(oldItem, equipped: equipped, wireless: wireless, active: active) as T;
+    
+    _items[index] = updatedItem;
+
+    // Also update the selected item if it's the one being changed
+    if (_selectedItemForDetails?.sourceId == item.sourceId) {
+      _selectedItemForDetails = _items[index];
+    }
+
+    // Call the parent callback to persist the change
+    if (widget.onUpdateItem != null) {
+      widget.onUpdateItem!(updatedItem);
+    }
+  }
+
+  /// Recursively search and update nested items
+  T? _updateItemRecursively(T parentItem, ShadowrunItem targetItem, {bool? equipped, bool? wireless, bool? active}) {
+    // Check if any child items need updating
+    if (parentItem is Gear && parentItem.children != null) {
+      // Check if the target is one of the children
+      final childIndex = parentItem.children!.indexWhere((child) => child.sourceId == targetItem.sourceId);
+      if (childIndex != -1) {
+        final updatedChild = _createUpdatedItem(parentItem.children![childIndex], equipped: equipped, wireless: wireless, active: active) as Gear;
+        final updatedChildren = List<Gear>.from(parentItem.children!);
+        updatedChildren[childIndex] = updatedChild;
+        return parentItem.copyWith(children: updatedChildren) as T;
+      }
+      
+      // Recursively check nested children
+      for (int i = 0; i < parentItem.children!.length; i++) {
+        final updatedChild = _updateItemRecursively(parentItem.children![i] as T, targetItem, equipped: equipped, wireless: wireless, active: active);
+        if (updatedChild != null) {
+          final updatedChildren = List<Gear>.from(parentItem.children!);
+          updatedChildren[i] = updatedChild as Gear;
+          return parentItem.copyWith(children: updatedChildren) as T;
+        }
+      }
+    }
+    
+    if (parentItem is Weapon && parentItem.accessories != null) {
+      // Check weapon accessories
+      final accessoryIndex = parentItem.accessories!.indexWhere((accessory) => accessory.sourceId == targetItem.sourceId);
+      if (accessoryIndex != -1) {
+        final updatedAccessory = _createUpdatedItem(parentItem.accessories![accessoryIndex], equipped: equipped, wireless: wireless, active: active) as WeaponAccessory;
+        final updatedAccessories = List<WeaponAccessory>.from(parentItem.accessories!);
+        updatedAccessories[accessoryIndex] = updatedAccessory;
+        return parentItem.copyWith(accessories: updatedAccessories) as T;
+      }
+    }
+    
+    if (parentItem is Armor && parentItem.armorMods != null) {
+      // Check armor mods
+      final modIndex = parentItem.armorMods!.indexWhere((mod) => mod.sourceId == targetItem.sourceId);
+      if (modIndex != -1) {
+        final updatedMod = _createUpdatedItem(parentItem.armorMods![modIndex], equipped: equipped, wireless: wireless, active: active) as ArmorMod;
+        final updatedMods = List<ArmorMod>.from(parentItem.armorMods!);
+        updatedMods[modIndex] = updatedMod;
+        return parentItem.copyWith(armorMods: updatedMods) as T;
+      }
+    }
+    
+    if (parentItem is Vehicle) {
+      // Check vehicle mods
+      if (parentItem.mods.isNotEmpty) {
+        final modIndex = parentItem.mods.indexWhere((mod) => mod.sourceId == targetItem.sourceId);
+        if (modIndex != -1) {
+          final updatedMod = _createUpdatedItem(parentItem.mods[modIndex], equipped: equipped, wireless: wireless, active: active) as VehicleMod;
+          final updatedMods = List<VehicleMod>.from(parentItem.mods);
+          updatedMods[modIndex] = updatedMod;
+          return parentItem.copyWith(mods: updatedMods) as T;
+        }
+      }
+      
+      // Check weapon mounts and their contents
+      if (parentItem.weaponMounts.isNotEmpty) {
+        for (int i = 0; i < parentItem.weaponMounts.length; i++) {
+          final mount = parentItem.weaponMounts[i];
+          
+          // Check if target is the mount itself
+          if (mount.sourceId == targetItem.sourceId) {
+            final updatedMount = _createUpdatedItem(mount, equipped: equipped, wireless: wireless, active: active) as WeaponMount;
+            final updatedMounts = List<WeaponMount>.from(parentItem.weaponMounts);
+            updatedMounts[i] = updatedMount;
+            return parentItem.copyWith(weaponMounts: updatedMounts) as T;
+          }
+          
+          // Check weapons in the mount
+          if (mount.weapons != null) {
+            final weaponIndex = mount.weapons!.indexWhere((weapon) => weapon.sourceId == targetItem.sourceId);
+            if (weaponIndex != -1) {
+              final updatedWeapon = _createUpdatedItem(mount.weapons![weaponIndex], equipped: equipped, wireless: wireless, active: active) as Weapon;
+              final updatedWeapons = List<Weapon>.from(mount.weapons!);
+              updatedWeapons[weaponIndex] = updatedWeapon;
+              final updatedMount = mount.copyWith(weapons: updatedWeapons);
+              final updatedMounts = List<WeaponMount>.from(parentItem.weaponMounts);
+              updatedMounts[i] = updatedMount;
+              return parentItem.copyWith(weaponMounts: updatedMounts) as T;
+            }
+          }
+        }
+      }
+    }
+
+    return null; // Item not found in this branch
+  }
+
+  /// Create an updated item with the specified changes
+  ShadowrunItem _createUpdatedItem(ShadowrunItem oldItem, {bool? equipped, bool? wireless, bool? active}) {
+    // Handle different item types with their specific copyWith methods
+    if (oldItem is Gear) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+        wirelessOn: wireless ?? oldItem.wirelessOn,
+        active: active ?? oldItem.active,
+      );
+    } else if (oldItem is Armor) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+        wirelessOn: wireless ?? oldItem.wirelessOn,
+      );
+    } else if (oldItem is Weapon) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+        wirelessOn: wireless ?? oldItem.wirelessOn,
+      );
+    } else if (oldItem is WeaponAccessory) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+        wirelessOn: wireless ?? oldItem.wirelessOn,
+      );
+    } else if (oldItem is ArmorMod) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+        wirelessOn: wireless ?? oldItem.wirelessOn,
+      );
+    } else if (oldItem is Vehicle) {
+      return oldItem.copyWith(
+        active: active ?? oldItem.active,
+      );
+    } else if (oldItem is VehicleMod) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+        wirelessOn: wireless ?? oldItem.wirelessOn,
+      );
+    } else if (oldItem is WeaponMount) {
+      return oldItem.copyWith(
+        equipped: equipped ?? oldItem.equipped,
+      );
+    } else {
+      // For other item types that don't have copyWith methods yet,
+      // we'll just return the original item unchanged
+      return oldItem;
+    }
+  }
+
+  /// Recursively find an item by sourceId
+  ShadowrunItem? _findItemRecursively(ShadowrunItem parentItem, String targetSourceId) {
+    if (parentItem.sourceId == targetSourceId) {
+      return parentItem;
+    }
+    
+    if (parentItem is Gear && parentItem.children != null) {
+      for (final child in parentItem.children!) {
+        final found = _findItemRecursively(child, targetSourceId);
+        if (found != null) return found;
+      }
+    }
+    
+    if (parentItem is Weapon && parentItem.accessories != null) {
+      for (final accessory in parentItem.accessories!) {
+        final found = _findItemRecursively(accessory, targetSourceId);
+        if (found != null) return found;
+      }
+    }
+    
+    if (parentItem is Armor && parentItem.armorMods != null) {
+      for (final mod in parentItem.armorMods!) {
+        final found = _findItemRecursively(mod, targetSourceId);
+        if (found != null) return found;
+      }
+    }
+    
+    if (parentItem is Vehicle) {
+      for (final mod in parentItem.mods) {
+        final found = _findItemRecursively(mod, targetSourceId);
+        if (found != null) return found;
+      }
+      
+      for (final mount in parentItem.weaponMounts) {
+        final found = _findItemRecursively(mount, targetSourceId);
+        if (found != null) return found;
+        
+        if (mount.weapons != null) {
+          for (final weapon in mount.weapons!) {
+            final found = _findItemRecursively(weapon, targetSourceId);
+            if (found != null) return found;
+          }
+        }
+      }
+    }
+    
+    return null;
   }
 
   // Helper methods for your slivers (extract them from the original build method)
@@ -520,7 +739,7 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
         builder: (context) {
           return ItemDetailsModal(
             item: item,
-            onUpdateGear: _updateGearState,
+            onUpdateItem: _updateItemState,
             character: widget.character,
           );
         },
@@ -542,14 +761,14 @@ class _ShadowrunItemLocationTreeViewState<T extends ShadowrunItem>
 
 class ItemDetailsPanel extends StatelessWidget {
   final ShadowrunItem item;
-  final Function(Gear, {bool? equipped, bool? wireless, bool? active})
-      onUpdateGear;
+  final Function(ShadowrunItem, {bool? equipped, bool? wireless, bool? active})
+      onUpdateItem;
   final ShadowrunCharacter? character; // Add character parameter
 
   const ItemDetailsPanel({
     super.key, 
     required this.item, 
-    required this.onUpdateGear,
+    required this.onUpdateItem,
     this.character, // Optional character parameter
   });
 
@@ -577,9 +796,7 @@ class ItemDetailsPanel extends StatelessWidget {
             ),
             const Divider(),
             item.getDetailsContent(context, onUpdate: (ShadowrunItem updatedItem, {bool? equipped, bool? wireless, bool? active}) {
-              if (updatedItem is Gear) {
-                onUpdateGear(updatedItem, equipped: equipped, wireless: wireless, active: active);
-              }
+              onUpdateItem(updatedItem, equipped: equipped, wireless: wireless, active: active);
             }, characterAttributes: _getCharacterAttributes()),
             // You can add more complex widgets here to display nested lists (mods, children, etc.)
             // For example, if item is a Vehicle, display its mods and mounts in sub-sections.
@@ -611,14 +828,14 @@ class ItemDetailsPanel extends StatelessWidget {
 
 class ItemDetailsModal extends StatelessWidget {
   final ShadowrunItem item;
-  final Function(Gear, {bool? equipped, bool? wireless, bool? active})
-      onUpdateGear;
+  final Function(ShadowrunItem, {bool? equipped, bool? wireless, bool? active})
+      onUpdateItem;
   final ShadowrunCharacter? character; // Add character parameter
 
   const ItemDetailsModal({
     super.key, 
     required this.item, 
-    required this.onUpdateGear,
+    required this.onUpdateItem,
     this.character, // Optional character parameter
   });
 
@@ -655,9 +872,7 @@ class ItemDetailsModal extends StatelessWidget {
           const Divider(),
           // Display details here, using the new ShadowrunItem methods
           item.getDetailsContent(context, onUpdate: (ShadowrunItem updatedItem, {bool? equipped, bool? wireless, bool? active}) {
-            if (updatedItem is Gear) {
-              onUpdateGear(updatedItem, equipped: equipped, wireless: wireless, active: active);
-            }
+            onUpdateItem(updatedItem, equipped: equipped, wireless: wireless, active: active);
           }, characterAttributes: _getCharacterAttributes()),
           const SizedBox(height: 20), // Padding at the bottom for modal
         ],
